@@ -1,0 +1,55 @@
+
+\begin{algorithm2e}[t]
+  MCTS$($node $p$, cumulative path length $l)$:\;
+  \pushline
+    \If{$l > T_{path}$}{{\bf return} Play-out$(p)$}           \label{alg:checkdepth}
+    \ElseIf{ExpandableNode$(p,l)$}{                           \label{alg:expandstart}
+      %\lIf{$l > T_{path}$}{{\bf return} \mbox{Playout}$(s)$\;}
+      \For{$c \in C(p)$}{                                       \label{alg:oldnewstart}
+        $c \gets $NewLeafNode() \;                              
+        Add new leaf $c$ to the tree\;                          \label{alg:oldnewend}
+        %\For{$d \in \{ old, new \}$}{                                     
+          %$c.n_t \gets 0$; $c.S_{survival,d} \gets 0$ \;
+          %$c.S_{pill,d} \gets 0$; $c.S_{ghost,d} \gets 0$ \;   
+          %$c.M_{survival} \gets 0$ \;
+          %$c.M_{pill} \gets 0$; $c.M_{ghost} \gets 0$ \;    
+      }
+      $(R,c') \gets \mbox{Play-out}(p)$\;
+      Update$(c,R)$; Update$(p,R)$ \;
+      {\bf return} $(p,R)$                            \label{alg:expandend}
+    }
+    \Else{  
+      Let $t$ be the tactic set at the root \;                          \label{alg:internalstart}
+      $n_p \gets p.n_{old} + p.n_{new}$\;
+      \For{$c \in C(p)$}{
+        Let $i$ be the action associated with child $c$ \;
+        $n_i \gets c.n_{old} + c.n_{new}$ \;
+        $v_i \gets M^i_t$ as defined in Eq.~\ref{eq:vi}\;
+      }
+      %\For{$i \in s.\mbox{actions()}$}{
+      %\For{$i \in s.\mbox{actions()}$}{
+      %  $c \gets s.\mbox{GetChild}(i)$\;
+      %  $n_i \gets c.n_{old} + c.n_{new}$\;
+        %\If{$t = pill$ {\bf or} $t = ghost$}{
+        %  $\bar{S}_s \gets (c.S_{survival,old} + c.S_{survival,new}) / n_i$\;
+        %  $v_i \gets (c.S_{t,old} + c.S_{t,new}) \cdot \bar{S}_s $\;
+        %}
+      %  \lElse{ $v_i \gets c.S_{survival,old} + c.S_{survival,new}$ }  \label{alg:internalend}
+      %}
+      Select a move $i$ that maximizes $X_i$ from Eq.~\ref{eq:uct} \;
+      $(c, R', \Delta l) \gets p.\mbox{ApplyMove}(i)$\;                  \label{alg:transition}
+      \If{$R'_{survival} = 0$}{                                            \label{alg:deathstart}
+        $(R,c) \gets \mbox{Play-out}(p)$\;
+        %\lIf{$result = death$}{$p.n_{new} \gets p.n_{new} + 1$}
+        Update$(p,R)$\;
+        {\bf return} $(p,R)$\;                                  \label{alg:deathend}
+      }
+      $R \gets \mbox{MCTS}(c, l + \Delta l)$\;                               \label{alg:reccall}
+      Update$(p,R)$\;
+      {\bf return} $(p,R)$\;
+    }
+  \popline
+  \vspace{0.3cm}
+  \caption{\hl{Pseudo-code of MCTS for Ms Pac-Man.} \label{alg}}
+\end{algorithm2e}
+

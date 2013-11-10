@@ -1,0 +1,78 @@
+
+\documentclass{article}
+
+\setlength{\topmargin}{-0.75in}
+\setlength{\oddsidemargin}{-0.25in}
+\setlength{\evensidemargin}{0in}
+\setlength{\textwidth}{7in}
+\setlength{\textheight}{9.5in}
+\setlength{\parindent}{0.0in}
+
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{color}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{comment}
+\usepackage{booktabs}
+\usepackage{nopageno}
+\usepackage{url}
+
+\usepackage[algo2e, noend, noline, linesnumbered]{algorithm2e}
+\DontPrintSemicolon
+
+\makeatletter
+\newcommand{\pushline}{\Indp}% Indent
+\newcommand{\popline}{\Indm}
+\makeatother
+\newcommand{\argmax}{\operatornamewithlimits{argmax}}
+
+\captionsetup{compatibility=false}
+
+
+
+%\pgfplotsset{compat=newest}
+\usetikzlibrary{arrows,shapes,petri}
+
+\newcommand{\bE}{\mathbb{E}}
+\newcommand{\cA}{\mathcal{A}}
+\newcommand{\cC}{\mathcal{C}}
+\newcommand{\cD}{\mathcal{D}}
+\newcommand{\cI}{\mathcal{I}}
+\newcommand{\cN}{\mathcal{N}}
+\newcommand{\cO}{\mathcal{O}}
+\newcommand{\cS}{\mathcal{S}}
+\newcommand{\cT}{\mathcal{T}}
+\newcommand{\cZ}{\mathcal{Z}}
+\newcommand{\eg}{{\it e.g.,}~}
+\newcommand{\ie}{{\it i.e.,}~}
+
+\newcommand{\redbold}[1]{\textbf{\color{red}#1}} 
+\newcommand{\markw}[1]{\textbf{\color{red} /* #1 (markw) */}} 
+\newcommand{\marcl}[1]{\textbf{\color{red} /* #1 (marcl) */}} 
+
+\begin{document}
+
+\title{Improving Monte Carlo Tree Search with Heuristic Evaluations using Implicit Minimax Backups}
+
+\author{Authors}
+
+\maketitle
+
+\begin{abstract}
+In this document we describe implicit minimax backups. 
+\end{abstract}
+
+\section{Introduction}
+
+Monte Carlo Tree Search (MCTS)~\cite{Coulom06Efficient,Kocsis06Bandit}
+
+
+\bibliographystyle{unsrt}
+\bibliography{im-mcts}
+
+\end{document}
