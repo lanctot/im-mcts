@@ -1,12 +1,11 @@
 
 \documentclass{article}
 
-\setlength{\topmargin}{-0.75in}
-\setlength{\oddsidemargin}{-0.25in}
-\setlength{\evensidemargin}{0in}
-\setlength{\textwidth}{7in}
-\setlength{\textheight}{9.5in}
-\setlength{\parindent}{0.0in}
+%\setlength{\topmargin}{-0.75in}
+\setlength{\oddsidemargin}{0.3in}
+\setlength{\evensidemargin}{0.3in}
+\setlength{\textwidth}{6in}
+%\setlength{\textheight}{9.5in}
 
 \usepackage{graphicx}
 \usepackage{amssymb}
@@ -64,13 +63,47 @@
 \maketitle
 
 \begin{abstract}
-In this document we describe implicit minimax backups. 
+In this document we describe how minimax backups from evaluations functions can be combined implicitly 
+with MCTS. 
 \end{abstract}
 
 \section{Introduction}
 
-Monte Carlo Tree Search (MCTS)~\cite{Coulom06Efficient,Kocsis06Bandit}
+Monte Carlo Tree Search (MCTS)~\cite{Coulom06Efficient,Kocsis06Bandit} 
 
+\section{Background and Related Work} 
+
+Several techniques for minimax-style backup rules in the simulation-based MCTS framework have already been proposed. 
+The first was Coulom's original {\it maximum backpropagation}~\cite{Coulom06Efficient}. This method of backpropagation
+suggests, after a number of simulations to a node has been reached, to switch to propagating the maximum value instead 
+of the simulated (``average'') value. 
+The rationale behind this choice is that after a certain point, the search algorithm should consider the node
+{\it converged} and return an estimate of the best value. 
+Maximum backpropagation focuses on estimating the value of the optimal action required for the parent nodes, which is a
+``separate exploratory concern'' than simply identifying the best action at that node~\cite{Feldman13Theoretically}.
+In games where minimax search works well, such as Mancala, modifying MCTS to 
+use minimax-style backups and heuristic values instead of playouts was shown to be as powerful as a strong 
+depth-first minimax search~\cite{Ramanujan11Tradeoffs}.
+Similarly, there is further evidence suggesting not replacing the playout entirely, but terminating them early 
+using heuristic evaluations, has increased the performance in Lines of Action~\cite{bla}, Amazons~\cite{bla}, and 
+Breakthrough~\cite{bla}. 
+
+% mention score-bounded mcts
+% mention hendrik's minimax methods
+% use mcts-solver to motivate implicit minimax
+
+One way to combine minimax backups implictly is to use MCTS-Solver~\cite{Winands08Solver}. When using 
+MCTS-Solver, proven wins and losses are backpropagated as extra information in MCTS. When a node is proven to be a 
+win or a loss, it no longer needs to be searched. This simple, domain-independent modification greatly enhances 
+MCTS in many games (some examples). 
+\marcl{Also mention MCTS + minimax hybrids (Baier \& Winands) and Score-bounded MCTS (...))}
+
+In this work, we propose to augment MCTS with the help of an implictly-computed minimax search which uses
+heuristic evaluations. In our case, these heurstic evaluations are not used to replace or terminate playouts, but 
+rather as a {\it separate source of information} to guide the tree search during the selection phase. Like MCTS-Solver, 
+the backpropagation of these values is treated differently and affect node selection. However, unlike MCTS-Solver and 
+minimax hybrids, these modifications are based on heuristic evaluations rather than proven wins and losses. 
+We show that (something good and insightful). 
 
 \bibliographystyle{unsrt}
 \bibliography{im-mcts}
