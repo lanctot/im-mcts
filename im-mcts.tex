@@ -23,7 +23,6 @@
 
 \usepackage[algo2e, noend, noline, linesnumbered]{algorithm2e}
 \DontPrintSemicolon
-
 \makeatletter
 \newcommand{\pushline}{\Indp}% Indent
 \newcommand{\popline}{\Indm}
@@ -41,9 +40,11 @@
 \newcommand{\cA}{\mathcal{A}}
 \newcommand{\cC}{\mathcal{C}}
 \newcommand{\cD}{\mathcal{D}}
+\newcommand{\cG}{\mathcal{G}}
 \newcommand{\cI}{\mathcal{I}}
 \newcommand{\cN}{\mathcal{N}}
 \newcommand{\cO}{\mathcal{O}}
+\newcommand{\cR}{\mathcal{R}}
 \newcommand{\cS}{\mathcal{S}}
 \newcommand{\cT}{\mathcal{T}}
 \newcommand{\cZ}{\mathcal{Z}}
@@ -69,9 +70,9 @@ with MCTS.
 
 \section{Introduction}
 
-Monte Carlo Tree Search (MCTS)~\cite{Coulom06Efficient,Kocsis06Bandit} 
+Monte Carlo Tree Search (MCTS)~\cite{mctssurvey,Coulom06Efficient,Kocsis06Bandit} is a ... 
 
-\section{Background and Related Work} 
+\subsection{Related Work}
 
 Several techniques for minimax-style backup rules in the simulation-based MCTS framework have already been proposed. 
 The first was Coulom's original {\it maximum backpropagation}~\cite{Coulom06Efficient}. This method of backpropagation
@@ -85,18 +86,23 @@ In games where minimax search works well, such as Mancala, modifying MCTS to
 use minimax-style backups and heuristic values instead of playouts was shown to be as powerful as a strong 
 depth-first minimax search~\cite{Ramanujan11Tradeoffs}.
 Similarly, there is further evidence suggesting not replacing the playout entirely, but terminating them early 
-using heuristic evaluations, has increased the performance in Lines of Action~\cite{bla}, Amazons~\cite{bla}, and 
-Breakthrough~\cite{bla}. 
+using heuristic evaluations, has increased the performance in Lines of Action (LOA)~\cite{Winands10MCTS-LOA}, 
+Amazons~\cite{Lorentz08Amazons}, and Breakthrough~\cite{Lorentz13Breakthrough}. In LOA and Amazons, the 
+MCTS players enhanced with evaluation functions outperform their minimax counterparts using the same evaluation function.
 
 % mention score-bounded mcts
 % mention hendrik's minimax methods
 % use mcts-solver to motivate implicit minimax
+%\marcl{Also mention MCTS + minimax hybrids (Baier \& Winands) and Score-bounded MCTS (...))}
 
-One way to combine minimax backups implictly is to use MCTS-Solver~\cite{Winands08Solver}. When using 
+One may want to combine minimax backups or searches without using an evaluation function. 
+The prime example is MCTS-Solver~\cite{Winands08Solver}. When using 
 MCTS-Solver, proven wins and losses are backpropagated as extra information in MCTS. When a node is proven to be a 
 win or a loss, it no longer needs to be searched. This simple, domain-independent modification greatly enhances 
-MCTS in many games (some examples). 
-\marcl{Also mention MCTS + minimax hybrids (Baier \& Winands) and Score-bounded MCTS (...))}
+MCTS in many games (some examples). Score-bounded MCTS extends this idea to games with multiple outcomes, 
+leading to $\alpha \beta$ style pruning in the tree~\cite{Cazenave10ScoreBounded}. Finally, one can do use hybrid
+minimax searches in the tree to initialize nodes during expansion, enhance the playout, or to help MCTS-Solver 
+in backpropagation. 
 
 In this work, we propose to augment MCTS with the help of an implictly-computed minimax search which uses
 heuristic evaluations. In our case, these heurstic evaluations are not used to replace or terminate playouts, but 
@@ -105,7 +111,83 @@ the backpropagation of these values is treated differently and affect node selec
 minimax hybrids, these modifications are based on heuristic evaluations rather than proven wins and losses. 
 We show that (something good and insightful). 
 
-\bibliographystyle{unsrt}
+\section{Background}
+
+%The following notation is taken from~\cite{Sutton98}
+
+A finite Markov Decision Process (MDP) is 4-tuple $(\cS, \cA, \cT, \cR)$. Here, $\cS$ is a finite non-empty set of {\it states}. 
+$\cA$ is a finite non-empty set of {\it actions}. $\cT : \cS \times \cA \mapsto \Delta \cS$ is a {\it transition function} mapping 
+each state and action to a distribution over successor states. Finally, $\cR : \cS \times \cA \times \cS \mapsto \Re$ 
+is a {\it reward function} mapping (state, action, successor state) triplets to numerical rewards. 
+
+A two-player perfect information game is an specific augmented MDP. Denote $\cZ \subset \cS$ the set of {\it terminal states}. 
+In addition, for all nonterminal states $s' \in \cS - \cZ$, $\cR(s,a,s') = 0$. 
+There is a {\it player identity function} $\tau : \cS - \cZ \mapsto \{1,2\}$. 
+In this paper, we assume fully deterministic domains, so $\cT(s,a)$ maps to a single state, $s'$. However, the ideas proposed can 
+be easily extended to domains with stochastic transitions.
+
+Monte Carlo Tree Search is a simulation-based best-first search algorithm that incrementally builds a model of the game 
+$\cG$, in memory. Each search starts with from a {\it root state} $s_0 \in \cS - \cZ$, and initially sets $\cG = \emptyset$. 
+Each simulation samples a trajectory $\rho = (s_0, a_0, s_1, a_1, \cdots, s_n)$, where $s_n \in \cZ$. 
+The portion of the $\rho$ where $s_i \in \cG$ is called the {\it tree portion} and the remaining portion is
+called the {\it playout portion}. In the tree portion, actions are chosen according to some {\it selection policy}. 
+The first state encountered in the playout portion is added to $\cG$. The actions chosen in the playout portion are 
+determined by a specific {\it playout policy}. 
+
+
+
+
+\section{Implicit Minimax Backups in MCTS}
+
+\begin{algorithm2e}[h!]
+  MCTS($s$):\;
+  \pushline
+    
+    \If{$l > T_{path}$}{{\bf return} Play-out$(p)$}           \label{alg:checkdepth}
+    \ElseIf{ExpandableNode$(p,l)$}{                           \label{alg:expandstart}
+      %\lIf{$l > T_{path}$}{{\bf return} \mbox{Playout}$(s)$\;}
+      \For{$c \in C(p)$}{                                       \label{alg:oldnewstart}
+        $c \gets $NewLeafNode() \;                              
+        Add new leaf $c$ to the tree\;                          \label{alg:oldnewend}
+        %\For{$d \in \{ old, new \}$}{                                     
+          %$c.n_t \gets 0$; $c.S_{survival,d} \gets 0$ \;
+          %$c.S_{pill,d} \gets 0$; $c.S_{ghost,d} \gets 0$ \;   
+          %$c.M_{survival} \gets 0$ \;
+          %$c.M_{pill} \gets 0$; $c.M_{ghost} \gets 0$ \;    
+      }
+      $(R,c') \gets \mbox{Play-out}(p)$\;
+      Update$(c,R)$; Update$(p,R)$ \;
+      {\bf return} $(p,R)$                            \label{alg:expandend}
+    }
+    \Else{  
+      Let $t$ be the tactic set at the root \;                          \label{alg:internalstart}
+      $n_p \gets p.n_{old} + p.n_{new}$\;
+      \For{$c \in C(p)$}{
+        Let $i$ be the action associated with child $c$ \;
+        $n_i \gets c.n_{old} + c.n_{new}$ \;
+        $v_i \gets M^i_t$ as defined in Eq.?\;
+      }
+      Select a move $i$ that maximizes $X_i$ from Eq.?\;
+      $(c, R', \Delta l) \gets p.\mbox{ApplyMove}(i)$\;                  \label{alg:transition}
+      \If{$R'_{survival} = 0$}{                                            \label{alg:deathstart}
+        $(R,c) \gets \mbox{Play-out}(p)$\;
+        %\lIf{$result = death$}{$p.n_{new} \gets p.n_{new} + 1$}
+        Update$(p,R)$\;
+        {\bf return} $(p,R)$\;                                  \label{alg:deathend}
+      }
+      $R \gets \mbox{MCTS}(c, l + \Delta l)$\;                               \label{alg:reccall}
+      Update$(p,R)$\;
+      {\bf return} $(p,R)$\;
+    }
+  \popline
+  \vspace{0.3cm}
+  \caption{Pseudo-code of MCTS for Ms Pac-Man. \label{alg}}
+\end{algorithm2e}
+
+
+
+
+\bibliographystyle{plain}
 \bibliography{im-mcts}
 
 \end{document}
