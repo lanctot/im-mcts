@@ -37,6 +37,7 @@
 \usetikzlibrary{arrows,shapes,petri}
 
 \newcommand{\bE}{\mathbb{E}}
+\newcommand{\bQ}{\bar{Q}}
 \newcommand{\cA}{\mathcal{A}}
 \newcommand{\cC}{\mathcal{C}}
 \newcommand{\cD}{\mathcal{D}}
@@ -48,6 +49,8 @@
 \newcommand{\cS}{\mathcal{S}}
 \newcommand{\cT}{\mathcal{T}}
 \newcommand{\cZ}{\mathcal{Z}}
+\newcommand{\hQ}{\hat{Q}}
+\newcommand{\hV}{\hat{V}}
 \newcommand{\eg}{{\it e.g.,}~}
 \newcommand{\ie}{{\it i.e.,}~}
 
@@ -87,7 +90,7 @@ use minimax-style backups and heuristic values instead of playouts was shown to 
 depth-first minimax search~\cite{Ramanujan11Tradeoffs}.
 Similarly, there is further evidence suggesting not replacing the playout entirely, but terminating them early 
 using heuristic evaluations, has increased the performance in Lines of Action (LOA)~\cite{Winands10MCTS-LOA}, 
-Amazons~\cite{Lorentz08Amazons}, and Breakthrough~\cite{Lorentz13Breakthrough}. In LOA and Amazons, the 
+Amazons~\cite{Kloetzer10Amazons,Lorentz08Amazons}, and Breakthrough~\cite{Lorentz13Breakthrough}. In LOA and Amazons, the 
 MCTS players enhanced with evaluation functions outperform their minimax counterparts using the same evaluation function.
 
 % mention score-bounded mcts
@@ -116,72 +119,107 @@ We show that (something good and insightful).
 %The following notation is taken from~\cite{Sutton98}
 
 A finite Markov Decision Process (MDP) is 4-tuple $(\cS, \cA, \cT, \cR)$. Here, $\cS$ is a finite non-empty set of {\it states}. 
-$\cA$ is a finite non-empty set of {\it actions}. $\cT : \cS \times \cA \mapsto \Delta \cS$ is a {\it transition function} mapping 
+$\cA$ is a finite non-empty set of {\it actions}, where we denote $\cA(s \subseteq \cA)$ the set of available actions at state $s$. 
+$\cT : \cS \times \cA \mapsto \Delta \cS$ is a {\it transition function} mapping 
 each state and action to a distribution over successor states. Finally, $\cR : \cS \times \cA \times \cS \mapsto \Re$ 
 is a {\it reward function} mapping (state, action, successor state) triplets to numerical rewards. 
 
-A two-player perfect information game is an specific augmented MDP. Denote $\cZ \subset \cS$ the set of {\it terminal states}. 
+A two-player perfect information game is an augmented MDP with a specific form. 
+Denote $\cZ \subset \cS$ the set of {\it terminal states}. 
 In addition, for all nonterminal states $s' \in \cS - \cZ$, $\cR(s,a,s') = 0$. 
 There is a {\it player identity function} $\tau : \cS - \cZ \mapsto \{1,2\}$. 
 In this paper, we assume fully deterministic domains, so $\cT(s,a)$ maps to a single state, $s'$. However, the ideas proposed can 
-be easily extended to domains with stochastic transitions.
+be easily extended to domains with stochastic transitions. 
 
 Monte Carlo Tree Search is a simulation-based best-first search algorithm that incrementally builds a model of the game 
 $\cG$, in memory. Each search starts with from a {\it root state} $s_0 \in \cS - \cZ$, and initially sets $\cG = \emptyset$. 
 Each simulation samples a trajectory $\rho = (s_0, a_0, s_1, a_1, \cdots, s_n)$, where $s_n \in \cZ$. 
 The portion of the $\rho$ where $s_i \in \cG$ is called the {\it tree portion} and the remaining portion is
 called the {\it playout portion}. In the tree portion, actions are chosen according to some {\it selection policy}. 
-The first state encountered in the playout portion is added to $\cG$. The actions chosen in the playout portion are 
-determined by a specific {\it playout policy}. 
+The first state encountered in the playout portion is {\it expanded} (added to $\cG$.) 
+The actions chosen in the playout portion are determined by a specific {\it playout policy}. 
+States $s \in \cG$ are referred to as {\it nodes} and statistics are  
+maintained for each node $s$: the cumulative reward {\it with respect to }$\tau(s)$, $r^{\tau}_s$, and visit count, $n_s$. 
+By popular convention, we define $r_{s,a} = r_{s'}$ where $s' = \cT(s,a)$, and similarly $n_{s,a} = n_{s'}$. 
 
-
-
+Let $\hV(s,a)$ be an estimator for node $s$ and $\hQ(s,a)$ for the state-action pair. 
+For example, one popular estimator is the observed mean over all simulations 
+$\bQ(s,a) = \frac{r^{\tau}_{s,a}}{n_{s,a}}$. 
+The most widely-used is based on a bandit algorithm called Upper Confidence Bounds (UCB)~\cite{Auer02Finite} in an algorithm adapted 
+for MCTS called UCT~\cite{Kocsis06Bandit}, which selects action $a'$ using
+\begin{equation}
+\label{eq:select-ucb}
+a' = \argmax_{a \in \cA(s)} \left\{ \hQ(s,a) + C \sqrt{\frac{\ln n_s}{n_{s,a}}} \right\}, 
+\end{equation}
+where $C$ is parameter determining the weight of exploration. 
 
 \section{Implicit Minimax Backups in MCTS}
 
+Now, suppose we are given an evaluation function $e_0(s)$ whose range is the same as that of the reward function $\cR$. 
+Assuming $e_0(s)$ is a sensible indicator of success for one player, we would like that this added source of information
+strictly benefits MCTS. 
+
+To make use of this information in MCTS, we add another value to maintain at each node, the 
+{\it implicit minimax evaluation with respect to }$\tau(s)$, $e^{\tau}(s)$, and define $e^{\tau}(s,a)$ as before. 
+During backpropagation, $r_s$ and $n_s$ are updated in the usual way, and additionally $e^{\tau}(s)$ is updated a minimax backup 
+rule based on children values. Also, rather than using $\hQ = \bQ$ for selection in Equation~\ref{eq:select-ucb}, we use
+\begin{equation}
+\label{eq:imq}
+\hQ^{\mathit{IM}}(s,a) = \frac{r^{\tau}_{s,a}}{n_{s,a}} + \alpha(n_s) e^{\tau}(s,a)
+\end{equation}
+
+Pseudo-code (without MCTS-Solver for now) presented in Algorithm~\ref{alg}. The two changes from vanillia MCTS are on lines
+\ref{alg:imselect} and \ref{alg:imeval}. During selection, $\hQ^{\mathit{IM}}$ from Equation~\ref{eq:imq} replaces $\bQ$ in 
+Equation~\ref{eq:select-ucb}. During backpropagation, the implicit minimax evaluations $e^{\tau}(s)$ are updated based on 
+the children's values. Note that a single $\max$ is used here since the evaluations are assumed to be in view of $\tau(s)$. 
+The function $\alpha(n_s)$ will determine how much weight to attribute to these evaluations.  
+
+\newcommand{\MCTS}{{\sc MCTS}}
+\newcommand{\Update}{{\sc Update}}
+\newcommand{\Playout}{{\sc Playout}}
+\newcommand{\Select}{{\sc Select}}
+\newcommand{\Expand}{{\sc Expand}}
+\newcommand{\Simulate}{{\sc Simulate}}
+
 \begin{algorithm2e}[h!]
-  MCTS($s$):\;
+  \Select$(s)$:\;
   \pushline
-    
-    \If{$l > T_{path}$}{{\bf return} Play-out$(p)$}           \label{alg:checkdepth}
-    \ElseIf{ExpandableNode$(p,l)$}{                           \label{alg:expandstart}
-      %\lIf{$l > T_{path}$}{{\bf return} \mbox{Playout}$(s)$\;}
-      \For{$c \in C(p)$}{                                       \label{alg:oldnewstart}
-        $c \gets $NewLeafNode() \;                              
-        Add new leaf $c$ to the tree\;                          \label{alg:oldnewend}
-        %\For{$d \in \{ old, new \}$}{                                     
-          %$c.n_t \gets 0$; $c.S_{survival,d} \gets 0$ \;
-          %$c.S_{pill,d} \gets 0$; $c.S_{ghost,d} \gets 0$ \;   
-          %$c.M_{survival} \gets 0$ \;
-          %$c.M_{pill} \gets 0$; $c.M_{ghost} \gets 0$ \;    
-      }
-      $(R,c') \gets \mbox{Play-out}(p)$\;
-      Update$(c,R)$; Update$(p,R)$ \;
-      {\bf return} $(p,R)$                            \label{alg:expandend}
+    Let $A'$ be the set of actions $a \in \cA(s)$ maximizing $\hQ^{\mathit{IM}}(s,a) + C \sqrt{\frac{\ln n_s}{n_{s,a}}}$ \; \label{alg:imselect}
+    {\bf return} $a' \sim {\sc Unif}(A')$ \;
+  \popline
+  \;
+  \Update$(s,r)$:\;
+  \pushline
+    $r_s \leftarrow r_s + r$\;
+    $n_s \leftarrow n_s + 1$\;
+    $e^{\tau}(s) \leftarrow \max_{s' \in C(s)} e^{\tau}(s')$\; \label{alg:imeval}
+  \popline
+  \;
+  \Simulate$(s_{prev}, a_{prev}, s)$:\;
+  \pushline
+    \lIf{$s \in \cZ$}{{\bf return} $\cR(s_{prev}, a_{prev}, s)$}
+    \ElseIf{$s \not\in \cG$}{
+      \Expand($s$)\;
+      $r \leftarrow $\Playout($s$)\;
+      \Update($s,r$)\;
+      {\bf return} $r$\;
     }
-    \Else{  
-      Let $t$ be the tactic set at the root \;                          \label{alg:internalstart}
-      $n_p \gets p.n_{old} + p.n_{new}$\;
-      \For{$c \in C(p)$}{
-        Let $i$ be the action associated with child $c$ \;
-        $n_i \gets c.n_{old} + c.n_{new}$ \;
-        $v_i \gets M^i_t$ as defined in Eq.?\;
-      }
-      Select a move $i$ that maximizes $X_i$ from Eq.?\;
-      $(c, R', \Delta l) \gets p.\mbox{ApplyMove}(i)$\;                  \label{alg:transition}
-      \If{$R'_{survival} = 0$}{                                            \label{alg:deathstart}
-        $(R,c) \gets \mbox{Play-out}(p)$\;
-        %\lIf{$result = death$}{$p.n_{new} \gets p.n_{new} + 1$}
-        Update$(p,R)$\;
-        {\bf return} $(p,R)$\;                                  \label{alg:deathend}
-      }
-      $R \gets \mbox{MCTS}(c, l + \Delta l)$\;                               \label{alg:reccall}
-      Update$(p,R)$\;
-      {\bf return} $(p,R)$\;
+    \Else{ 
+      $a \leftarrow $\Select$(s)$\;
+      $s' \leftarrow \cT(s,a)$\;
+      $r \leftarrow $\Simulate$(s,a,s')$\;
+      \Update($s,r$)\;
+      {\bf return} $r$\;
     }
   \popline
+  \;
+  \MCTS($s_0$):\;
+  \pushline
+    \lWhile{\mbox{time left}}{\Simulate$(-,-,s_0)$}
+    {\bf return} $\argmax_{a \in \cA(s_0)} \bQ(s_0,a)$\; 
+  \popline
   \vspace{0.3cm}
-  \caption{Pseudo-code of MCTS for Ms Pac-Man. \label{alg}}
+  \caption{Pseudo-code of MCTS with Implicit Minimax Backups. \label{alg}}
 \end{algorithm2e}
 
 
