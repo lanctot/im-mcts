@@ -174,7 +174,7 @@ of which are on lines \ref{alg:imselect} and \ref{alg:imeval}.
 During selection, $\hQ^{\mathit{IM}}$ from Equation~\ref{eq:imq} replaces $\bQ$ in 
 Equation~\ref{eq:select-ucb}. During backpropagation, the implicit minimax evaluations $e^{\tau}_s$ are updated based on 
 the children's values. Note that a single $\max$ is used here since the evaluations are assumed to be in 
-view of $\tau(s)$.
+view of player $\tau(s)$.
 %\footnote{Domain-dependent inversions or scalings may be necessary to convert the rewards. These details are 
 %intentionally omitted from the pseudo-code for generality.}
 The function $\alpha(n_s)$ will determine how much weight to attribute to these evaluations.  
