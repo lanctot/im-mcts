@@ -60,7 +60,7 @@
 
 \begin{document}
 
-\title{Improving Monte Carlo Tree Search with Heuristic Evaluations using Implicit Minimax Backups}
+\title{Enhancing Monte Carlo Tree Search with Heuristic Evaluations using Implicit Minimax Backups}
 
 \author{Authors}
 
@@ -107,8 +107,8 @@ leading to $\alpha \beta$ style pruning in the tree~\cite{Cazenave10ScoreBounded
 minimax searches in the tree to initialize nodes during expansion, enhance the playout, or to help MCTS-Solver 
 in backpropagation. 
 
-In this work, we propose to augment MCTS with the help of an implictly-computed minimax search which uses
-heuristic evaluations. In our case, these heurstic evaluations are not used to replace or terminate playouts, but 
+In this work, we propose to augment MCTS with the help of an implicitly-computed minimax search which uses
+heuristic evaluations. In our case, these heuristic evaluations are not used to replace or terminate playouts, but 
 rather as a {\it separate source of information} to guide the tree search during the selection phase. Like MCTS-Solver, 
 the backpropagation of these values is treated differently and affect node selection. However, unlike MCTS-Solver and 
 minimax hybrids, these modifications are based on heuristic evaluations rather than proven wins and losses. 
@@ -119,7 +119,7 @@ We show that (something good and insightful).
 %The following notation is taken from~\cite{Sutton98}
 
 A finite Markov Decision Process (MDP) is 4-tuple $(\cS, \cA, \cT, \cR)$. Here, $\cS$ is a finite non-empty set of {\it states}. 
-$\cA$ is a finite non-empty set of {\it actions}, where we denote $\cA(s \subseteq \cA)$ the set of available actions at state $s$. 
+$\cA$ is a finite non-empty set of {\it actions}, where we denote $\cA(s) \subseteq \cA$ the set of available actions at state $s$. 
 $\cT : \cS \times \cA \mapsto \Delta \cS$ is a {\it transition function} mapping 
 each state and action to a distribution over successor states. Finally, $\cR : \cS \times \cA \times \cS \mapsto \Re$ 
 is a {\it reward function} mapping (state, action, successor state) triplets to numerical rewards. 
@@ -139,12 +139,14 @@ called the {\it playout portion}. In the tree portion, actions are chosen accord
 The first state encountered in the playout portion is {\it expanded} (added to $\cG$.) 
 The actions chosen in the playout portion are determined by a specific {\it playout policy}. 
 States $s \in \cG$ are referred to as {\it nodes} and statistics are  
-maintained for each node $s$: the cumulative reward {\it with respect to }$\tau(s)$, $r^{\tau}_s$, and visit count, $n_s$. 
+maintained for each node $s$: the cumulative reward, $r_s$, and visit count, $n_s$. 
 By popular convention, we define $r_{s,a} = r_{s'}$ where $s' = \cT(s,a)$, and similarly $n_{s,a} = n_{s'}$. 
+Also, we use $r^{\tau}_s$ to denote the reward at state $s$ {\it with respect to player} $\tau(s)$. 
+Finally, we denote  the set $C(s)$ to be the children of $s$ that are in $\cG$. 
 
 Let $\hV(s,a)$ be an estimator for node $s$ and $\hQ(s,a)$ for the state-action pair. 
 For example, one popular estimator is the observed mean over all simulations 
-$\bQ(s,a) = \frac{r^{\tau}_{s,a}}{n_{s,a}}$. 
+$\bQ(s,a) = r^{\tau}_{s,a} / n_{s,a}$. 
 The most widely-used is based on a bandit algorithm called Upper Confidence Bounds (UCB)~\cite{Auer02Finite} in an algorithm adapted 
 for MCTS called UCT~\cite{Kocsis06Bandit}, which selects action $a'$ using
 \begin{equation}
@@ -156,23 +158,28 @@ where $C$ is parameter determining the weight of exploration.
 \section{Implicit Minimax Backups in MCTS}
 
 Now, suppose we are given an evaluation function $e_0(s)$ whose range is the same as that of the reward function $\cR$. 
-Assuming $e_0(s)$ is a sensible indicator of success for one player, we would like that this added source of information
+Assuming $e_0(s)$ is a sensible indicator of the reward, we would like that this added source of information
 strictly benefits MCTS. 
-
 To make use of this information in MCTS, we add another value to maintain at each node, the 
-{\it implicit minimax evaluation with respect to }$\tau(s)$, $e^{\tau}(s)$, and define $e^{\tau}(s,a)$ as before. 
-During backpropagation, $r_s$ and $n_s$ are updated in the usual way, and additionally $e^{\tau}(s)$ is updated a minimax backup 
+{\it implicit minimax evaluation with respect to player} $\tau(s)$, $e^{\tau}_s$, and define $e^{\tau}_{s,a}$ as before. 
+During backpropagation, $r_s$ and $n_s$ are updated in the usual way, and additionally $e^{\tau}_s$ is updated a minimax backup 
 rule based on children values. Also, rather than using $\hQ = \bQ$ for selection in Equation~\ref{eq:select-ucb}, we use
 \begin{equation}
 \label{eq:imq}
-\hQ^{\mathit{IM}}(s,a) = \frac{r^{\tau}_{s,a}}{n_{s,a}} + \alpha(n_s) e^{\tau}(s,a)
+\hQ^{\mathit{IM}}(s,a) = \frac{r^{\tau}_{s,a}}{n_{s,a}} + \alpha(n_s) e^{\tau}_{s,a}.
 \end{equation}
 
-Pseudo-code (without MCTS-Solver for now) presented in Algorithm~\ref{alg}. The two changes from vanillia MCTS are on lines
-\ref{alg:imselect} and \ref{alg:imeval}. During selection, $\hQ^{\mathit{IM}}$ from Equation~\ref{eq:imq} replaces $\bQ$ in 
-Equation~\ref{eq:select-ucb}. During backpropagation, the implicit minimax evaluations $e^{\tau}(s)$ are updated based on 
-the children's values. Note that a single $\max$ is used here since the evaluations are assumed to be in view of $\tau(s)$. 
+Pseudo-code (without MCTS-Solver for now) is presented in Algorithm~\ref{alg}. There are three main changes from vanilla MCTS, two 
+of which are on lines \ref{alg:imselect} and \ref{alg:imeval}. 
+During selection, $\hQ^{\mathit{IM}}$ from Equation~\ref{eq:imq} replaces $\bQ$ in 
+Equation~\ref{eq:select-ucb}. During backpropagation, the implicit minimax evaluations $e^{\tau}_s$ are updated based on 
+the children's values. Note that a single $\max$ is used here since the evaluations are assumed to be in 
+view of $\tau(s)$.
+%\footnote{Domain-dependent inversions or scalings may be necessary to convert the rewards. These details are 
+%intentionally omitted from the pseudo-code for generality.}
 The function $\alpha(n_s)$ will determine how much weight to attribute to these evaluations.  
+Finally, during a node expansion on line~\ref{alg:imexpand}, the implicit minimax value is initialized to its heuristic
+evaluation $e^{\tau}_s \leftarrow e^{\tau}_0(s)$. 
 
 \newcommand{\MCTS}{{\sc MCTS}}
 \newcommand{\Update}{{\sc Update}}
@@ -185,26 +192,26 @@ The function $\alpha(n_s)$ will determine how much weight to attribute to these 
   \Select$(s)$:\;
   \pushline
     Let $A'$ be the set of actions $a \in \cA(s)$ maximizing $\hQ^{\mathit{IM}}(s,a) + C \sqrt{\frac{\ln n_s}{n_{s,a}}}$ \; \label{alg:imselect}
-    {\bf return} $a' \sim {\sc Unif}(A')$ \;
+    {\bf return} $a' \sim ${\sc Uniform}$(A')$ \;
   \popline
   \;
   \Update$(s,r)$:\;
   \pushline
     $r_s \leftarrow r_s + r$\;
     $n_s \leftarrow n_s + 1$\;
-    $e^{\tau}(s) \leftarrow \max_{s' \in C(s)} e^{\tau}(s')$\; \label{alg:imeval}
+    $e^{\tau}_s \leftarrow \max_{s' \in C(s)} e^{\tau}_{s'}$\; \label{alg:imeval}
   \popline
   \;
   \Simulate$(s_{prev}, a_{prev}, s)$:\;
   \pushline
-    \lIf{$s \in \cZ$}{{\bf return} $\cR(s_{prev}, a_{prev}, s)$}
-    \ElseIf{$s \not\in \cG$}{
-      \Expand($s$)\;
+    \If{$s \not\in \cG$}{
+      \Expand($s$)\;                                           \label{alg:imexpand}
       $r \leftarrow $\Playout($s$)\;
       \Update($s,r$)\;
       {\bf return} $r$\;
     }
     \Else{ 
+      \lIf{$s \in \cZ$}{{\bf return} $\cR(s_{prev}, a_{prev}, s)$}
       $a \leftarrow $\Select$(s)$\;
       $s' \leftarrow \cT(s,a)$\;
       $r \leftarrow $\Simulate$(s,a,s')$\;
@@ -216,7 +223,7 @@ The function $\alpha(n_s)$ will determine how much weight to attribute to these 
   \MCTS($s_0$):\;
   \pushline
     \lWhile{\mbox{time left}}{\Simulate$(-,-,s_0)$}
-    {\bf return} $\argmax_{a \in \cA(s_0)} \bQ(s_0,a)$\; 
+    {\bf return} $\argmax_{a \in \cA(s_0)} n_{s_0,a}$\; 
   \popline
   \vspace{0.3cm}
   \caption{Pseudo-code of MCTS with Implicit Minimax Backups. \label{alg}}
