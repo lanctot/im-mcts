@@ -199,7 +199,7 @@ evaluation $e^{\tau}_s \leftarrow e^{\tau}_0(s)$.
   \pushline
     $r_s \leftarrow r_s + r$\;
     $n_s \leftarrow n_s + 1$\;
-    $e^{\tau}_s \leftarrow \max_{s' \in C(s)} e^{\tau}_{s'}$\; \label{alg:imeval}
+    $e^{\tau}_s \leftarrow \max_{a \in \cA(s)} e^{\tau}_{s,a}$\; \label{alg:imeval}
   \popline
   \;
   \Simulate$(s_{prev}, a_{prev}, s)$:\;
