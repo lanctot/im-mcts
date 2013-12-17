@@ -1,12 +1,9 @@
-
-\documentclass{ecai2014}
-
-%\setlength{\topmargin}{-0.75in}
-%\setlength{\oddsidemargin}{0.3in}
-%\setlength{\evensidemargin}{0.3in}
-%\setlength{\textwidth}{6in}
-%\setlength{\textheight}{9.5in}
-
+%File: formatting-instruction.tex
+\documentclass[letterpaper]{article}
+\usepackage{aaai}
+\usepackage{times}
+\usepackage{helvet}
+\usepackage{courier}
 \usepackage{graphicx}
 \usepackage{amssymb}
 \usepackage{amsmath}
@@ -30,8 +27,6 @@
 \newcommand{\argmax}{\operatornamewithlimits{argmax}}
 
 \captionsetup{compatibility=false}
-
-
 
 %\pgfplotsset{compat=newest}
 \usetikzlibrary{arrows,shapes,petri}
@@ -58,10 +53,19 @@
 \newcommand{\markw}[1]{\textbf{\color{red} /* #1 (markw) */}} 
 \newcommand{\marcl}[1]{\textbf{\color{red} /* #1 (marcl) */}} 
 
+\frenchspacing
+\setlength{\pdfpagewidth}{8.5in}
+\setlength{\pdfpageheight}{11in}
+\pdfinfo{
+/Title (Insert Your Title Here)
+/Author (Put All Your Authors Here, Separated by Commas)}
+\setcounter{secnumdepth}{0}  
+
 \begin{document}
-
-\title{Monte Carlo Tree Search with Heuristic Evaluations using Implicit Minimax Backups}
-
+% The file aaai.sty is the style file for AAAI Press 
+% proceedings, working notes, and technical reports.
+%
+\title{Monte Carlo Tree Search with Heuristic Evaluations\\using Implicit Minimax Backups}
 \author{Authors}
 
 \maketitle
@@ -232,7 +236,8 @@ evaluation $e^{\tau}_s \leftarrow e^{\tau}_0(s)$.
 
 
 
-\bibliographystyle{ecai2014}
+\bibliographystyle{aaai}
 \bibliography{im-mcts}
+
 
 \end{document}
