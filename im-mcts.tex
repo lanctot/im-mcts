@@ -161,29 +161,29 @@ where $C$ is parameter determining the weight of exploration.
 
 \section{Implicit Minimax Backups in MCTS}
 
-Now, suppose we are given an evaluation function $e_0(s)$ whose range is the same as that of the reward function $\cR$. 
-Assuming $e_0(s)$ is a sensible indicator of the reward, we would like that this added source of information
+Now, suppose we are given an evaluation function $v_0(s)$ whose range is the same as that of the reward function $\cR$. 
+Assuming $v_0(s)$ is a sensible indicator of the reward, we would like that this added source of information
 strictly benefits MCTS. 
 To make use of this information in MCTS, we add another value to maintain at each node, the 
-{\it implicit minimax evaluation with respect to player} $\tau(s)$, $e^{\tau}_s$, and define $e^{\tau}_{s,a}$ as before. 
-During backpropagation, $r_s$ and $n_s$ are updated in the usual way, and additionally $e^{\tau}_s$ is updated a minimax backup 
+{\it implicit minimax evaluation with respect to player} $\tau(s)$, $v^{\tau}_s$, and define $v^{\tau}_{s,a}$ as before. 
+During backpropagation, $r_s$ and $n_s$ are updated in the usual way, and additionally $v^{\tau}_s$ is updated a minimax backup 
 rule based on children values. Also, rather than using $\hQ = \bQ$ for selection in Equation~\ref{eq:select-ucb}, we use
 \begin{equation}
 \label{eq:imq}
-\hQ^{\mathit{IM}}(s,a) = \frac{r^{\tau}_{s,a}}{n_{s,a}} + \alpha(n_s) e^{\tau}_{s,a}.
+\hQ^{\mathit{IM}}(s,a) = \frac{r^{\tau}_{s,a}}{n_{s,a}} + \alpha(n_s) v^{\tau}_{s,a}.
 \end{equation}
 
 Pseudo-code (without MCTS-Solver for now) is presented in Algorithm~\ref{alg}. There are three main changes from vanilla MCTS, two 
 of which are on lines \ref{alg:imselect} and \ref{alg:imeval}. 
 During selection, $\hQ^{\mathit{IM}}$ from Equation~\ref{eq:imq} replaces $\bQ$ in 
-Equation~\ref{eq:select-ucb}. During backpropagation, the implicit minimax evaluations $e^{\tau}_s$ are updated based on 
+Equation~\ref{eq:select-ucb}. During backpropagation, the implicit minimax evaluations $v^{\tau}_s$ are updated based on 
 the children's values. Note that a single $\max$ is used here since the evaluations are assumed to be in 
 view of player $\tau(s)$.
 %\footnote{Domain-dependent inversions or scalings may be necessary to convert the rewards. These details are 
 %intentionally omitted from the pseudo-code for generality.}
 The function $\alpha(n_s)$ will determine how much weight to attribute to these evaluations.  
 Finally, during a node expansion on line~\ref{alg:imexpand}, the implicit minimax value is initialized to its heuristic
-evaluation $e^{\tau}_s \leftarrow e^{\tau}_0(s)$. 
+evaluation $v^{\tau}_s \leftarrow v^{\tau}_0(s)$. 
 
 \newcommand{\MCTS}{{\sc MCTS}}
 \newcommand{\Update}{{\sc Update}}
@@ -203,7 +203,7 @@ evaluation $e^{\tau}_s \leftarrow e^{\tau}_0(s)$.
   \pushline
     $r_s \leftarrow r_s + r$\;
     $n_s \leftarrow n_s + 1$\;
-    $e^{\tau}_s \leftarrow \max_{a \in \cA(s)} e^{\tau}_{s,a}$\; \label{alg:imeval}
+    $v^{\tau}_s \leftarrow \max_{a \in \cA(s)} v^{\tau}_{s,a}$\; \label{alg:imeval}
   \popline
   \;
   \Simulate$(s_{prev}, a_{prev}, s)$:\;
