@@ -51,9 +51,20 @@
 \newcommand{\eg}{{\it e.g.,}~}
 \newcommand{\ie}{{\it i.e.,}~}
 
-\newcommand{\redbold}[1]{\textbf{\color{red}#1}} 
-\newcommand{\markw}[1]{\textbf{\color{red} /* #1 (markw) */}} 
-\newcommand{\marcl}[1]{\textbf{\color{red} /* #1 (marcl) */}} 
+% the note center!
+\definecolor{darkgreen}{RGB}{0,125,0}
+\newcounter{nsNoteCounter}
+\newcounter{mlNoteCounter}
+\newcounter{mwNoteCounter}
+\newcounter{tpNoteCounter}
+\newcommand{\nsnote}[1]{{\scriptsize \color{blue} $\blacksquare$ \refstepcounter{vlNoteCounter}\textsf{[NS]$_{\arabic{vlNoteCounter}}$:{#1}}}}
+\newcommand{\mlnote}[1]{{\scriptsize \color{darkgreen} $\blacksquare$ \refstepcounter{mlNoteCounter}\textsf{[ML]$_{\arabic{mlNoteCounter}}$:{#1}}}}
+\newcommand{\mwnote}[1]{{\scriptsize \color{red} $\blacktriangle$ \refstepcounter{asNoteCounter}\textsf{[AS]$_{\arabic{asNoteCounter}}$:{#1}}}}
+\newcommand{\tpnote}[1]{{\scriptsize \color{orange} $\blacktriangle$ \refstepcounter{asNoteCounter}\textsf{[TP]$_{\arabic{asNoteCounter}}$:{#1}}}}
+%\newcounter{NoteCounter}
+%\newcommand{\vlnote}[1]{{\scriptsize \color{blue} \refstepcounter{vlNoteCounter}\textsf{[VL]$_{\arabic{vlNoteCounter}}$:{#1}}}}
+%\renewcommand{\vlnote}[1]{}
+
 
 \frenchspacing
 \setlength{\pdfpagewidth}{8.5in}
@@ -83,7 +94,7 @@ Monte Carlo Tree Search (MCTS)~\cite{mctssurvey,Coulom06Efficient,Kocsis06Bandit
 
 \subsection{Related Work}
 
-Several techniques for minimax-style backup rules in the simulation-based MCTS framework have already been proposed. 
+Several techniques for minimax-influenced backup rules in the simulation-based MCTS framework have already been proposed. 
 The first was Coulom's original {\it maximum backpropagation}~\cite{Coulom06Efficient}. This method of backpropagation
 suggests, after a number of simulations to a node has been reached, to switch to propagating the maximum value instead 
 of the simulated (``average'') value. 
@@ -120,7 +131,7 @@ the backpropagation of these values is treated differently and affect node selec
 minimax hybrids, these modifications are based on heuristic evaluations rather than proven wins and losses. 
 We show that (something good and insightful). 
 
-\section{Background}
+\section{Adversarial Search in Turn-Taking Games}
 
 %The following notation is taken from~\cite{Sutton98}
 
@@ -134,8 +145,9 @@ A two-player perfect information game is an augmented MDP with a specific form.
 Denote $\cZ \subset \cS$ the set of {\it terminal states}. 
 In addition, for all nonterminal states $s' \in \cS - \cZ$, $\cR(s,a,s') = 0$. 
 There is a {\it player identity function} $\tau : \cS - \cZ \mapsto \{1,2\}$. 
-In this paper, we assume fully deterministic domains, so $\cT(s,a)$ maps to a single state, $s'$. However, the ideas proposed can 
-be easily extended to domains with stochastic transitions. 
+In this paper, we assume fully deterministic domains, so $\cT(s,a)$ maps to a single state. 
+When it is clear from the context and unless otherwise stated, de denote $s' = \cT(s,a)$. 
+However, the ideas proposed can be easily extended to domains with stochastic transitions. 
 
 Monte Carlo Tree Search is a simulation-based best-first search algorithm that incrementally builds a model of the game 
 $\cG$, in memory. Each search starts with from a {\it root state} $s_0 \in \cS - \cZ$, and initially sets $\cG = \emptyset$. 
@@ -172,7 +184,7 @@ During backpropagation, $r_s$ and $n_s$ are updated in the usual way, and additi
 rule based on children values. Also, rather than using $\hQ = \bQ$ for selection in Equation~\ref{eq:select-ucb}, we use
 \begin{equation}
 \label{eq:imq}
-\hQ^{\mathit{IM}}(s,a) = \frac{r^{\tau}_{s,a}}{n_{s,a}} + \alpha(n_s) v^{\tau}_{s,a}.
+\hQ^{\mathit{IM}}(s,a) = (1-\alpha) \frac{r^{\tau}_{s,a}}{n_{s,a}} + \alpha v^{\tau}_{s,a}.
 \end{equation}
 
 Pseudo-code (without MCTS-Solver for now) is presented in Algorithm~\ref{alg}. There are three main changes from vanilla MCTS, two 
@@ -235,7 +247,39 @@ evaluation $v^{\tau}_s \leftarrow v^{\tau}_0(s)$.
   \caption{Pseudo-code of MCTS with Implicit Minimax Backups. \label{alg}}
 \end{algorithm2e}
 
+\section{Empirical Evaluation}
 
+\newcommand{\UCTMAXH}{$\mbox{UCTMAX}_H$ }
+\newcommand{\UCTH}{$\mbox{UCT}_H$ }
+
+Some important things we might want to consider for the results:
+
+\begin{itemize}
+\item {\bf Early playout terminations}. When a playout is started from state $s$, descend $d$ plies by 
+      choosing actions according to a playout policy to reach state $s^d$, then return the value 
+      of the $v^{\tau}_0(s^d)$. In Mancala, \UCTH uses early terminations with $d = 0$. 
+      In previous work in Amazons and Breakthrough, and some domains with chance, 
+      best performance is achieved for $d > 0$. 
+\item {\bf $\epsilon$-greedy playouts}. 
+      At state $s$, the playout policy chooses randomly with 
+      probability $\epsilon$ and chooses an action $a \in \cA(s)$ that maximizes $v_0^\tau(\cT(s,a))$. 
+\item {\bf Constant/Progressive bias.} Constant or progressive bias defines $\hQ$ as in Equation \ref{eq:imq} 
+      except replaces $v^{\tau}_{s,a}$ with $v^{\tau}_0(s')$ or with $v^{\tau}_0(s') / (n_{s,a} + 1)$, respectively. 
+\item Probably the most similar competitor is \UCTMAXH from \cite{Ramanujan11Tradeoffs}. \UCTH
+      is standard UCT with early playout terminations ($d = 0$). \UCTMAXH is the same, except maximum backpropagation
+      is used. Note that \UCTMAXH is different from implicit minimax; implicit minimax keeps the average computed by 
+      the playouts and minimax values separately, benefiting from both sources of information. I expect implicit minimax
+      to work better than \UCTMAXH, but it might be nice to show this (esp. in Mancala). 
+\item The extension to games with chance nodes is straight-forward. It might be nice to show it, though. There is a tactical 
+      candidate game growing in popularity (Chinese Dark Chess). 
+\item Simple regret / observed error? We need a small game that's solveable so we can compute the optimal minimax values.
+\end{itemize}
+
+Candidate domains at the moment: Breakthrough, Cannon, Chinese Checkers, Lines of Action, Mancala, Chinese Dark Chess.
+In terms of choosing domains, it seems like this work on ``somewhat tactical games'' (where minimaxing will help). 
+
+A comparison to standard minimax seems appropriate. It'd be nice to find a game where MCTS with implicit minimax backups
+is preferred over all of the others (minimax, MCTS, \UCTMAXH). 
 
 
 \bibliographystyle{aaai}
