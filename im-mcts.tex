@@ -84,13 +84,25 @@
 \maketitle
 
 \begin{abstract}
-In this document we describe how minimax backups from evaluations functions can be combined implicitly 
-with MCTS. 
+Monte Carlo Tree Search (MCTS) has improved the performance of game-playing engines in 
+domains such as Go, Hex, and general-game playing. MCTS has been shown to outperform 
+classic minimax search in games where good heuristic evaluations are difficult to obtain. 
+In recent years, combining 
+ideas from traditional minimax search in MCTS has been shown to be advantageous in some domains,
+such as Lines of Action, Mancala, Amazons, Breakthrough, and Connect Four. In this paper, we propose 
+a new way to use heuristic evaluations to guide the MCTS search by storing the two sources of 
+information, estimated win rates and heuristic evaluations, separately. 
+Rather than using the heuristic evaluations to replace the playouts, 
+our technique backs them up {\it implicity} during its MCTS simulations. 
+These learned evaluation values are then used to guide future simulations. 
+Compared to current techniques, we show that using implicit minimax backups  
+reduces regret in an example game and leads to stronger 
+play performance in four games: Lines of Action, Chinese Checkers, Mancala, and Breakthrough. 
 \end{abstract}
 
 \section{Introduction}
 
-Monte Carlo Tree Search (MCTS)~\cite{mctssurvey,Coulom06Efficient,Kocsis06Bandit} is a ... 
+Monte Carlo Tree Search (MCTS)~\cite{mctssurvey,Coulom06Efficient,Kocsis06Bandit} is a 
 
 \subsection{Related Work}
 
