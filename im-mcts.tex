@@ -132,8 +132,8 @@ The prime example is MCTS-Solver~\cite{Winands08Solver}. When using
 MCTS-Solver, proven wins and losses are backpropagated as extra information in MCTS. When a node is proven to be a 
 win or a loss, it no longer needs to be searched. This simple, domain-independent modification greatly enhances 
 MCTS in many games (some examples). Score-bounded MCTS extends this idea to games with multiple outcomes, 
-leading to $\alpha \beta$ style pruning in the tree~\cite{Cazenave10ScoreBounded}. Finally, one can do use hybrid
-minimax searches in the tree to initialize nodes during expansion, enhance the playout, or to help MCTS-Solver 
+leading to $\alpha \beta$ style pruning in the tree~\cite{Cazenave10ScoreBounded}. Finally, one can use hybrid
+minimax searches in the tree to initialize nodes during, enhance the playout, or to help MCTS-Solver 
 in backpropagation~\cite{Baier13MinimaxHybrids}.
 
 In this work, we propose to augment MCTS with the help of an implicitly-computed minimax search which uses
@@ -277,6 +277,7 @@ Some important things we might want to consider for the results:
       probability $\epsilon$ and chooses an action $a \in \cA(s)$ that maximizes $v_0^\tau(\cT(s,a))$. 
 \item {\bf Constant/Progressive bias.} Constant or progressive bias defines $\hQ$ as in Equation \ref{eq:imq} 
       except replaces $v^{\tau}_{s,a}$ with $v^{\tau}_0(s')$ or with $v^{\tau}_0(s') / (n_{s,a} + 1)$, respectively. 
+\item {\bf Node priors} (see Lorentz paper, cite previous papers on this)
 \item Probably the most similar competitor is \UCTMAXH from \cite{Ramanujan11Tradeoffs}. \UCTH
       is standard UCT with early playout terminations ($d = 0$). \UCTMAXH is the same, except maximum backpropagation
       is used. Note that \UCTMAXH is different from implicit minimax; implicit minimax keeps the average computed by 
