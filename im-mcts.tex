@@ -97,7 +97,7 @@ our technique backs them up {\it implicity} during its MCTS simulations.
 These learned evaluation values are then used to guide future simulations. 
 Compared to current techniques, we show that using implicit minimax backups  
 reduces regret in an example game and leads to stronger 
-play performance in four games: Lines of Action, Chinese Checkers, Mancala, and Breakthrough. 
+play performance in four games: Lines of Action, Chinese Checkers, Breakthrough, and/or \{Mancala,Hearts\}.
 \end{abstract}
 
 %\subsection{Related Work}
@@ -292,7 +292,7 @@ evaluation $v^{\tau}_s \leftarrow v^{\tau}_0(s)$.
     {\bf return} $\argmax_{a \in \cA(s_0)} n_{s_0,a}$\; 
   \popline
   \vspace{0.3cm}
-  \caption{Pseudo-code of MCTS with Implicit Minimax Backups. \label{alg}}
+  \caption{Pseudo-code of MCTS with implicit minimax backups. \label{alg}}
 \end{algorithm2e}
 
 In essence, MCTS with implicit minimax backups acts like a heuristic approximation of MCTS-Solver for the portion of the
@@ -305,7 +305,17 @@ proven wins and losses.
 \newcommand{\UCTMAXH}{$\mbox{UCTMAX}_H$\xspace}
 \newcommand{\UCTH}{$\mbox{UCT}_H$\xspace}
 
-Some important things we might want to consider for the results:
+Results for different alpha values in LOA are shown in Figure~\ref{fig:loa-alpha}.
+
+\begin{figure}
+\begin{center}
+\includegraphics[scale=0.7]{plots/loa-alpha}
+\caption{Results in LOA. Each data represents 1000 games with 1 second of search time.} 
+\label{fig:loa-alpha}
+\end{center}
+\end{figure}
+
+Some important things we might want to consider for the experiments and/or message:
 
 \begin{itemize}
 \item {\bf Early playout terminations}. When a playout is started from state $s$, descend $d$ plies by 
@@ -318,15 +328,22 @@ Some important things we might want to consider for the results:
       probability $\epsilon$ and chooses an action $a \in \cA(s)$ that maximizes $v_0^\tau(\cT(s,a))$. 
 \item {\bf Constant/Progressive bias.} Constant or progressive bias defines $\hQ$ as in Equation \ref{eq:imq} 
       except replaces $v^{\tau}_{s,a}$ with $v^{\tau}_0(s')$ or with $v^{\tau}_0(s') / (n_{s,a} + 1)$, respectively. 
-\item {\bf Node priors} (see Lorentz paper, cite previous papers on this)
+\item {\bf Node priors} (Lorentz paper claims this make large difference in Breakthrough)
 \item Probably the most similar competitor is \UCTMAXH from \cite{Ramanujan11Tradeoffs}. \UCTH
       is standard UCT with early playout terminations ($d = 0$). \UCTMAXH is the same, except maximum backpropagation
       is used. Note that \UCTMAXH is different from implicit minimax; implicit minimax keeps the average computed by 
       the playouts and minimax values separately, benefiting from both sources of information. I expect implicit minimax
       to work better than \UCTMAXH, but it might be nice to show this (esp. in Mancala). 
 \item The extension to games with chance nodes is straight-forward. It might be nice to show it, though. There is a tactical 
-      candidate game growing in popularity (Chinese Dark Chess). 
+      candidate game growing in popularity (Chinese Dark Chess). Probably not going to happen -- just not enough time {\tt :(}
+\item Implicit max$^n$ in Hearts. If this works well and we want to include the results, we'd 
+      change the formulation a bit to talk about the $>2$ player case~\cite{Sturtevant08An}. 
+\item For Chinese Checkers we should also try Progressive History~\cite{Nijssen10Enhancements,Nijssen13PhdThesis} since it was 
+      shown to work quite well there.
 \item Simple regret / observed error? We need a small game that's solveable so we can compute the optimal minimax values.
+      Small Chinese Checkers?
+\item Seems like, at least from our observations of watching experiments in Breakthrough, implicit minimax could be better at 
+      detecting/defending ``fortresses''~\cite{Guid12Fortress}. 
 \end{itemize}
 
 Candidate domains at the moment: Breakthrough, Cannon, Chinese Checkers, Lines of Action, Mancala, Chinese Dark Chess, Hearts.
