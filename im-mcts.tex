@@ -305,12 +305,18 @@ proven wins and losses.
 \newcommand{\UCTMAXH}{$\mbox{UCTMAX}_H$\xspace}
 \newcommand{\UCTH}{$\mbox{UCT}_H$\xspace}
 
+\mlnote{We'll need to modify how this paragraph to not give away our identities.}
 Results for different alpha values in LOA are shown in Figure~\ref{fig:loa-alpha}.
+A particularly good enhancement in LOA is the progressive bias from move categories 
+(see~\cite{Winands10MCTS-LOA}). We test how implicit minimax backups perform against 
+the strongest known LOA player (MC-LOA) with and without progressive bias from move
+categories enabled. MC-LOA also uses MCTS-Solver, (dynamic) early playout terminations,
+and more.  \\
 
 \begin{figure}
 \begin{center}
 \includegraphics[scale=0.7]{plots/loa-alpha}
-\caption{Results in LOA. Each data represents 1000 games with 1 second of search time.} 
+\caption{Results in MC-LOA. Each data represents 1000 games with 1 second of search time.} 
 \label{fig:loa-alpha}
 \end{center}
 \end{figure}
