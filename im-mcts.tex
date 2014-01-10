@@ -100,9 +100,36 @@ reduces regret in an example game and leads to stronger
 play performance in four games: Lines of Action, Chinese Checkers, Mancala, and Breakthrough. 
 \end{abstract}
 
+%\subsection{Related Work}
+
 \section{Introduction}
 
-Monte Carlo Tree Search (MCTS)~\cite{mctssurvey,Coulom06Efficient,Kocsis06Bandit} is a 
+Monte Carlo Tree Search (MCTS)~\cite{Coulom06Efficient,Kocsis06Bandit} is a simulation-based best-first
+search paradigm that has been shown to increase performane in domains such as turn-taking games, 
+general-game playing, real-time strategy games, single-agent planning, and more~\cite{mctssurvey}. 
+While the initial applications have been to games where heursitic evaluations are difficult to obtain, 
+progress in MCTS research has shown that heuristics can be effectively be combined in MCTS, even in games 
+where class minimax search has traditonally been preferred. 
+
+The most popular Monte Carlo tree search algorithm is UCT~\cite{Kocsis06Bandit}, an algorithm
+which performs a single simulation from the root of the search tree to a terminal state at each iteration. 
+During the iterative process, a model of the game tree is incrementally built by adding a 
+new leaf node to the tree on each iteration. 
+The nodes in the tree are used to store statistical information regarding wins and losses, and backpropagation
+policies are used to update parent estimates, and these improving estimates are then used to guide future simulations. 
+When the simulation reaches parts of the game tree not included in the model, a default playout policy
+is used to simulate to a terminal state where a win or loss is determined. 
+
+%When applied to sequential turn-taking games, MCTS has primarily been used in domains where good 
+%heuristic evaluations are difficult to obtain. 
+In this work, we propose to augment MCTS with the help of 
+an implicitly-computed minimax search which uses heuristic evaluations. 
+Unlike previous work, these heuristic evaluations are used as {\it separate source of information}, 
+and backed up in the same way as in classic minimax search. These minimax-style backups are done {\it implicitly}
+as a simple extra step during the standard simulation, and always maintained separately from win rate estimates obtained
+from playouts. These two separate information sources are then used to guide the MCTS search. 
+We show that combining heuristic evaluations in this way reduces simple regret and improves performance in four 
+different games. 
 
 \subsection{Related Work}
 
@@ -112,11 +139,19 @@ suggests, after a number of simulations to a node has been reached, to switch to
 of the simulated (``average'') value. 
 The rationale behind this choice is that after a certain point, the search algorithm should consider the node
 {\it converged} and return an estimate of the best value. 
-Maximum backpropagation focuses on estimating the value of the optimal action required for the parent nodes, which is a
-``separate exploratory concern'' than simply identifying the best action at that node~\cite{Feldman13Theoretically}.
-In games where minimax search works well, such as Mancala, modifying MCTS to 
-use minimax-style backups and heuristic values instead of playouts was shown to be as powerful as a strong 
-depth-first minimax search~\cite{Ramanujan11Tradeoffs}.
+Maximum backpropagation has also been used in other Monte Carlo tree search algorithms and demonstrated success in
+probabilistic planning, as an alternative type of forecaster in BRUE~\cite{Feldman13Theoretically} and as Bellman 
+backups for online dynamic programming in THTS~\cite{Keller13Trial}.
+
+The first use of enhancing MCTS using prior knowledge was in Computer Go~\cite{Gelly07Combining}. 
+In this work, offline-learned knowledge initialized values of expanded nodes increased performance against significantly against 
+strong benchmark player. This technique was also confirmed to be advantageous in Breakthrough~\cite{Lorentz13Breakthrough}. 
+Another way to introduce prior knowledge is a progressive bias during selection~\cite{Chaslot08Progressive}, which also showed 
+increased performance in Go play strength. 
+
+In games where minimax search performs well, such as Mancala, modifying MCTS to 
+use minimax-style backups and heuristic values instead to replace playouts offers a worthwhile trade-off 
+under different search time settings~\cite{Ramanujan11Tradeoffs}.
 Similarly, there is further evidence suggesting not replacing the playout entirely, but terminating them early 
 using heuristic evaluations, has increased the performance in Lines of Action (LOA)~\cite{Winands10MCTS-LOA}, 
 Amazons~\cite{Kloetzer10Amazons,Lorentz08Amazons}, and Breakthrough~\cite{Lorentz13Breakthrough}. In LOA and Amazons, the 
@@ -136,14 +171,15 @@ leading to $\alpha \beta$ style pruning in the tree~\cite{Cazenave10ScoreBounded
 minimax searches in the tree to initialize nodes during, enhance the playout, or to help MCTS-Solver 
 in backpropagation~\cite{Baier13MinimaxHybrids}.
 
-In this work, we propose to augment MCTS with the help of an implicitly-computed minimax search which uses
-heuristic evaluations. In our case, these heuristic evaluations are not used to replace or terminate playouts, but 
-rather as a {\it separate source of information} to guide the tree search during the selection phase. Like MCTS-Solver, 
-the backpropagation of these values is treated differently and affect node selection. However, unlike MCTS-Solver and 
-minimax hybrids, these modifications are based on heuristic evaluations rather than proven wins and losses. 
-We show that (something good and insightful). 
+Finally, recent work has attempted to explain and identify some of the shortcomings that arise from estimates in 
+MCTS, specifically compared to situations where classic minimax search has historically performed 
+well~\cite{Ramanujan10Understanding,Ramanujan10On}. 
+Attempts have been made to overcome the problem of {\it traps} or {\it optimistic moves} (strategic  
+tactial lines that are problematic for MCTS) such as sufficiency thresholds during selection~\cite{Gudmindsson13Sufficiency} 
+and shallow minimax searches~\cite{Baier13MinimaxHybrids}. We show that implicit minimax backups also
+improve performance in domains with tactical short-term goals. 
 
-\section{Adversarial Search in Turn-Taking Games}
+\section{Adversarial Search in Turn-based Games}
 
 %The following notation is taken from~\cite{Sutton98}
 
@@ -153,8 +189,8 @@ $\cT : \cS \times \cA \mapsto \Delta \cS$ is a {\it transition function} mapping
 each state and action to a distribution over successor states. Finally, $\cR : \cS \times \cA \times \cS \mapsto \Re$ 
 is a {\it reward function} mapping (state, action, successor state) triplets to numerical rewards. 
 
-A two-player perfect information game is an augmented MDP with a specific form. 
-Denote $\cZ \subset \cS$ the set of {\it terminal states}. 
+A two-player perfect information game is an MDP with a specific form. 
+Denote $\cZ = \{ s \in \cS: \cA(s) = \emptyset \} \subset \cS$ the set of {\it terminal states}. 
 In addition, for all nonterminal states $s' \in \cS - \cZ$, $\cR(s,a,s') = 0$. 
 There is a {\it player identity function} $\tau : \cS - \cZ \mapsto \{1,2\}$. 
 In this paper, we assume fully deterministic domains, so $\cT(s,a)$ maps to a single state. 
@@ -172,7 +208,7 @@ States $s \in \cG$ are referred to as {\it nodes} and statistics are
 maintained for each node $s$: the cumulative reward, $r_s$, and visit count, $n_s$. 
 By popular convention, we define $r_{s,a} = r_{s'}$ where $s' = \cT(s,a)$, and similarly $n_{s,a} = n_{s'}$. 
 Also, we use $r^{\tau}_s$ to denote the reward at state $s$ {\it with respect to player} $\tau(s)$. 
-Finally, we denote  the set $C(s)$ to be the children of $s$ that are in $\cG$. 
+%Finally, we denote  the set $C(s)$ to be the children of $s$ that are in $\cG$. 
 
 Let $\hV(s,a)$ be an estimator for node $s$ and $\hQ(s,a)$ for the state-action pair. 
 For example, one popular estimator is the observed mean over all simulations 
@@ -199,7 +235,7 @@ rule based on children values. Also, rather than using $\hQ = \bQ$ for selection
 \hQ^{\mathit{IM}}(s,a) = (1-\alpha) \frac{r^{\tau}_{s,a}}{n_{s,a}} + \alpha v^{\tau}_{s,a}.
 \end{equation}
 
-Pseudo-code (without MCTS-Solver for now) is presented in Algorithm~\ref{alg}. There are three main changes from vanilla MCTS, two 
+Pseudo-code is presented in Algorithm~\ref{alg}. There are three main changes from vanilla MCTS, two 
 of which are on lines \ref{alg:imselect} and \ref{alg:imeval}. 
 During selection, $\hQ^{\mathit{IM}}$ from Equation~\ref{eq:imq} replaces $\bQ$ in 
 Equation~\ref{eq:select-ucb}. During backpropagation, the implicit minimax evaluations $v^{\tau}_s$ are updated based on 
@@ -258,6 +294,11 @@ evaluation $v^{\tau}_s \leftarrow v^{\tau}_0(s)$.
   \vspace{0.3cm}
   \caption{Pseudo-code of MCTS with Implicit Minimax Backups. \label{alg}}
 \end{algorithm2e}
+
+In essence, MCTS with implicit minimax backups acts like a heuristic approximation of MCTS-Solver for the portion of the
+search tree that has not reached terminal states. 
+However, unlike MCTS-Solver and minimax hybrids, these modifications are based on heuristic evaluations rather than 
+proven wins and losses. 
 
 \section{Empirical Evaluation}
 
