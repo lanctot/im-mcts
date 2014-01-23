@@ -89,7 +89,7 @@ domains such as Go, Hex, and general-game playing. MCTS has been shown to outper
 classic minimax search in games where good heuristic evaluations are difficult to obtain. 
 In recent years, combining 
 ideas from traditional minimax search in MCTS has been shown to be advantageous in some domains,
-such as Lines of Action, Mancala, Amazons, Breakthrough, and Connect Four. In this paper, we propose 
+such as Lines of Action, Amazons, Breakthrough, Connect Four, and Kalah. In this paper, we propose 
 a new way to use heuristic evaluations to guide the MCTS search by storing the two sources of 
 information, estimated win rates and heuristic evaluations, separately. 
 Rather than using the heuristic evaluations to replace the playouts, 
@@ -97,7 +97,7 @@ our technique backs them up {\it implicity} during its MCTS simulations.
 These learned evaluation values are then used to guide future simulations. 
 Compared to current techniques, we show that using implicit minimax backups  
 reduces regret in an example game and leads to stronger 
-play performance in four games: Lines of Action, Chinese Checkers, Breakthrough, and/or \{Mancala,Hearts\}.
+play performance in Breakthrough, Lines of Action, and Kalah, (...and Hearts?).
 \end{abstract}
 
 %\subsection{Related Work}
@@ -136,7 +136,7 @@ different games.
 Several techniques for minimax-influenced backup rules in the simulation-based MCTS framework have already been proposed. 
 The first was Coulom's original {\it maximum backpropagation}~\cite{Coulom06Efficient}. This method of backpropagation
 suggests, after a number of simulations to a node has been reached, to switch to propagating the maximum value instead 
-of the simulated (``average'') value. 
+of the simulated (average) value. 
 The rationale behind this choice is that after a certain point, the search algorithm should consider the node
 {\it converged} and return an estimate of the best value. 
 Maximum backpropagation has also been used in other Monte Carlo tree search algorithms and demonstrated success in
@@ -149,8 +149,9 @@ strong benchmark player. This technique was also confirmed to be advantageous in
 Another way to introduce prior knowledge is a progressive bias during selection~\cite{Chaslot08Progressive}, which also showed 
 increased performance in Go play strength. 
 
-In games where minimax search performs well, such as Mancala, modifying MCTS to 
-use minimax-style backups and heuristic values instead to replace playouts offers a worthwhile trade-off 
+In games where minimax search performs well, such as Kalah\footnote{Kalah has been weakly solved for 
+several different starting configurations~\cite{Irving00Solving}.}
+modifying MCTS to use minimax-style backups and heuristic values instead to replace playouts offers a worthwhile trade-off 
 under different search time settings~\cite{Ramanujan11Tradeoffs}.
 Similarly, there is further evidence suggesting not replacing the playout entirely, but terminating them early 
 using heuristic evaluations, has increased the performance in Lines of Action (LOA)~\cite{Winands10MCTS-LOA}, 
@@ -235,16 +236,18 @@ rule based on children values. Also, rather than using $\hQ = \bQ$ for selection
 \hQ^{\mathit{IM}}(s,a) = (1-\alpha) \frac{r^{\tau}_{s,a}}{n_{s,a}} + \alpha v^{\tau}_{s,a}.
 \end{equation}
 
-Pseudo-code is presented in Algorithm~\ref{alg}. There are three main changes from vanilla MCTS, two 
-of which are on lines \ref{alg:imselect} and \ref{alg:imeval}. 
+Pseudo-code is presented in Algorithm~\ref{alg}. There are three simple additions to vanilla MCTS,
+which are located on lines \ref{alg:imselect}, \ref{alg:imeval}, and \ref{alg:imexpand}.
 During selection, $\hQ^{\mathit{IM}}$ from Equation~\ref{eq:imq} replaces $\bQ$ in 
 Equation~\ref{eq:select-ucb}. During backpropagation, the implicit minimax evaluations $v^{\tau}_s$ are updated based on 
-the children's values. Note that a single $\max$ is used here since the evaluations are assumed to be in 
-view of player $\tau(s)$.
+the children's values. For simplicity, a single $\max$ operator is used here since the evaluations are assumed to be in 
+view of player $\tau(s)$. Depending on how the game is modeled, the implementation may require keeping track of or  
+accounting for signs of rewards, for example a negamax model would include a sign switch from the returned child on 
+line~\ref{alg:imeval}. 
 %\footnote{Domain-dependent inversions or scalings may be necessary to convert the rewards. These details are 
 %intentionally omitted from the pseudo-code for generality.}
 The function $\alpha(n_s)$ will determine how much weight to attribute to these evaluations.  
-Finally, during a node expansion on line~\ref{alg:imexpand}, the implicit minimax value is initialized to its heuristic
+Finally, after a node expansion, on line~\ref{alg:imexpand}, the implicit minimax value is initialized to its heuristic
 evaluation $v^{\tau}_s \leftarrow v^{\tau}_0(s)$. 
 
 \newcommand{\MCTS}{{\sc MCTS}}
@@ -271,7 +274,8 @@ evaluation $v^{\tau}_s \leftarrow v^{\tau}_0(s)$.
   \Simulate$(s_{prev}, a_{prev}, s)$:\;
   \pushline
     \If{$s \not\in \cG$}{
-      \Expand($s$)\;                                           \label{alg:imexpand}
+      \Expand($s$)\;        
+      $v^{\tau}_s \leftarrow v^{\tau}_0(s)$ \; \label{alg:imexpand}
       $r \leftarrow $\Playout($s$)\;
       \Update($s,r$)\;
       {\bf return} $r$\;
@@ -334,7 +338,7 @@ Some important things we might want to consider for the experiments and/or messa
 \begin{itemize}
 \item {\bf Early playout terminations}. When a playout is started from state $s$, descend $d$ plies by 
       choosing actions according to a playout policy to reach state $s^d$, then return the value 
-      of the $v^{\tau}_0(s^d)$. In Mancala, \UCTH uses early terminations with $d = 0$. 
+      of the $v^{\tau}_0(s^d)$. In Kalah, \UCTH uses early terminations with $d = 0$. 
       In previous work in Amazons and Breakthrough, and some domains with chance, 
       best performance is achieved for $d > 0$. 
 \item {\bf $\epsilon$-greedy playouts}. 
@@ -347,7 +351,7 @@ Some important things we might want to consider for the experiments and/or messa
       is standard UCT with early playout terminations ($d = 0$). \UCTMAXH is the same, except maximum backpropagation
       is used. Note that \UCTMAXH is different from implicit minimax; implicit minimax keeps the average computed by 
       the playouts and minimax values separately, benefiting from both sources of information. I expect implicit minimax
-      to work better than \UCTMAXH, but it might be nice to show this (esp. in Mancala). 
+      to work better than \UCTMAXH, but it might be nice to show this (esp. in Kalah). 
 \item The extension to games with chance nodes is straight-forward. It might be nice to show it, though. There is a tactical 
       candidate game growing in popularity (Chinese Dark Chess). Probably not going to happen -- just not enough time {\tt :(}
 \item Implicit max$^n$ in Hearts. If this works well and we want to include the results, we'd 
@@ -360,7 +364,7 @@ Some important things we might want to consider for the experiments and/or messa
       detecting/defending ``fortresses''~\cite{Guid12Fortress}. 
 \end{itemize}
 
-Candidate domains at the moment: Breakthrough, Cannon, Chinese Checkers, Lines of Action, Mancala, Chinese Dark Chess, Hearts.
+Candidate domains at the moment: Breakthrough, Lines of Action, Kalah, and Hearts.
 In terms of choosing domains, it seems like this work on ``somewhat tactical games'' (where minimaxing will help). 
 
 A comparison to standard minimax seems appropriate. It'd be nice to find a game where MCTS with implicit minimax backups
