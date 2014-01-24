@@ -1,0 +1,17 @@
+Every 2.0s: scripts/parseres.perl scratch | sort -n                                                                                                                             Fri Jan 24 23:48:09 2014
+
+matchup summary: mcts_h_pd4-mcts_h_pd4_im0.00 658 458 3729  (diff 200, games 4845)  58.96  41.04  +/-  2.89
+matchup summary: mcts_h_pd4-mcts_h_pd4_im0.05 542 726 3649  (diff -184, games 4917)  42.74  57.26  +/-  2.72
+matchup summary: mcts_h_pd4-mcts_h_pd4_im0.10 538 898 3411  (diff -360, games 4847)  37.47  62.53  +/-  2.50
+matchup summary: mcts_h_pd4-mcts_h_pd4_im0.15 474 986 3447  (diff -512, games 4907)  32.47  67.53  +/-  2.40
+matchup summary: mcts_h_pd4-mcts_h_pd4_im0.20 506 1026 3335  (diff -520, games 4867)  33.03  66.97  +/-  2.36
+matchup summary: mcts_h_pd4-mcts_h_pd4_im0.25 486 1015 3378  (diff -529, games 4879)  32.38  67.62  +/-  2.37
+matchup summary: mcts_h_pd4-mcts_h_pd4_im0.30 470 1108 3286  (diff -638, games 4864)  29.78  70.22  +/-  2.26
+matchup summary: mcts_h_pd4-mcts_h_pd4_im0.35 512 1114 3209  (diff -602, games 4835)  31.49  68.51  +/-  2.26
+matchup summary: mcts_h_pd4-mcts_h_pd4_im0.40 578 1023 3259  (diff -445, games 4860)  36.10  63.90  +/-  2.35
+matchup summary: mcts_h_pd4-mcts_h_pd4_im0.45 604 976 3274  (diff -372, games 4854)  38.23  61.77  +/-  2.40
+matchup summary: mcts_h_pd4-mcts_h_pd4_im0.50 622 826 3415  (diff -204, games 4863)  42.96  57.04  +/-  2.55
+matchup summary: mcts_h_pd4-mcts_h_pd4_im0.55 747 828 3359  (diff -81, games 4934)  47.43  52.57  +/-  2.47
+matchup summary: mcts_h_pd4-mcts_h_pd4_im0.60 684 728 3424  (diff -44, games 4836)  48.44  51.56  +/-  2.61
+matchup summary: mcts_h_pd4-mcts_h_pd4_im0.75 1084 478 3306  (diff 606, games 4868)  69.40  30.60  +/-  2.29
+matchup summary: mcts_h_pd4-mcts_h_pd4_im1.00 1959 198 2693  (diff 1761, games 4850)  90.82  9.18  +/-  1.22
