@@ -309,7 +309,6 @@ proven wins and losses.
 \newcommand{\UCTMAXH}{$\mbox{UCTMAX}_H$\xspace}
 \newcommand{\UCTH}{$\mbox{UCT}_H$\xspace}
 
-\mlnote{We'll need to modify how this paragraph reads so as to not give away our identities.}
 Results for different alpha values in LOA are shown in Figure~\ref{fig:loa-alpha}.
 A particularly good enhancement in LOA is the progressive bias from move categories 
 (see~\cite{Winands10MCTS-LOA}). We test how implicit minimax backups perform against 
@@ -329,6 +328,15 @@ and more.  \\
 \begin{center}
 \includegraphics[scale=0.7]{plots/bt-alpha}
 \caption{Results in Breakthrough. Each data point represents 1000 games with 1 second of search time.} 
+\label{fig:loa-alpha}
+\end{center}
+\end{figure}
+
+\begin{figure}
+\begin{center}
+\includegraphics[scale=0.7]{plots/kalah-alpha}
+\caption{Results in Kalah. Each data point is $\pm$ ~3\% at the moment (still running), with 1 second of search time. 
+Same evaluation function as \cite{Ramanujan11Tradeoffs} normalized to $[0,1]$ using tanh and an (optimal) pdepth of 4.} 
 \label{fig:loa-alpha}
 \end{center}
 \end{figure}
