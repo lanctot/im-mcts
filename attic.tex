@@ -1,0 +1,30 @@
+
+Some important things we might want to consider for the experiments and/or message:
+\begin{itemize}
+\item {\bf Early playout terminations}. When a playout is started from state $s$, descend $d$ plies by 
+      choosing actions according to a playout policy to reach state $s^d$, then return the value 
+      of the $v^{\tau}_0(s^d)$. In Kalah, \UCTH uses early terminations with $d = 0$. 
+      In previous work in Amazons and Breakthrough, and some domains with chance, 
+      best performance is achieved for $d > 0$. 
+\item {\bf $\epsilon$-greedy playouts}. 
+      At state $s$, the playout policy chooses randomly with 
+      probability $\epsilon$ and chooses an action $a \in \cA(s)$ that maximizes $v_0^\tau(\cT(s,a))$. 
+\item {\bf Constant/Progressive bias.} Constant or progressive bias defines $\hQ$ as in Equation \ref{eq:imq} 
+      except replaces $v^{\tau}_{s,a}$ with $v^{\tau}_0(s')$ or with $v^{\tau}_0(s') / (n_{s,a} + 1)$, respectively. 
+\item {\bf Node priors} (Lorentz paper claims this make large difference in Breakthrough)
+\item Probably the most similar competitor is \UCTMAXH from \cite{Ramanujan11Tradeoffs}. \UCTH
+      is standard UCT with early playout terminations ($d = 0$). \UCTMAXH is the same, except maximum backpropagation
+      is used. Note that \UCTMAXH is different from implicit minimax; implicit minimax keeps the average computed by 
+      the playouts and minimax values separately, benefiting from both sources of information. I expect implicit minimax
+      to work better than \UCTMAXH, but it might be nice to show this (esp. in Kalah). 
+\item The extension to games with chance nodes is straight-forward. It might be nice to show it, though. There is a tactical 
+      candidate game growing in popularity (Chinese Dark Chess). Probably not going to happen -- just not enough time {\tt :(}
+\item Implicit max$^n$ in Hearts. If this works well and we want to include the results, we'd 
+      change the formulation a bit to talk about the $>2$ player case~\cite{Sturtevant08An}. 
+\item For Chinese Checkers we should also try Progressive History~\cite{Nijssen10Enhancements,Nijssen13PhdThesis} since it was 
+      shown to work quite well there. See also~\cite{Roschke13UCT}.
+\item Simple regret / observed error? We need a small game that's solveable so we can compute the optimal minimax values.
+      Small Chinese Checkers?
+\item Seems like, at least from our observations of watching experiments in Breakthrough, implicit minimax could be better at 
+      detecting/defending ``fortresses''~\cite{Guid12Fortress}. 
+\end{itemize}

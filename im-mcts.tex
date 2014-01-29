@@ -17,6 +17,8 @@
 \usepackage{booktabs}
 \usepackage{nopageno}
 \usepackage{url}
+\usepackage{chessboard}
+\usepackage{skak}
 
 \usepackage[algo2e, noend, noline, linesnumbered]{algorithm2e}
 \providecommand{\SetAlgoLined}{\SetLine}  
@@ -27,6 +29,7 @@
 \newcommand{\popline}{\Indm}
 \makeatother
 \newcommand{\argmax}{\operatornamewithlimits{argmax}}
+\newcommand{\defword}[1]{\textbf{\boldmath{#1}}}
 
 \captionsetup{compatibility=false}
 
@@ -149,8 +152,7 @@ strong benchmark player. This technique was also confirmed to be advantageous in
 Another way to introduce prior knowledge is a progressive bias during selection~\cite{Chaslot08Progressive}, which also showed 
 increased performance in Go play strength. 
 
-In games where minimax search performs well, such as Kalah\footnote{Kalah has been weakly solved for 
-several different starting configurations~\cite{Irving00Solving}.}
+In games where minimax search performs well, such as Kalah, 
 modifying MCTS to use minimax-style backups and heuristic values instead to replace playouts offers a worthwhile trade-off 
 under different search time settings~\cite{Ramanujan11Tradeoffs}.
 Similarly, there is further evidence suggesting not replacing the playout entirely, but terminating them early 
@@ -309,28 +311,102 @@ proven wins and losses.
 \newcommand{\UCTMAXH}{$\mbox{UCTMAX}_H$\xspace}
 \newcommand{\UCTH}{$\mbox{UCT}_H$\xspace}
 
-Results for different alpha values in LOA are shown in Figure~\ref{fig:loa-alpha}.
-A particularly good enhancement in LOA is the progressive bias from move categories 
-(see~\cite{Winands10MCTS-LOA}). We test how implicit minimax backups perform against 
-the strongest known LOA player (MC-LOA) with and without progressive bias from move
-categories enabled. MC-LOA also uses MCTS-Solver, (dynamic) early playout terminations,
-and more.  \\
+In this section, we thoroughly evaluate the practical performance of the implicit minimax backups technique. 
+Before reporting head-to-head results, we first describe our experimental setup and 
+summarize the techniques that have been used to improve playouts. We then present results on three game
+domains: Breakthrough, Kalah, and Lines of Action. 
 
-\begin{figure}
-\begin{center}
-\includegraphics[scale=0.7]{plots/loa-alpha}
-\caption{Results in MC-LOA. Each data point represents 1000 games with 1 second of search time.} 
-\label{fig:loa-alpha}
-\end{center}
-\end{figure}
+Unless otherwise stated, our implementations expand a new node every simulation, the first node encountered
+that is not in the tree. MCTS-Solver is enabled in all of our experiments since its overhead is negligible and
+never decreases performance. 
+Rewards are in $\{-1, 0, 1\}$ representing a loss, draw, and win.
+To ensure values in the same range, evaluation functions are scaled to $[-1,1]$ by passing a domain-dependant 
+score differences through a cache-optimized $\tanh$. 
+When simulating, to avoid memory overhead, a single game state is modified and 
+moves are undone when returning from the recursive call.
+Whenever possible, evaluation functions are updated incrementally to save time. 
+All of the experiments include swapped seats to ensure that each player type plays 
+an equal number of games as first player and as second player. 
+Domain-dependent playout policies and speeds are reported in the appropriate subsections below.
+
+We compare to and combine our technique with number of previous ones to include  
+domain knowledge. A popular technique is {\it early playout terminations}. When a leaf node of the tree 
+is reached, a fixed-depth early playout terminations, hereby abbreviated to ``pd$x$'', plays $x$ moves according
+to the playout policy resulting in state $s$, and then terminates the playout returning $v_0(s)$. This method has
+shown to improve performance against baseline MCTS in Amazons, Kalah, and 
+Breakthrough~\cite{Lorentz08Amazons,RamanujanS11,Lorentz13Breakthrough}. A similar technique is 
+{\it dynamic early terminations}, which periodically checks the evaluation function (or other domain-dependent features)
+terminating only when some condition is met. 
+This approach has been used as a ``mercy rule'' in Go~\cite{Bouzy07Old} and quite successfully in 
+Lines of Action~\cite{Winands08MCTSSolver}.
+In our version, which we abbreviate ``det$x$'', a playout is terminated and returns $1$ if $v_0(s) \ge x$ and 
+$-1$ if $v_0(s) \le -x$. Another option is to use an $\epsilon$-greedy playout policy that chooses a successor randomly 
+with probability $\epsilon$ and successor state with the largest evaluation with probability $1-\epsilon$, with 
+improved performance in Chinese Checkers~\cite{Sturtevant08An,Nijssen12Playout}.
+
+Another popular technique is {\it maximimum backpropagation}, where certain number of visits in the \Update~procedure,
+the valued backed up is the one of the best child instead of the sampled value from the simulation.
+Couloum originally showed that the the mean backpropagation to be superior in Go~\cite{Coulom06Efficient}. 
+In Kalah, the \UCTMAXH algorithm proposed by Ramanujan resembles closely maximum backpropagation with early terminations 
+(pd0) except that the values are also weighted by visit counts, and was shown to perform as well or better than a strong minimax 
+player at a low number of nodes expansions. Another successful technique in Go is 
+{\it node priors}~\cite{Gelly07Combining}, where newly-expanded nodes are assigned some initial wins and loss counts, 
+which also improved performance in Breakthrough~\cite{Lorentz13Breakthrough}. Finally, another way to use 
+heuristic knowledge is as a means of {\it progressive bias} which has been rather successful
+in Go~\cite{Gelly07Combining,ChaslotWHUB2008} and Lines of Action~\cite{Winands10MCTS-LOA}.
+
+\subsection{Breakthrough}
+
+Breakthrough is a turn-based alternating move game played on an 8-by-8 chess board, where each player 
+contains 16 identical pieces on their initial two rows. 
+Each piece is allowed to move forward to an empty square, either straight or via the diagonals, but may only 
+capture via the diagonals like Chess pawns. The goal of the game is bring a piece to the furthest opponent row. 
 
 \begin{figure}
 \begin{center}
 \includegraphics[scale=0.7]{plots/bt-alpha}
 \caption{Results in Breakthrough. Each data point represents 1000 games with 1 second of search time.} 
-\label{fig:loa-alpha}
+\label{fig:bt-alpha}
 \end{center}
 \end{figure}
+
+Breakthrough was first introduced in general game-playing competitions and has been identified as a domain 
+that is particularly difficult for MCTS due to traps and random playouts~\cite{Gudmindsson13Sufficiency}. 
+Our playout policy always choose a 1-ply ``decisive'' move and prevent 1-ply ``anti-decisive'' losses. 
+Otherwise, a move is selected non-uniformly at random, where capturing undefended pieces are four times more
+likely than other moves. We use two evaluation functions, a simple one found in \cite{Schadd11PhdThesis} 
+that assigns each piece a score of 10 and the further row achieved as 2.5, and the one found in 
+\cite{Lorentz13Breakthrough}. 
+We base much of our analysis in Breakthrough on the Lorentz \& Holey player, which 
+at the time of publication had an ELO rating of 1910 on the Little Golem web site. 
+Currently, the ELO rating is 2010 and is the 8th highest-rated player out of over 300 Breakthrough players. 
+
+\begin{figure}
+\begin{center}
+\newgame
+\def\mylist{Pa1, Pb1, Pc1, Pd1, Pe1, Pf1, Ph1, Pg1, pd6, pe7}
+\setchessboard{setpieces=\mylist,showmover=false}
+\chessboard
+\end{center}
+\caption{An example position in Breakthrough.}
+\end{figure}
+
+\subsection{Kalah}
+
+Kalah is a turn-based game in the Mancala family of games. Each player has six houses, each 
+initially containing four stones, and a store on the endpoint of the board, initially empty. 
+On their turn, a player chooses one of their houses, removes all the stones in it, and ``sows'' 
+the stones one per house in counter-clockwise fashion, skipping the opponent's store. 
+If the final stone lands in the player's store, that player gets another turn, and there is no 
+limit to then number of consecutive turns taken by same player. If the stone ends on a house owned
+by the player that contains no stones, then that player captures all the stones in the adjacent 
+opponent house, putting it into the player's store. The game plays until one player's houses are
+all empty; the opponent then moves their remaining stones to their store. The winner is the player
+who has collected the most stones in their store. 
+
+Kalah has been weakly solved for several different starting configurations~\cite{Irving00Solving}, 
+and was used as a domain to compare MCTS variants to classical minimax search~\cite{Ramanujan11Tradeoffs}.
+
 
 \begin{figure}
 \begin{center}
@@ -341,43 +417,22 @@ Same evaluation function as \cite{Ramanujan11Tradeoffs} normalized to $[0,1]$ us
 \end{center}
 \end{figure}
 
-Some important things we might want to consider for the experiments and/or message:
+\subsection{Lines of Action}
 
-\begin{itemize}
-\item {\bf Early playout terminations}. When a playout is started from state $s$, descend $d$ plies by 
-      choosing actions according to a playout policy to reach state $s^d$, then return the value 
-      of the $v^{\tau}_0(s^d)$. In Kalah, \UCTH uses early terminations with $d = 0$. 
-      In previous work in Amazons and Breakthrough, and some domains with chance, 
-      best performance is achieved for $d > 0$. 
-\item {\bf $\epsilon$-greedy playouts}. 
-      At state $s$, the playout policy chooses randomly with 
-      probability $\epsilon$ and chooses an action $a \in \cA(s)$ that maximizes $v_0^\tau(\cT(s,a))$. 
-\item {\bf Constant/Progressive bias.} Constant or progressive bias defines $\hQ$ as in Equation \ref{eq:imq} 
-      except replaces $v^{\tau}_{s,a}$ with $v^{\tau}_0(s')$ or with $v^{\tau}_0(s') / (n_{s,a} + 1)$, respectively. 
-\item {\bf Node priors} (Lorentz paper claims this make large difference in Breakthrough)
-\item Probably the most similar competitor is \UCTMAXH from \cite{Ramanujan11Tradeoffs}. \UCTH
-      is standard UCT with early playout terminations ($d = 0$). \UCTMAXH is the same, except maximum backpropagation
-      is used. Note that \UCTMAXH is different from implicit minimax; implicit minimax keeps the average computed by 
-      the playouts and minimax values separately, benefiting from both sources of information. I expect implicit minimax
-      to work better than \UCTMAXH, but it might be nice to show this (esp. in Kalah). 
-\item The extension to games with chance nodes is straight-forward. It might be nice to show it, though. There is a tactical 
-      candidate game growing in popularity (Chinese Dark Chess). Probably not going to happen -- just not enough time {\tt :(}
-\item Implicit max$^n$ in Hearts. If this works well and we want to include the results, we'd 
-      change the formulation a bit to talk about the $>2$ player case~\cite{Sturtevant08An}. 
-\item For Chinese Checkers we should also try Progressive History~\cite{Nijssen10Enhancements,Nijssen13PhdThesis} since it was 
-      shown to work quite well there. See also~\cite{Roschke13UCT}.
-\item Simple regret / observed error? We need a small game that's solveable so we can compute the optimal minimax values.
-      Small Chinese Checkers?
-\item Seems like, at least from our observations of watching experiments in Breakthrough, implicit minimax could be better at 
-      detecting/defending ``fortresses''~\cite{Guid12Fortress}. 
-\end{itemize}
+Lines of Action is a turn-based alternating-move game played on an 8-by-8 board that uses checkers board and pieces, 
+invented by Claude Soucie around 1960 and published in Sid Sackson's {\it A Gamut of Games}. 
+The goal is to connect all your pieces into a single connected group (of any size), 
+where the pieces are connected via adjacent and diagonals squares. A piece may move in any direction, but the number of squares 
+it may move depends on the total number of pieces in the line, including opponent pieces. A piece may jump over its own
+pieces but not opponent pieces. Captures occur by landing on opponent pieces. 
 
-Candidate domains at the moment: Breakthrough, Lines of Action, Kalah, and Hearts.
-In terms of choosing domains, it seems like this work on ``somewhat tactical games'' (where minimaxing will help). 
-
-A comparison to standard minimax seems appropriate. It'd be nice to find a game where MCTS with implicit minimax backups
-is preferred over all of the others (minimax, MCTS, \UCTMAXH). 
-
+\begin{figure}
+\begin{center}
+\includegraphics[scale=0.7]{plots/loa-alpha}
+\caption{Results in LOA. Each data point represents 1000 games with 1 second of search time.} 
+\label{fig:loa-alpha}
+\end{center}
+\end{figure}
 
 \bibliographystyle{aaai}
 \bibliography{im-mcts}
