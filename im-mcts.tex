@@ -182,7 +182,7 @@ tactial lines that are problematic for MCTS) such as sufficiency thresholds duri
 and shallow minimax searches~\cite{Baier13MinimaxHybrids}. We show that implicit minimax backups also
 improve performance in domains with tactical short-term goals. 
 
-\section{Adversarial Search in Turn-based Games}
+\section{Adversarial Search in Turn-Taking Games}
 
 %The following notation is taken from~\cite{Sutton98}
 
@@ -357,15 +357,17 @@ in Go~\cite{Gelly07Combining,ChaslotWHUB2008} and Lines of Action~\cite{Winands1
 
 \subsection{Breakthrough}
 
-Breakthrough is a turn-based alternating move game played on an 8-by-8 chess board, where each player 
+Breakthrough is a turn-taking alternating move game played on an 8-by-8 chess board, where each player 
 contains 16 identical pieces on their initial two rows. 
 Each piece is allowed to move forward to an empty square, either straight or via the diagonals, but may only 
 capture via the diagonals like Chess pawns. The goal of the game is bring a piece to the furthest opponent row. 
 
 \begin{figure}
 \begin{center}
-\includegraphics[scale=0.7]{plots/bt-base-alpha}
-\caption{Results in Breakthrough. Each data point represents 1000 games with 1 second of search time.} 
+\includegraphics[scale=0.7]{plots/bt-base-alpha}\\
+\includegraphics[scale=0.7]{plots/bt-basenp-alpha}
+\caption{Results in Breakthrough. Each data point represents 1000 games. 
+Top is without node priors, bottom is with node priors.} 
 \label{fig:bt-base-alpha}
 \end{center}
 \end{figure}
@@ -393,7 +395,7 @@ Currently, the ELO rating is 2010 and is the 8th highest-rated player out of ove
 
 \subsection{Kalah}
 
-Kalah is a turn-based game in the Mancala family of games. Each player has six houses, each 
+Kalah is a turn-taking game in the Mancala family of games. Each player has six houses, each 
 initially containing four stones, and a store on the endpoint of the board, initially empty. 
 On their turn, a player chooses one of their houses, removes all the stones in it, and ``sows'' 
 the stones one per house in counter-clockwise fashion, skipping the opponent's store. 
@@ -404,7 +406,7 @@ opponent house, putting it into the player's store. The game plays until one pla
 all empty; the opponent then moves their remaining stones to their store. The winner is the player
 who has collected the most stones in their store. 
 
-Kalah has been weakly solved for several different starting configurations~\cite{Irving00Solving}, 
+Kalah has been weakly solved for several different variants of Kalah~\cite{Irving00Solving}, 
 and was used as a domain to compare MCTS variants to classical minimax search~\cite{Ramanujan11Tradeoffs}.
 
 
@@ -419,7 +421,7 @@ Same evaluation function as \cite{Ramanujan11Tradeoffs} normalized to $[0,1]$ us
 
 \subsection{Lines of Action}
 
-Lines of Action is a turn-based alternating-move game played on an 8-by-8 board that uses checkers board and pieces, 
+Lines of Action is a turn-taking alternating-move game played on an 8-by-8 board that uses checkers board and pieces, 
 invented by Claude Soucie around 1960 and published in Sid Sackson's {\it A Gamut of Games}. 
 The goal is to connect all your pieces into a single connected group (of any size), 
 where the pieces are connected via adjacent and diagonals squares. A piece may move in any direction, but the number of squares 

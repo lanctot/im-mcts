@@ -1,0 +1,2 @@
+    mcts_h_ege0.1_efv0_det0.5_np10_im0.6 vs.                          mcts_h_pd4_np10:   873   127     0 (diff   746, games  1000) 87.30 12.70 +/- 2.06
+          mcts_h_ege0.1_efv0_det0.5_np10 vs.                          mcts_h_pd4_np10:   635   365     0 (diff   270, games  1000) 63.50 36.50 +/- 2.98
