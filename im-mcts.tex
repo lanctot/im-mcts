@@ -99,8 +99,7 @@ Rather than using the heuristic evaluations to replace the playouts,
 our technique backs them up {\it implicity} during its MCTS simulations. 
 These learned evaluation values are then used to guide future simulations. 
 Compared to current techniques, we show that using implicit minimax backups  
-reduces regret in an example game and leads to stronger 
-play performance in Breakthrough, Lines of Action, and Kalah, (...and Hearts?).
+leads to stronger play performance in Breakthrough, Lines of Action, and Kalah. 
 \end{abstract}
 
 %\subsection{Related Work}
@@ -108,13 +107,13 @@ play performance in Breakthrough, Lines of Action, and Kalah, (...and Hearts?).
 \section{Introduction}
 
 Monte Carlo Tree Search (MCTS)~\cite{Coulom06Efficient,Kocsis06Bandit} is a simulation-based best-first
-search paradigm that has been shown to increase performane in domains such as turn-taking games, 
+search paradigm that has been shown to increase performance in domains such as turn-taking games, 
 general-game playing, real-time strategy games, single-agent planning, and more~\cite{mctssurvey}. 
 While the initial applications have been to games where heursitic evaluations are difficult to obtain, 
 progress in MCTS research has shown that heuristics can be effectively be combined in MCTS, even in games 
 where class minimax search has traditonally been preferred. 
 
-The most popular Monte Carlo tree search algorithm is UCT~\cite{Kocsis06Bandit}, an algorithm
+The most popular MCTS algorithm is UCT~\cite{Kocsis06Bandit}, 
 which performs a single simulation from the root of the search tree to a terminal state at each iteration. 
 During the iterative process, a model of the game tree is incrementally built by adding a 
 new leaf node to the tree on each iteration. 
@@ -131,12 +130,12 @@ Unlike previous work, these heuristic evaluations are used as {\it separate sour
 and backed up in the same way as in classic minimax search. These minimax-style backups are done {\it implicitly}
 as a simple extra step during the standard simulation, and always maintained separately from win rate estimates obtained
 from playouts. These two separate information sources are then used to guide the MCTS search. 
-We show that combining heuristic evaluations in this way reduces simple regret and improves performance in four 
-different games. 
+We show that combining heuristic evaluations in this way can lead to significantly stronger play peformance in three 
+separate domains: Breakthrough, Kalah, and Lines of Action. 
 
 \subsection{Related Work}
 
-Several techniques for minimax-influenced backup rules in the simulation-based MCTS framework have already been proposed. 
+Several techniques for minimax-influenced backup rules in the simulation-based MCTS framework have been previously proposed. 
 The first was Coulom's original {\it maximum backpropagation}~\cite{Coulom06Efficient}. This method of backpropagation
 suggests, after a number of simulations to a node has been reached, to switch to propagating the maximum value instead 
 of the simulated (average) value. 
@@ -149,8 +148,8 @@ backups for online dynamic programming in Trial-based Heuristic Tree Search~\cit
 The first use of enhancing MCTS using prior knowledge was in Computer Go~\cite{Gelly07Combining}. 
 In this work, offline-learned knowledge initialized values of expanded nodes increased performance against significantly against 
 strong benchmark player. This technique was also confirmed to be advantageous in Breakthrough~\cite{Lorentz13Breakthrough}. 
-Another way to introduce prior knowledge is a progressive bias during selection~\cite{Chaslot08Progressive}, which also showed 
-increased performance in Go play strength. 
+Another way to introduce prior knowledge is a progressive bias during selection~\cite{Chaslot08Progressive}, which has 
+significantly increased performance in Go play strength~\cite{Gelly07Combining}. 
 
 In games where minimax search performs well, such as Kalah, 
 modifying MCTS to use minimax-style backups and heuristic values instead to replace playouts offers a worthwhile trade-off 
@@ -169,8 +168,8 @@ One may want to combine minimax backups or searches without using an evaluation 
 The prime example is MCTS-Solver~\cite{Winands08Solver}. When using 
 MCTS-Solver, proven wins and losses are backpropagated as extra information in MCTS. When a node is proven to be a 
 win or a loss, it no longer needs to be searched. This simple, domain-independent modification greatly enhances 
-MCTS in many games (some examples). Score-bounded MCTS extends this idea to games with multiple outcomes, 
-leading to $\alpha \beta$ style pruning in the tree~\cite{Cazenave10ScoreBounded}. Finally, one can use hybrid
+MCTS, particularly in end-games, with negligible overhead. Score-bounded MCTS extends this idea to games with multiple 
+outcomes, leading to $\alpha \beta$ style pruning in the tree~\cite{Cazenave10ScoreBounded}. Finally, one can use hybrid
 minimax searches in the tree to initialize nodes during, enhance the playout, or to help MCTS-Solver 
 in backpropagation~\cite{Baier13MinimaxHybrids}.
 
@@ -179,8 +178,10 @@ MCTS, specifically compared to situations where classic minimax search has histo
 well~\cite{Ramanujan10Understanding,Ramanujan10On}. 
 Attempts have been made to overcome the problem of {\it traps} or {\it optimistic moves} (strategic  
 tactial lines that are problematic for MCTS) such as sufficiency thresholds during selection~\cite{Gudmindsson13Sufficiency} 
-and shallow minimax searches~\cite{Baier13MinimaxHybrids}. We show that implicit minimax backups also
-improve performance in domains with tactical short-term goals. 
+and shallow minimax searches~\cite{Baier13MinimaxHybrids}. We believe that implicit minimax backups can help MCTS in acheiving
+short-term tactical goals. 
+
+%We show that implicit minimax backups also improve performance in domains with tactical short-term goals. 
 
 \section{Adversarial Search in Turn-Taking Games}
 
