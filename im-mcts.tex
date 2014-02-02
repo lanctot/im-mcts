@@ -131,7 +131,7 @@ where class minimax search has traditonally been preferred.
 
 The most popular MCTS algorithm is UCT~\cite{Kocsis06Bandit}, 
 which performs a single simulation from the root of the search tree to a terminal state at each iteration. 
-During the iterative process, a model of the game tree is incrementally built by adding a 
+During the iterative process, a game tree is incrementally built by adding a 
 new leaf node to the tree on each iteration. 
 The nodes in the tree are used to store statistical information regarding wins and losses, and backpropagation
 policies are used to update parent estimates, and these improving estimates are then used to select actions 
@@ -166,9 +166,10 @@ backups for online dynamic programming in Trial-based Heuristic Tree Search~\cit
 
 The first use of enhancing MCTS using prior knowledge was in Computer Go~\cite{Gelly07Combining}. 
 In this work, offline-learned knowledge initialized values of expanded nodes increased performance against significantly against 
-strong benchmark player. This technique was also confirmed to be advantageous in Breakthrough~\cite{Lorentz13Breakthrough}. 
+strong benchmark player. 
+This technique was also confirmed to be advantageous in Breakthrough~\cite{Lorentz13Breakthrough}. 
 Another way to introduce prior knowledge is via a progressive bias during selection~\cite{Chaslot08Progressive}, which has 
-significantly increased performance in Go play strength~\cite{Gelly07Combining}. 
+significantly increased performance in Go play strength~\cite{Chaslot10Adding}. 
 
 In games where minimax search performs well, such as Kalah, 
 modifying MCTS to use minimax-style backups and heuristic values instead to replace playouts offers a worthwhile trade-off 
@@ -186,8 +187,8 @@ MCTS players enhanced with evaluation functions outperform their minimax counter
 One may want to combine minimax backups or searches without using an evaluation function. 
 The prime example is MCTS-Solver~\cite{Winands08Solver}. When using 
 MCTS-Solver, proven wins and losses are backpropagated as extra information in MCTS. When a node is proven to be a 
-win or a loss, it no longer needs to be searched. This simple, domain-independent modification greatly enhances 
-MCTS, particularly in end-games, with negligible overhead. Score-bounded MCTS extends this idea to games with multiple 
+win or a loss, it no longer needs to be searched. This domain-independent modification greatly enhances 
+MCTS with negligible overhead. Score-bounded MCTS extends this idea to games with multiple 
 outcomes, leading to $\alpha \beta$ style pruning in the tree~\cite{Cazenave10ScoreBounded}. Finally, one can use hybrid
 minimax searches in the tree to initialize nodes during, enhance the playout, or to help MCTS-Solver 
 in backpropagation~\cite{Baier13MinimaxHybrids}.
@@ -223,8 +224,8 @@ state.
 However, the ideas proposed can be easily extended to domains with stochastic transitions. 
 When it is clear from the context and unless otherwise stated, de denote $s' = \cT(s,a)$. 
 
-Monte Carlo Tree Search is a simulation-based best-first search algorithm that incrementally builds a model, $\cG$, 
-of the game tree, in memory. We also refer to $\cG$ as the MCTS tree. 
+Monte Carlo Tree Search is a simulation-based best-first search algorithm that incrementally builds a tree, $\cG$, 
+in memory. 
 Each search starts with from a {\it root state} $s_0 \in \cS - \cZ$, and initially sets $\cG = \emptyset$. 
 Each simulation samples a trajectory $\rho = (s_0, a_0, s_1, a_1, \cdots, s_n)$, where $s_n \in \cZ$ unless the playout 
 is terminated early. 
@@ -261,14 +262,15 @@ We propose a simple and elegant solution: add another value to maintain at each 
 as above. 
 This new value at node $s$ {\it only} maintains a heuristic minimax value built from the evaluations of subtrees below $s$. 
 During backpropagation, $r_s$ and $n_s$ are updated in the usual way, and additionally $v^{\tau}_s$ is updated using minimax backup 
-rule based on children values. Then, during selection, rather than using $\hQ = \bQ$ for selection in Equation~\ref{eq:select-ucb}, 
-we use
+rule based on children values. Then, similarly to RAVE~\cite{Gelly07Combining}, rather than using $\hQ = \bQ$ for 
+selection in Equation~\ref{eq:select-ucb}, we use
 \begin{equation}
 \label{eq:imq}
-\hQ^{\mathit{IM}}(s,a) = (1-\alpha) \frac{r^{\tau}_{s,a}}{n_{s,a}} + \alpha v^{\tau}_{s,a}.
+\hQ^{\mathit{IM}}(s,a) = (1-\alpha) \frac{r^{\tau}_{s,a}}{n_{s,a}} + \alpha v^{\tau}_{s,a}, 
 \end{equation}
+where $\alpha$ is a weight representing the influence of the heuristic minimax values.
 
-Pseudo-code is presented in Algorithm~\ref{alg}. There are three simple additions to vanilla MCTS,
+The entire process is summarized in Algorithm~\ref{alg}. There are three simple additions to vanilla MCTS,
 which are located on lines \ref{alg:imselect}, \ref{alg:imeval}, and \ref{alg:imexpand}.
 During selection, $\hQ^{\mathit{IM}}$ from Equation~\ref{eq:imq} replaces $\bQ$ in 
 Equation~\ref{eq:select-ucb}. During backpropagation, the implicit minimax evaluations $v^{\tau}_s$ are updated based on 
@@ -278,7 +280,7 @@ accounting for signs of rewards, for example a negamax model would include a sig
 line~\ref{alg:imeval}. 
 %\footnote{Domain-dependent inversions or scalings may be necessary to convert the rewards. These details are 
 %intentionally omitted from the pseudo-code for generality.}
-The function $\alpha(n_s)$ will determine how much weight to attribute to these evaluations.  
+%The function $\alpha(n_s)$ will determine how much weight to attribute to these evaluations.  
 Finally, after a node expansion, on line~\ref{alg:imexpand}, the implicit minimax value is initialized to its heuristic
 evaluation $v^{\tau}_s \leftarrow v^{\tau}_0(s)$. 
 
@@ -334,7 +336,8 @@ evaluation $v^{\tau}_s \leftarrow v^{\tau}_0(s)$.
 In essence, MCTS with implicit minimax backups acts like a heuristic approximation of MCTS-Solver for the portion of the
 search tree that has not reached terminal states. 
 However, unlike MCTS-Solver and minimax hybrids, these modifications are based on heuristic evaluations rather than 
-proven wins and losses, which might help the search in the opening and mid-games. 
+proven wins and losses.
+%which might help the search in the opening and mid-games. 
 
 Define a two-outcome game to be one with reward set containing only wins and losses, $R = \{ -1, 1 \}$. 
 Define a backup rule as {\it minimax-consistent} if $\forall s \in \cG,$
@@ -343,27 +346,31 @@ v^{\tau}_s = \left\{ \begin{array}{ll}
 \top & \mbox{if } \exists a \in \cA(s), \mbox{win}(s, s') \vee (s' \in \cG \wedge v^{\tau}_{s'} = \top), \\
 \bot & \mbox{if } \forall a \in \cA(s), \mbox{loss}(s, s') \vee (s' \in \cG \wedge v^{\tau}_{s'} = \bot), \end{array} \right. 
 \]
-where $\mbox{win}(s,s')$ is true if $s' \in \cZ$ and leads to a win for player $\tau(s)$, and false otherwise, 
+where $\mbox{win}(s,s')$ is true if $s' \in \cZ$ and leads to a win for player $\tau(s)$ (and false otherwise), 
 with loss defined similarly.
   Naturally, we set $\top = +\infty$ and $\bot = -\infty$ which refer to proven wins and losses as computed by MCTS-Solver. 
 
 \begin{proposition}
-If Algorithm~\ref{alg} in run on a two-outcome game using a minimax-consistent
-backup rule on line~\ref{alg:imeval}, then
-$\forall s \in \cA, \lim_{n_s \rightarrow \infty} \hV(s) = V^*(s)$, where $V^*(s)$ is the 
-unique game-theoretic minimax value for state $s$.  
+If Algorithm~\ref{alg} in run on a two-outcome game  
+using a minimax-consistent backup rule on line~\ref{alg:imeval} and $\alpha<1,C\ge1$, then
+$\forall s \in \cS, \lim_{n_s \rightarrow \infty} \hV(s) = V^*(s)$, where $V^*(s)$ is the 
+game-theoretic minimax value of state $s$.  
 \end{proposition}
 
-For this property to hold, the algorithm must continue to explore so that eventually $\cG = \cS$. Therefore,
-on line \ref{alg:imselect} unvisited actions with $n_{s,a} = 0$ must always be chosen before visited ones. 
+For this property to hold for all games and playout policies, 
+the algorithm must continue to explore so that eventually $\cG = \cS$. 
+On line \ref{alg:imselect}, unvisited actions ($n_{s,a} = 0$) must always be chosen first.  
+The UCT exploration term ensures that each node continues to be visited infinitely often 
+in the limit. 
 The property then follows from the analysis in \cite[Section 2.3]{Saffidine13PhdThesis}. 
-In particular, our technique defines an information scheme that contains both the implicitly computed 
-minimax values as well as win rate estimates. 
+Our technique defines an information scheme that contains both the implicitly computed 
+minimax values as well as win rate estimates, where $\top$ and $\bot$ always override 
+approximations from estimators. 
 
-Of course, while a badly chosen evaluation function with a minimax-consistent backup rule will still converge to the 
-optimal value eventually, we are mainly concerned with how an evaluation function can help MCTS performance.
+While a badly chosen-evaluation function can still converge to the optimal value eventually with a minimax-consistent
+backup rule, we are mainly concerned with how an evaluation function can help MCTS performance.
 Our empirical evaluation will show that MCTS can benefit significantly from this added information, even with 
-very simple heuristic evaluations.
+simple heuristic evaluation functions.
 
 
 \section{Empirical Evaluation}
@@ -381,17 +388,35 @@ that is not in the tree. MCTS-Solver is enabled in all of our experiments since 
 never decreases performance. 
 Rewards are in $\{-1, 0, 1\}$ representing a loss, draw, and win.
 To ensure values in the same range, evaluation functions are scaled to $[-1,1]$ by passing a domain-dependant 
-score differences through a cache-optimized $\tanh$. 
+score differences through a cache-optimized sigmoid function. 
 When simulating, to avoid memory overhead, a single game state is modified and 
 moves are undone when returning from the recursive call.
 Whenever possible, evaluation functions are updated incrementally to save time. 
 All of the experiments include swapped seats to ensure that each player type plays 
-an equal number of games as first player and as second player. 
-To tune parameters, we ran hierarchical elimination tournaments against players of the same type where each 
-head-to-head match consisted of 200 games with seats swapped halfway. The parameter value sets are 
-given in Table~\ref{tbl:parmsets}. 
-Domain-dependent playout policies and speeds are reported in the appropriate subsections below.
+an equal number of games as first player and as second player.
+All reported win rates are over 1000 played games unless specifically stated otherwise, such as in Lines of Action.
+Domain-dependent playout policies and optimizations are reported in each subsection.
 
+\subsection{Breakthrough}
+
+Breakthrough is a turn-taking alternating move game played on an 8-by-8 chess board, where each player 
+contains 16 identical pieces on their initial two rows. 
+Each piece is allowed to move forward to an empty square, either straight or via the diagonals, but may only 
+capture via the diagonals like Chess pawns. The goal of the game is bring a piece to the furthest opponent row. 
+
+Breakthrough was first introduced in general game-playing competitions and has been identified as a domain 
+that is particularly difficult for MCTS due to traps and random playouts~\cite{Gudmindsson13Sufficiency}. 
+Our playout policy always chooses a one-ply ``decisive'' wins and prevents immediate ``anti-decisive'' 
+losses~\cite{Teytaud10On}.
+Otherwise, a move is selected non-uniformly at random, where capturing undefended pieces are four times more
+likely than other moves. 
+MCTS with this playout policy beats one using uniform random X\% of the time.
+We use two evaluation functions, a simple one found in \cite{Schadd11PhdThesis} 
+that assigns each piece a score of 10 and the further row achieved as 2.5, and the one described in
+\cite{Lorentz13Breakthrough}. 
+We base much of our analysis in Breakthrough on the Lorentz \& Holey player, which 
+at the time of publication had an ELO rating of 1910 on the Little Golem web site. 
+Currently, the ELO rating is 2010 and is the 8th highest-rated player out of over 300 Breakthrough players. 
 
 We compare to and combine our technique with number of previous ones to include  
 domain knowledge. A popular technique is {\it early playout terminations}. When a leaf node of the tree 
@@ -408,18 +433,18 @@ $-1$ if $v_0(s) \le -x$. Another option is to use an $\epsilon$-greedy playout p
 with probability $\epsilon$ and successor state with the largest evaluation with probability $1-\epsilon$, with 
 improved performance in Chinese Checkers~\cite{Sturtevant08An,Nijssen12Playout}, abbreviated ege$\epsilon$.
 
-Another popular technique is {\it maximimum backpropagation}, where certain number of visits in the \Update~procedure,
-the valued backed up is the one of the best child instead of the sampled value from the simulation.
-Couloum originally showed that the the mean backpropagation to be superior in Go~\cite{Coulom06Efficient}. 
-In Kalah, the \UCTMAXH algorithm proposed by Ramanujan resembles closely maximum backpropagation with early terminations 
-(pd0) except that the values are also weighted by visit counts, and was shown to perform as well or better than a strong minimax 
-player at a low number of nodes expansions. Another successful technique in Go is 
-{\it node priors}~\cite{Gelly07Combining}, where newly-expanded nodes are assigned some initial wins and loss counts, 
-which also improved performance in Breakthrough~\cite{Lorentz13Breakthrough}. Finally, another way to use 
-heuristic knowledge is as a means of {\it progressive bias} which has been rather successful
-in Go~\cite{Gelly07Combining,ChaslotWHUB2008} and Lines of Action~\cite{Winands10MCTS-LOA}.
+%Another popular technique is {\it maximimum backpropagation}, where certain number of visits in the \Update~procedure,
+%the valued backed up is the one of the best child instead of the sampled value from the simulation.
+%Couloum originally showed that the the mean backpropagation to be superior in Go~\cite{Coulom06Efficient}. 
+%In Kalah, the \UCTMAXH algorithm proposed by Ramanujan resembles closely maximum backpropagation with early terminations 
+%(pd0) except that the values are also weighted by visit counts, and was shown to perform as well or better than a strong minimax 
+%player at a low number of nodes expansions. Another successful technique in Go is 
+%{\it node priors}~\cite{Gelly07Combining}, where newly-expanded nodes are assigned some initial wins and loss counts, 
+%which also improved performance in Breakthrough~\cite{Lorentz13Breakthrough}. Finally, another way to use 
+%heuristic knowledge is as a means of {\it progressive bias} which has been rather successful
+%in Go~\cite{Gelly07Combining,ChaslotWHUB2008} and Lines of Action~\cite{Winands10MCTS-LOA}.
 
-\begin{table}[t]
+\begin{table}[b]
 {\small
 \begin{center}
 \begin{tabular}{|l|l|}
@@ -438,12 +463,7 @@ im$\alpha$     & $\{ 0, .05, .1, .15, \ldots, .55, .6, .75, 1 \}$ \\
 }
 \end{table}
 
-\subsection{Breakthrough}
 
-Breakthrough is a turn-taking alternating move game played on an 8-by-8 chess board, where each player 
-contains 16 identical pieces on their initial two rows. 
-Each piece is allowed to move forward to an empty square, either straight or via the diagonals, but may only 
-capture via the diagonals like Chess pawns. The goal of the game is bring a piece to the furthest opponent row. 
 
 \begin{figure}[t]
 \begin{center}
@@ -456,32 +476,61 @@ Each point represents 1000 games. Top excludes node priors, bottom includes node
 \end{center}
 \end{figure}
 
-Breakthrough was first introduced in general game-playing competitions and has been identified as a domain 
-that is particularly difficult for MCTS due to traps and random playouts~\cite{Gudmindsson13Sufficiency}. 
-Our playout policy always choose a 1-ply ``decisive'' move and prevent 1-ply ``anti-decisive'' losses. 
-Otherwise, a move is selected non-uniformly at random, where capturing undefended pieces are four times more
-likely than other moves. We use two evaluation functions, a simple one found in \cite{Schadd11PhdThesis} 
-that assigns each piece a score of 10 and the further row achieved as 2.5, and the one found in 
-\cite{Lorentz13Breakthrough}. 
-We base much of our analysis in Breakthrough on the Lorentz \& Holey player, which 
-at the time of publication had an ELO rating of 1910 on the Little Golem web site. 
-Currently, the ELO rating is 2010 and is the 8th highest-rated player out of over 300 Breakthrough players. 
+We start with a set of experiments using the simple evaluation function. 
+We first determined the best playout strategy amongst fixed and dynamic early 
+terminations and $\epsilon$-greedy playouts.
+To tune parameters, we ran hierarchical elimination tournaments against players of the same type 
+where each head-to-head match consisted of 200 games with seats swapped halfway. 
+The parameter value sets are given in Table~\ref{tbl:parmsets}.
+Our best fixed early terminations player was pd$20$ and best $\epsilon$-greedy player was ege$0.1$.
+Through systematic testing on 1000 games per pairing, we determined that the best playout 
+policy when using the simple evaluation function is the combination (ege$0.1$,det$0.5$), which 
+we we call the baseline player. The detailed test results are found in Appendix 
+A.\footnote{Appendix A is included as a supplementary material. If accepted, it will be made 
+available in a technical report.}
+%however is likely explained by less 
+%overhead due to incremental evaluations and efficient transitions. 
 
-We first determined the best playout strategy amongst fixed and dynamic early terminations  
-and $\epsilon$-greedy playouts. Through systematic testing on thousands of games, we determined that 
-the best playout policy when using the simple evaluation function is the combination (ege$0.1$,det$0.5$). 
-This was suprising since fixed early terminations are much faster, however is likely explained by less 
-overhead due to incremental evaluations and efficient transitions.
+We then played MCTS with implicit minimax backups against this baseline player for a 
+variety different values for $\alpha$. The results are shown in the top of Figure~\ref{fig:bt-base-alpha}.
+We see that implicit minimax backups give an advantage for $\alpha \in [0.1,0.6]$ under both one- and five-second 
+search times. 
+When $\alpha > 0.6$, MCTS(im$\alpha$) acts like greedy best-first minimax.
+To verify that the benefit was not only due to optimized playout policy, we played 
+MCTS(im$0.4$) against a baseline MCTS player where both used a playout policy without early terminations, 
+and with both players using pd$20$. MCTS(im$0.4$) won X\% in the former and Y\% in the latter.
 
-\begin{figure}[t]
-\begin{center}
-\newgame
-\def\mylist{Pa1, Pb1, Pc1, Pd1, Pe1, Pf1, Ph1, Pg1, pd6, pe7}
-\setchessboard{setpieces=\mylist,showmover=false}
-\chessboard
-\end{center}
-\caption{An example position in Breakthrough. \mlnote{I hope to have a nice example to show here soon.}}
-\end{figure}
+%\begin{figure}[t]
+%\begin{center}
+%\newgame
+%\def\mylist{Pa1, Pb1, Pc1, Pd1, Pe1, Pf1, Ph1, Pg1, pd6, pe7}
+%\setchessboard{setpieces=\mylist,showmover=false}
+%\chessboard
+%\end{center}
+%\caption{An example position in Breakthrough. \mlnote{I hope to have a nice example to show here soon.}}
+%\end{figure}
+ 
+The next question was whether the mixing static evaluation values themselves ($v_0(s)$) at node $s$ 
+was the source of the benefit or whether the minimax backup values ($v^{\tau}_s$) were the contributing factor.
+Therefore, we tried MCTS(im$0.4$) against a baseline player that uses constant bias over the static 
+evaluations, \ie uses an estimator $\hQ^{CB}(s,a) = (1-\alpha)\bQ + \alpha v_0(s')$, and also against a
+player using a progressive bias over the minimax backups, 
+$\hQ^{CB}(s,a) = (1-\alpha)\bQ + \alpha v^{\tau}_s/(n_{s,a} + 1)$. MCTS(im$0.4$) won X\% in the former 
+and Y\% in the latter. 
+
+Another question is whether to prefer implicit minimax over {\it node priors}~\cite{Gelly07Combining}, 
+\ie initializing each new leaf node with wins and losses based on prior knowledge. We 
+use the node priors that worked well in~\cite{Lorentz13Breakthrough}
+which takes into account the saftey of surrounding pieces, and scaled the counts by the 
+time setting (10 for one second, 50 for five seconds).
+We ran MCTS(im$\alpha$) against the baseline player where both players use node priors. 
+The results are shown at the bottom of Figure~\ref{fig:bt-base-alpha}. When combined at one second, 
+implicit minimax backups still seem to give an advantage for $\alpha \in [0.5,0.6]$, and at five 
+seconds gives an advantage for $\alpha \in [0.1,0.6]$. To verify that the combination is complementary,
+we played MCTS(im$0.6$) with and without node priors each against the baseline player. The version with 
+node priors won X\% and, from Figure 1, the one without won 63.3\%. 
+
+Finally, we tried using the more sophisticated evaluation function from~\cite{Lorentz13Breakthrough}...
 
 \subsection{Kalah}
 
