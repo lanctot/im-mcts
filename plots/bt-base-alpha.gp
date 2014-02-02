@@ -1,4 +1,4 @@
-set terminal postscript eps enhanced color "Helvetica" 20
+set terminal postscript eps enhanced color "Helvetica" 16
 set out 'bt-base-alpha.eps'
 set title 'Performance of MCTS(alpha) for different alphas in Breakthrough'
 set multiplot
