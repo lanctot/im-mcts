@@ -517,16 +517,16 @@ several $T$ values are given in Table~\ref{tbl:maxbackprop}.
 \begin{table}[b]
 {\small
 \begin{center}
-\begin{tabular}{|c|cccccccc|}
+\begin{tabular}{|c|cccccc|}
 \hline
-time $\backslash T$ &   10 &  50 & 100 & 250 & 500 & 1000 & 1500 & 2000 \\
+time $\backslash T$ &   10  &  50   & 100  & 500  & 1000 & 2000 \\
 \hline
-1s                  &      &     &     &     &     &      &      &      \\
-5s                  &      &     &     &     &     &      &      &      \\  
+1s                  &  95.6 & 86.10 & 81.9 & 73.1 & 69.1 & 64.8 \\
+5s                  &       &       &      &      &      &      \\  
 \hline
 \end{tabular}
 \end{center}
-\caption{Win rates (\%) of MCTS(im$0.4$) vs. maximim backpropagation in Breakthrough. \mlnote{Exps still running...}}
+\caption{Win rates (\%) of MCTS(im$0.4$) vs. maximim backpropagation in Breakthrough. \mlnote{5s exps still running...}}
 \label{tbl:maxbackprop}
 }
 \end{table}
@@ -548,18 +548,18 @@ When we add node priors to our baseline, this rises to 78.0\%.
 When we also add implicit minimax backups ($\alpha = 0.6$), this rises again to 84.9\%. 
 We label this best performing player MCTS(im$0.6$,np). 
 Nonetheless, using the alternative baseline, we reran the initial $\alpha$ experiment. 
-Results are shown in Figure~\ref{fig:bt-alt-alpha}. In this case, the advantage diminishes and 
-the optimal range of $\alpha$ changes to $[0.4,0.55]$. We label the best player in this figure 
-using the alternative baseline MCTS(bl', im$0.55$, np). 
+Results are shown in Figure~\ref{fig:bt-alt-alpha}. Again, using implicit minimax backups  
+with $\alpha \in [0.1,0.6]$ gives an advantage in performance. 
+We label the best player in this figure using the alternative baseline MCTS(bl', im$0.4$, np). 
 We played the two best players against each other, and MCTS(im$0.6$,np) wins with X\%. 
 Given this result, we conjecture that implicit minimax backups may benefit more when combined with 
 defensive and less granular evaluation functions.
 
 \begin{figure}[t]
 \begin{center}
-\includegraphics[scale=0.68]{plots/bt-base-alpha}
+\includegraphics[scale=0.68]{plots/bt-alt-alpha}
 \caption{Results of varying $\alpha$ in Breakthrough using the alternative baseline player.
-Each point represents 1000 games. \mlnote{Note: This graph is a placeholder for the moment.}} 
+Each point represents 1000 games. \mlnote{Note: 5s exps still running...}} 
 \label{fig:bt-alt-alpha}
 \end{center}
 \end{figure}

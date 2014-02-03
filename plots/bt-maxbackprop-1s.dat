@@ -1,0 +1,12 @@
+
+mcts_h_ege0.1_efv0_det0.5_im0.4 vs.        mcts_h_ege0.1_efv0_det0.5_mbp2000:   648   352     0 (diff   296, games  1000) 64.80 35.20 +/- 2.96
+mcts_h_ege0.1_efv0_det0.5_im0.4 vs.        mcts_h_ege0.1_efv0_det0.5_mbp1500:   654   346     0 (diff   308, games  1000) 65.40 34.60 +/- 2.95
+mcts_h_ege0.1_efv0_det0.5_im0.4 vs.        mcts_h_ege0.1_efv0_det0.5_mbp1000:   691   309     0 (diff   382, games  1000) 69.10 30.90 +/- 2.86
+mcts_h_ege0.1_efv0_det0.5_im0.4 vs.         mcts_h_ege0.1_efv0_det0.5_mbp500:   731   269     0 (diff   462, games  1000) 73.10 26.90 +/- 2.75
+mcts_h_ege0.1_efv0_det0.5_im0.4 vs.         mcts_h_ege0.1_efv0_det0.5_mbp250:   727   273     0 (diff   454, games  1000) 72.70 27.30 +/- 2.76
+mcts_h_ege0.1_efv0_det0.5_im0.4 vs.         mcts_h_ege0.1_efv0_det0.5_mbp100:   819   181     0 (diff   638, games  1000) 81.90 18.10 +/- 2.39
+mcts_h_ege0.1_efv0_det0.5_im0.4 vs.          mcts_h_ege0.1_efv0_det0.5_mbp50:   861   139     0 (diff   722, games  1000) 86.10 13.90 +/- 2.14
+mcts_h_ege0.1_efv0_det0.5_im0.4 vs.          mcts_h_ege0.1_efv0_det0.5_mbp10:   959    41     0 (diff   918, games  1000) 95.90 4.10 +/- 1.23
+
+
+
