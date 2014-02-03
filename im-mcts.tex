@@ -312,7 +312,7 @@ evaluation $v^{\tau}_s \leftarrow v^{\tau}_0(s)$.
       $v^{\tau}_s \leftarrow v^{\tau}_0(s)$ \; \label{alg:imexpand}
       $r \leftarrow $\Playout($s$)\;
       \Update($s,r$)\;
-      {\bf return} $r$\;
+      {\bf return} $r$\;                       \label{alg:retline1}
     }
     \Else{ 
       \lIf{$s \in \cZ$}{{\bf return} $\cR(s_{prev}, a_{prev}, s)$}
@@ -320,7 +320,7 @@ evaluation $v^{\tau}_s \leftarrow v^{\tau}_0(s)$.
       $s' \leftarrow \cT(s,a)$\;
       $r \leftarrow $\Simulate$(s,a,s')$\;
       \Update($s,r$)\;
-      {\bf return} $r$\;
+      {\bf return} $r$\;                       \label{alg:retline2}
     }
   \popline
   \;
@@ -405,12 +405,12 @@ Each piece is allowed to move forward to an empty square, either straight or via
 capture via the diagonals like Chess pawns. The goal of the game is bring a piece to the furthest opponent row. 
 
 Breakthrough was first introduced in general game-playing competitions and has been identified as a domain 
-that is particularly difficult for MCTS due to traps and random playouts~\cite{Gudmindsson13Sufficiency}. 
+that is particularly difficult for MCTS due to traps and uninformed playouts~\cite{Gudmindsson13Sufficiency}. 
 Our playout policy always chooses a one-ply ``decisive'' wins and prevents immediate ``anti-decisive'' 
 losses~\cite{Teytaud10On}.
 Otherwise, a move is selected non-uniformly at random, where capturing undefended pieces are four times more
 likely than other moves. 
-MCTS with this playout policy beats one using uniform random X\% of the time.
+MCTS with this playout policy beats one using uniform random 94.3\% of the time.
 We use two evaluation functions, a simple one found in \cite{Schadd11PhdThesis} 
 that assigns each piece a score of 10 and the further row achieved as 2.5, and the one described in
 \cite{Lorentz13Breakthrough}. 
@@ -444,27 +444,6 @@ improved performance in Chinese Checkers~\cite{Sturtevant08An,Nijssen12Playout},
 %heuristic knowledge is as a means of {\it progressive bias} which has been rather successful
 %in Go~\cite{Gelly07Combining,ChaslotWHUB2008} and Lines of Action~\cite{Winands10MCTS-LOA}.
 
-\begin{table}[b]
-{\small
-\begin{center}
-\begin{tabular}{|l|l|}
-\hline
-Technique & Parameter set \\
-\hline
-pd$x$          & $\{ 0, 1, \ldots, 5, 8, 10, 12, 16, 20, 30, 50, 100, 1000 \}$ \\
-det$x$         & $\{ .1, .2, .3, , .4, .5, .55, .6, .65, .7, .75, .8, .85, .9 \}$ \\
-ege$\epsilon$  & $\{ 0, .05, .1, .15, .2, .3, .4, .5, .6, .7, .8, .9, 1 \}$ \\
-im$\alpha$     & $\{ 0, .05, .1, .15, \ldots, .55, .6, .75, 1 \}$ \\
-\hline
-\end{tabular}
-\end{center}
-\caption{Parameter value sets.}
-\label{tbl:parmsets}
-}
-\end{table}
-
-
-
 \begin{figure}[t]
 \begin{center}
 \includegraphics[scale=0.7]{plots/bt-base-alpha}\\
@@ -481,14 +460,13 @@ We first determined the best playout strategy amongst fixed and dynamic early
 terminations and $\epsilon$-greedy playouts.
 To tune parameters, we ran hierarchical elimination tournaments against players of the same type 
 where each head-to-head match consisted of 200 games with seats swapped halfway. 
-The parameter value sets are given in Table~\ref{tbl:parmsets}.
+The parameter value sets are given in Appendix A.\footnote{Appendix A is included as a supplementary material. If accepted, it will be made 
+available as part of a technical report.}
 Our best fixed early terminations player was pd$20$ and best $\epsilon$-greedy player was ege$0.1$.
 Through systematic testing on 1000 games per pairing, we determined that the best playout 
 policy when using the simple evaluation function is the combination (ege$0.1$,det$0.5$), which 
-we we call the baseline player. The detailed test results are found in Appendix 
-A.\footnote{Appendix A is included as a supplementary material. If accepted, it will be made 
-available in a technical report.}
-%however is likely explained by less 
+we call the baseline player. The detailed test results are found in Appendix 
+A.%however is likely explained by less 
 %overhead due to incremental evaluations and efficient transitions. 
 
 We then played MCTS with implicit minimax backups against this baseline player for a 
@@ -498,7 +476,7 @@ search times.
 When $\alpha > 0.6$, MCTS(im$\alpha$) acts like greedy best-first minimax.
 To verify that the benefit was not only due to optimized playout policy, we played 
 MCTS(im$0.4$) against a baseline MCTS player where both used a playout policy without early terminations, 
-and with both players using pd$20$. MCTS(im$0.4$) won X\% in the former and Y\% in the latter.
+and with both players using pd$20$. MCTS(im$0.4$) won 82.3\% in the former and 87.2\% in the latter.
 
 %\begin{figure}[t]
 %\begin{center}
@@ -515,8 +493,9 @@ was the source of the benefit or whether the minimax backup values ($v^{\tau}_s$
 Therefore, we tried MCTS(im$0.4$) against a baseline player that uses constant bias over the static 
 evaluations, \ie uses an estimator $\hQ^{CB}(s,a) = (1-\alpha)\bQ + \alpha v_0(s')$, and also against a
 player using a progressive bias over the minimax backups, 
-$\hQ^{CB}(s,a) = (1-\alpha)\bQ + \alpha v^{\tau}_s/(n_{s,a} + 1)$. MCTS(im$0.4$) won X\% in the former 
-and Y\% in the latter. 
+$\hQ^{PB}(s,a) = (1-\alpha)\bQ + \alpha v^{\tau}_s/(n_{s,a} + 1)$. MCTS(im$0.4$) won 67.8\% in the former 
+and 65.5\% in the latter. It is possible that a different decay function for
+$v^{\tau}_s$ will further improve the advantage, and we leave this as an interesting topic for future work. 
 
 Another question is whether to prefer implicit minimax over {\it node priors}~\cite{Gelly07Combining}, 
 \ie initializing each new leaf node with wins and losses based on prior knowledge. We 
@@ -524,15 +503,80 @@ use the node priors that worked well in~\cite{Lorentz13Breakthrough}
 which takes into account the saftey of surrounding pieces, and scaled the counts by the 
 time setting (10 for one second, 50 for five seconds).
 We ran MCTS(im$\alpha$) against the baseline player where both players use node priors. 
-The results are shown at the bottom of Figure~\ref{fig:bt-base-alpha}. When combined at one second, 
-implicit minimax backups still seem to give an advantage for $\alpha \in [0.5,0.6]$, and at five 
+The results are shown at the bottom of Figure~\ref{fig:bt-base-alpha}. When combined at one second of 
+search time, implicit minimax backups still seem to give an advantage for $\alpha \in [0.5,0.6]$, and at five 
 seconds gives an advantage for $\alpha \in [0.1,0.6]$. To verify that the combination is complementary,
-we played MCTS(im$0.6$) with and without node priors each against the baseline player. The version with 
-node priors won X\% and, from Figure 1, the one without won 63.3\%. 
+we played MCTS(im$0.6$) with and without node priors each against the baseline player. The player with
+node priors won 77.9\% and, from Figure 1, the one without won 63.3\%. 
 
-Finally, we tried using the more sophisticated evaluation function from~\cite{Lorentz13Breakthrough}...
+We then evaluated MCTS(im$0.4$) against {\it maximum backpropagation}~\cite{Coulom06Efficient}, 
+which modifies line \ref{alg:retline2} to:
+if $n_{s,a} \ge T$ return $\max_{a \in \cA(s)} \bQ(s,a)$ else return $r$. The results for
+several $T$ values are given in Table~\ref{tbl:maxbackprop}. 
+
+\begin{table}[b]
+{\small
+\begin{center}
+\begin{tabular}{|c|cccccccc|}
+\hline
+time $\backslash T$ &   10 &  50 & 100 & 250 & 500 & 1000 & 1500 & 2000 \\
+\hline
+1s                  &      &     &     &     &     &      &      &      \\
+5s                  &      &     &     &     &     &      &      &      \\  
+\hline
+\end{tabular}
+\end{center}
+\caption{Win rates (\%) of MCTS(im$0.4$) vs. maximim backpropagation in Breakthrough. \mlnote{Exps still running...}}
+\label{tbl:maxbackprop}
+}
+\end{table}
+
+%            mcts_h_ege0.1_efv0_det0.5 vs.      mcts_h_pd20_np10:   402   598     0 (diff  -196, games  1000) 40.20 59.80 +/- 3.04
+%            mcts_h_ege0.1_efv0_det0.5 vs.       mcts_h_pd4_np10:   576   424     0 (diff   152, games  1000) 57.60 42.40 +/- 3.06
+% mcts_h_ege0.1_efv0_det0.5_np10_im0.6 vs.      mcts_h_pd20_np10:   849   151     0 (diff   698, games  1000) 84.90 15.10 +/- 2.22
+% mcts_h_ege0.1_efv0_det0.5_np10_im0.6 vs.       mcts_h_pd4_np10:   886   114     0 (diff   772, games  1000) 88.60 11.40 +/- 1.97
+%       mcts_h_ege0.1_efv0_det0.5_np10 vs.      mcts_h_pd20_np10:   780   220     0 (diff   560, games  1000) 78.00 22.00 +/- 2.57
+%       mcts_h_ege0.1_efv0_det0.5_np10 vs.       mcts_h_pd4_np10:   692   308     0 (diff   384, games  1000) 69.20 30.80 +/- 2.86
+
+Finally, we tried using the more sophisticated evaluation function from~\cite{Lorentz13Breakthrough}, 
+that assigns specific piece count values depending on their position on the board. 
+Rather than repeat all of the above experiments, we chose simply to compare baselines and to repeat
+the initial experiment. 
+The best playout with this evaluation function is pd$20$ with node priors, which we call the alternative baseline. 
+Our baseline MCTS player wins 40.2\% of games against the alternative baseline. 
+When we add node priors to our baseline, this rises to 78.0\%. 
+When we also add implicit minimax backups ($\alpha = 0.6$), this rises again to 84.9\%. 
+We label this best performing player MCTS(im$0.6$,np). 
+Nonetheless, using the alternative baseline, we reran the initial $\alpha$ experiment. 
+Results are shown in Figure~\ref{fig:bt-alt-alpha}. In this case, the advantage diminishes and 
+the optimal range of $\alpha$ changes to $[0.4,0.55]$. We label the best player in this figure 
+using the alternative baseline MCTS(bl', im$0.55$, np). 
+We played the two best players against each other, and MCTS(im$0.6$,np) wins with X\%. 
+Given this result, we conjecture that implicit minimax backups may benefit more when combined with 
+defensive and less granular evaluation functions.
+
+\begin{figure}[t]
+\begin{center}
+\includegraphics[scale=0.68]{plots/bt-base-alpha}
+\caption{Results of varying $\alpha$ in Breakthrough using the alternative baseline player.
+Each point represents 1000 games. \mlnote{Note: This graph is a placeholder for the moment.}} 
+\label{fig:bt-alt-alpha}
+\end{center}
+\end{figure}
+
+%Through systematic testing, we found the best baseline with this evaluation 
+%function to use the pd$20$ playout. 
 
 \subsection{Kalah}
+
+\begin{figure}
+\begin{center}
+\includegraphics[scale=0.68]{plots/kalah-alpha}
+\caption{Results in Kalah. Each data point is based on roughly 1000 games; win percentages are $\pm \approx$ 3.0\% 
+with 95\% confidence.}
+\label{fig:loa-alpha}
+\end{center}
+\end{figure}
 
 Kalah is a turn-taking game in the Mancala family of games. Each player has six houses, each 
 initially containing four stones, and a store on the endpoint of the board, initially empty. 
@@ -544,28 +588,23 @@ by the player that contains no stones, then that player captures all the stones 
 opponent house, putting it into the player's store. The game plays until one player's houses are
 all empty; the opponent then moves their remaining stones to their store. The winner is the player
 who has collected the most stones in their store. 
-
 Kalah has been weakly solved for several different variants of Kalah~\cite{Irving00Solving}, 
 and was used as a domain to compare MCTS variants to classical minimax search~\cite{Ramanujan11Tradeoffs}.
 
-
-\begin{figure}[t]
-\begin{center}
-\includegraphics[scale=0.7]{plots/kalah-alpha}
-\caption{Results in Kalah. Each data point is $\pm$ ~3\% at the moment (still running), with 1 second of search time. 
-Same evaluation function as \cite{Ramanujan11Tradeoffs} normalized to $[0,1]$ using tanh and an (optimal) pdepth of 4.} 
-\label{fig:loa-alpha}
-\end{center}
-\end{figure}
+In running experiments from the initial position, we observed a noticeable first-player bias. Therefore, as
+was done in \cite{Ramanujan11Tradeoffs}, our experiments produce random starting board positions 
+without any stones placed in the stores. 
+Competiting players play one game and then swap seats to play a second game using the same board. A player 
+is declared a winner if that player won one of the games and at least tied the other game. If the same side 
+wins both games, the game is discarded. 
+Tournament results revealed that a pd$4$ early termination worked best. 
+The evaluation function was simply the difference between stones in each player's stores. Results with one 
+second of search time are shown in Figure~\ref{fig:loa-alpha}. 
+%As with the previous study employing MCTS, we notice that an evaluation function can be used to enhance the performance.
+Here, we again notice the same patterns as in Breakthrough. Within the range $\alpha \in [0.1,0.5]$ there is a clear 
+advantage in performance when using implicit minimax backups against the base player. 
 
 \subsection{Lines of Action}
-
-Lines of Action is a turn-taking alternating-move game played on an 8-by-8 board that uses checkers board and pieces, 
-invented by Claude Soucie around 1960 and published in Sid Sackson's {\it A Gamut of Games}. 
-The goal is to connect all your pieces into a single connected group (of any size), 
-where the pieces are connected via adjacent and diagonals squares. A piece may move in any direction, but the number of squares 
-it may move depends on the total number of pieces in the line, including opponent pieces. A piece may jump over its own
-pieces but not opponent pieces. Captures occur by landing on opponent pieces. 
 
 \begin{figure}[t]
 \begin{center}
@@ -575,8 +614,75 @@ pieces but not opponent pieces. Captures occur by landing on opponent pieces.
 \end{center}
 \end{figure}
 
+\begin{table}[t]
+{\small
+\begin{center}
+\begin{tabular}{ccccc|c}
+Options & Player        & Opp. & $n$ & $t$ & Res. (\%) \\
+\hline
+\hline
+PB      & MCTS(im$\alpha$) & MCTS     & 32000 & 1        & 50.59       \\
+PB      & MCTS(im$\alpha$) & MCTS     & 6000  & 5        & 50.91       \\
+\hline
+$\neg$PB & MCTS(im$\alpha$) & MCTS & 1000 & 1  & 59.90       \\
+$\neg$PB & MCTS(im$\alpha$) & MCTS & 6000 & 5  & 63.10       \\
+$\neg$PB & MCTS(im$\alpha$) & MCTS & 2600 & 10 & 63.80       \\
+\hline
+$\neg$PB & MCTS             & $\alpha \beta$ & 2000 & 5  & 40.0       \\
+$\neg$PB & MCTS(im$\alpha$) & $\alpha \beta$ & 2600 & 5 & 51.0       \\
+\hline
+PB       & MCTS             & $\alpha \beta$ & 4600 & 5  & 61.3       \\
+PB       & MCTS(im$\alpha$) & $\alpha \beta$ & 4600 & 5  & 62.2       \\
+\hline
+\end{tabular}
+\end{center}
+\caption{Summary of results for players and opponent pairings in LOA. 
+All MCTS players use $\alpha \beta$ playouts and MCTS(im$\alpha$) players use $\alpha = 0.2$. 
+Here, $n$ represents the number of games played and $t$ time in seconds per search.}
+\label{tbl:loaresults}
+}
+\end{table}
+
+Lines of Action is a turn-taking alternating-move game played on an 8-by-8 board that uses checkers board and pieces, 
+invented by Claude Soucie around 1960 and published in Sid Sackson's {\it A Gamut of Games}. 
+The goal is to connect all your pieces into a single connected group (of any size), 
+where the pieces are connected via adjacent and diagonals squares. A piece may move in any direction, but the number of squares 
+it may move depends on the total number of pieces in the line, including opponent pieces. A piece may jump over its own
+pieces but not opponent pieces. Captures occur by landing on opponent pieces. 
+
+For Lines of Action, we have based our implementation on the state-of-the-art techniques described in \cite{Winands10MCTS-LOA}, 
+which has won several Computer Olympiad tournaments and is to the best of our knowledge the world's best AI for Lines of Action.
+The evaluation function used is the one described in \cite{Winands10MCTS-LOA} based on the features used in MIA~\cite{Winands06MIA}.
+All of the results in Lines of Action use five seconds of search time and are based on a set of publicly available board 
+positions.\footnote{\small https://dke.maastrichtuniversity.nl/m.winands/loa/} 
+
+We repeat the implicit minimax backups experiment with varying $\alpha$. At first, we use standard UCT and a simple playout that ... . 
+Then, we enable the early cut-off strategy. Finally, we enable the progressive bias based on move categories. The results for these 
+three different settings are shown in Figure~\ref{fig:loa-alpha}. As before, we notice that in the first two situations,
+implicit minimax backups with $\alpha \in [0.1,0.5]$ can lead to better performance. When the progressive bias based on move 
+categories is added, the advantange diminishes. However, we do notice that $\alpha \in [0.05,0.3]$ seems to not significantly decrease
+the performance. 
+
+In the past, the strongest LOA player was MIA which was based on the $\alpha \beta$ search. Therefore, we also test our MCTS with 
+implicit minimax backups against a $\alpha \beta$ player based on MIA. The results are summarized in Table~\ref{tbl:loaresults}.
+
+
 \subsection{Conclusion}
 
+In this paper, we introduce a new technique called implicit minimax backups for MCTS. 
+Unlike previous methods used to combine heuristic evaluations, this techniques stores 
+the information from both sources separately, only combining the two sources to guide
+selection. Our technique is particularly simple and can lead to stronger play even with
+simple evaluation functions, in Breakthrough and Kalah. Furthermore, the technique 
+to help in a larger, more complex domain with sophisticated knowledge as Lines of Action
+against strong MCTS and classic $\alpha \beta$ players.
+
+For future work, we aim to compare the technique with sufficiency thresholds of Gudmunsson \& Bj\"{o}rnsson, 
+and compare our Breakthrough player to Lorentz \& Horey on Little Golem. 
+We also plan to investigate decaying strategies for 
+$\alpha$, incremental $\alpha \beta$ pruning, and alternative selection policies.
+The technique could also general game-playing agents using 
+evaluations learned during search~\cite{Finnsson10Learning}.
 
 \bibliographystyle{aaai}
 \bibliography{im-mcts}

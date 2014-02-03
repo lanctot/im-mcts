@@ -15,6 +15,25 @@
 
 This appendix includes details of the results of played games to determine the best baseline players. 
 
+\subsection{Parameter Values for Breakthrough and Kalah}
+
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+Technique & Parameter set \\
+\hline
+pd$x$          & $\{ 0, 1, \ldots, 5, 8, 10, 12, 16, 20, 30, 50, 100, 1000 \}$ \\
+det$x$         & $\{ .1, .2, .3, , .4, .5, .55, .6, .65, .7, .75, .8, .85, .9 \}$ \\
+ege$\epsilon$  & $\{ 0, .05, .1, .15, .2, .3, .4, .5, .6, .7, .8, .9, 1 \}$ \\
+im$\alpha$     & $\{ 0, .05, .1, .15, \ldots, .55, .6, .75, 1 \}$ \\
+\hline
+\end{tabular}
+\end{center}
+\caption{Parameter value sets.}
+\label{tbl:parmsets}
+\end{table}
+
 \subsection{Breakthrough Playout Optimization}
 
 \subsubsection{Tournament Results}
@@ -28,6 +47,21 @@ This appendix includes details of the results of played games to determine the b
                       mcts_h_ege0.1_efv0 vs.                          mcts_h_pd4_efv0:   768   232     0 (diff   536, games  1000) 76.80 23.20 +/- 2.62
 \end{verbatim}
 
+% mcts_h_ege0.1_efv0_det0.5_im0.4 vs.          mcts_h_ege0.1_efv0_det0.5_pb0.4:   678   322     0 (diff   356, games  1000) 67.80 32.20 +/- 2.90
+% mcts_h_ege0.1_efv0_det0.5_im0.4 vs.            mcts_h_ege0.1_efv0_det0.5_pbd:   655   345     0 (diff   310, games  1000) 65.50 34.50 +/- 2.95
+
+%       mcts_h_ege0.1_efv0_det0.5 vs.     mcts_h_ege0.1_efv0_det0.5_np10_im0.6:   221   779     0 (diff  -558, games  1000) 22.10 77.90 +/- 2.57
+
+%                mcts_h_pd20_efv0 vs.                   mcts_h_pd20_efv0_im0.4:   128   872     0 (diff  -744, games  1000) 12.80 87.20 +/- 2.07
+%                            mcts vs.                                   mcts_h:    57   943     0 (diff  -886, games  1000) 5.70 94.30 +/- 1.44
+
+%
+%            mcts_h_ege0.1_efv0_det0.5 vs.      mcts_h_pd20_np10:   402   598     0 (diff  -196, games  1000) 40.20 59.80 +/- 3.04
+%            mcts_h_ege0.1_efv0_det0.5 vs.       mcts_h_pd4_np10:   576   424     0 (diff   152, games  1000) 57.60 42.40 +/- 3.06
+% mcts_h_ege0.1_efv0_det0.5_np10_im0.6 vs.      mcts_h_pd20_np10:   849   151     0 (diff   698, games  1000) 84.90 15.10 +/- 2.22
+% mcts_h_ege0.1_efv0_det0.5_np10_im0.6 vs.       mcts_h_pd4_np10:   886   114     0 (diff   772, games  1000) 88.60 11.40 +/- 1.97
+%       mcts_h_ege0.1_efv0_det0.5_np10 vs.      mcts_h_pd20_np10:   780   220     0 (diff   560, games  1000) 78.00 22.00 +/- 2.57
+%       mcts_h_ege0.1_efv0_det0.5_np10 vs.       mcts_h_pd4_np10:   692   308     0 (diff   384, games  1000) 69.20 30.80 +/- 2.86
 
 
 \end{document}
