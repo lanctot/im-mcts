@@ -34,9 +34,71 @@ im$\alpha$     & $\{ 0, .05, .1, .15, \ldots, .55, .6, .75, 1 \}$ \\
 \label{tbl:parmsets}
 \end{table}
 
-\subsection{Breakthrough Playout Optimization}
+\subsection{Breakthrough Playout Enhancement Optimization}
 
-\subsubsection{Tournament Results}
+\subsubsection{Fixed Early Terminations Tournament}
+
+\begin{verbatim}
+round 1
+
+winner mcts_h_pd1000 (115) vs. loser mcts_h_pd0 (85)
+winner mcts_h_pd100 (117) vs. loser mcts_h_pd1 (83)
+winner mcts_h_pd50 (108) vs. loser mcts_h_pd2 (92)
+winner mcts_h_pd30 (138) vs. loser mcts_h_pd3 (62)
+winner mcts_h_pd20 (129) vs. loser mcts_h_pd4 (71)
+winner mcts_h_pd10 (129) vs. loser mcts_h_pd5 (71)
+mcts_h_pd8 gets a by
+
+round 2
+
+winner mcts_h_pd8 (108) vs. loser mcts_h_pd1000 (92)
+winner mcts_h_pd10 (112) vs. loser mcts_h_pd100 (88)
+winner mcts_h_pd20 (128) vs. loser mcts_h_pd50 (72)
+mcts_h_pd30 gets a by
+
+round 3
+
+winner mcts_h_pd30 (113) vs. loser mcts_h_pd8 (87)
+winner mcts_h_pd20 (104) vs. loser mcts_h_pd10 (96)
+
+round 4
+
+winner mcts_h_pd20 (104) vs. loser mcts_h_pd30 (96)
+
+Winner: mcts_h_pd20
+\end{verbatim}
+
+\subsubsection{Epsilon-greedy Playout Tournament}
+
+\begin{verbatim}
+round 1
+
+winner mcts_h_ege0.0 (156) vs. loser mcts_h_ege1.0 (44)
+winner mcts_h_ege0.05 (155) vs. loser mcts_h_ege0.9 (45)
+winner mcts_h_ege0.1 (156) vs. loser mcts_h_ege0.8 (44)
+winner mcts_h_ege0.15 (153) vs. loser mcts_h_ege0.7 (47)
+winner mcts_h_ege0.2 (151) vs. loser mcts_h_ege0.6 (49)
+winner mcts_h_ege0.3 (119) vs. loser mcts_h_ege0.5 (81)
+mcts_h_ege0.4 gets a by
+
+round 2
+
+winner mcts_h_ege0.0 (115) vs. loser mcts_h_ege0.4 (85)
+winner mcts_h_ege0.05 (119) vs. loser mcts_h_ege0.3 (81)
+winner mcts_h_ege0.1 (125) vs. loser mcts_h_ege0.2 (75)
+mcts_h_ege0.15 gets a by
+
+round 3
+
+winner mcts_h_ege0.15 (103) vs. loser mcts_h_ege0.0 (97)
+winner mcts_h_ege0.1 (110) vs. loser mcts_h_ege0.05 (90)
+
+round 4
+
+winner mcts_h_ege0.1 (108) vs. loser mcts_h_ege0.15 (92)
+
+Winner: mcts_h_ege0.1
+\end{verbatim}
 
 \subsubsection{Tournament Winner Comparisons}
 
@@ -46,37 +108,57 @@ im$\alpha$     & $\{ 0, .05, .1, .15, \ldots, .55, .6, .75, 1 \}$ \\
 %                      mcts_h_ege0.1_efv0 vs.                         mcts_h_pd20_efv0:   557   443     0 (diff   114, games  1000) 55.70 44.30 +/- 3.08
 %                      mcts_h_ege0.1_efv0 vs.                          mcts_h_pd4_efv0:   768   232     0 (diff   536, games  1000) 76.80 23.20 +/- 2.62
 
+Each player used the basic evaluation function.
+
 \begin{table}[h!]
 \begin{center}
 \begin{tabular}{|c|c|ccc|}
 \hline
-Player A & Player B                              & A Wins       & B Wins       & Ties \\ 
+Player A & Player B                             & A Wins (\%)  & B Wins (\%)  & Ties \\ 
 \hline
-MCTS(ege$0.1$,det$0.5$,efB) & MCTS(ege$0.1$,efB) & 738 (78.2\%) & 262 (26.2\%) & 0    \\ 
+MCTS(ege$0.1$,det$0.5$) & MCTS(ege$0.1$)        & 738 (78.2)   & 262 (26.2)   & 0    \\
+MCTS(ege$0.1$,det$0.5$) & MCTS(pd$20$,det$0.5$) & 633 (63.3)   & 367 (36.7)   & 0    \\
+MCTS(ege$0.1$)          & MCTS(pd$20$)          & 557 (55.7)   & 443 (44.3)   & 0    \\
+MCTS(ege$0.1$)          & MCTS(pd$4$)           & 768 (76.8)   & 232 (23.2)   & 0    \\
 \hline
 \end{tabular}
 \end{center}
-\caption{Parameter value sets.}
-\label{tbl:parmsets}
+\caption{Breakthrough playout comparisons.}
 \end{table}
 
+\subsection{Kalah Playout Optimization}
 
+\subsubsection{Fixed Early Termination Tournament}
 
-% mcts_h_ege0.1_efv0_det0.5_im0.4 vs.          mcts_h_ege0.1_efv0_det0.5_pb0.4:   678   322     0 (diff   356, games  1000) 67.80 32.20 +/- 2.90
-% mcts_h_ege0.1_efv0_det0.5_im0.4 vs.            mcts_h_ege0.1_efv0_det0.5_pbd:   655   345     0 (diff   310, games  1000) 65.50 34.50 +/- 2.95
+\begin{verbatim}
+round 1
 
-%       mcts_h_ege0.1_efv0_det0.5 vs.     mcts_h_ege0.1_efv0_det0.5_np10_im0.6:   221   779     0 (diff  -558, games  1000) 22.10 77.90 +/- 2.57
+winner mcts_h_pd0 (368) vs. loser mcts_h_pd1000 (61)
+winner mcts_h_pd1 (408) vs. loser mcts_h_pd100 (61)
+winner mcts_h_pd2 (458) vs. loser mcts_h_pd50 (61)
+winner mcts_h_pd3 (460) vs. loser mcts_h_pd30 (37)
+winner mcts_h_pd4 (429) vs. loser mcts_h_pd20 (44)
+winner mcts_h_pd5 (223) vs. loser mcts_h_pd10 (83)
+mcts_h_pd8 gets a by
 
-%                mcts_h_pd20_efv0 vs.                   mcts_h_pd20_efv0_im0.4:   128   872     0 (diff  -744, games  1000) 12.80 87.20 +/- 2.07
-%                            mcts vs.                                   mcts_h:    57   943     0 (diff  -886, games  1000) 5.70 94.30 +/- 1.44
+round 2
 
-%
-%            mcts_h_ege0.1_efv0_det0.5 vs.      mcts_h_pd20_np10:   402   598     0 (diff  -196, games  1000) 40.20 59.80 +/- 3.04
-%            mcts_h_ege0.1_efv0_det0.5 vs.       mcts_h_pd4_np10:   576   424     0 (diff   152, games  1000) 57.60 42.40 +/- 3.06
-% mcts_h_ege0.1_efv0_det0.5_np10_im0.6 vs.      mcts_h_pd20_np10:   849   151     0 (diff   698, games  1000) 84.90 15.10 +/- 2.22
-% mcts_h_ege0.1_efv0_det0.5_np10_im0.6 vs.       mcts_h_pd4_np10:   886   114     0 (diff   772, games  1000) 88.60 11.40 +/- 1.97
-%       mcts_h_ege0.1_efv0_det0.5_np10 vs.      mcts_h_pd20_np10:   780   220     0 (diff   560, games  1000) 78.00 22.00 +/- 2.57
-%       mcts_h_ege0.1_efv0_det0.5_np10 vs.       mcts_h_pd4_np10:   692   308     0 (diff   384, games  1000) 69.20 30.80 +/- 2.86
+winner mcts_h_pd0 (181) vs. loser mcts_h_pd8 (169)
+winner mcts_h_pd5 (189) vs. loser mcts_h_pd1 (116)
+winner mcts_h_pd4 (166) vs. loser mcts_h_pd2 (115)
+mcts_h_pd3 gets a by
+
+round 3
+
+winner mcts_h_pd3 (161) vs. loser mcts_h_pd0 (124)
+winner mcts_h_pd4 (132) vs. loser mcts_h_pd5 (122)
+
+round 4
+
+winner mcts_h_pd4 (139) vs. loser mcts_h_pd3 (110)
+
+Winner: mcts_h_pd4
+\end{verbatim}
 
 
 \end{document}

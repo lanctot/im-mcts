@@ -363,7 +363,8 @@ domains: Breakthrough, Kalah, and Lines of Action.
 
 Unless otherwise stated, our implementations expand a new node every simulation, the first node encountered
 that is not in the tree. MCTS-Solver is enabled in all of our experiments since its overhead is negligible and
-never decreases performance. 
+never decreases performance. After the simulations are done, the final move chosen is the one with the highest
+number of visits. 
 Rewards are in $\{-1, 0, 1\}$ representing a loss, draw, and win.
 To ensure values in the same range, evaluation functions are scaled to $[-1,1]$ by passing a domain-dependent 
 score differences through a cache-optimized sigmoid function. 
@@ -380,14 +381,19 @@ We will use a wide range of enhancements in each game. For reference, a summary 
 {\small
 \caption{Enhancements tested in Breakthrough (B), Kalah (K) and Lines of Action (L).}
 \begin{center}
-\begin{tabular}{|l|c|c|c|}
-\hline Enhancement & B & K & L \\ \hline
-Early Playout Termination & \checkmark & & \\
-Dynamic Early Termination & \checkmark & & \\
-Node Priors & \checkmark & & \\
- $\epsilon$-greedy playouts & \checkmark & & \\
-Maximum backup propagation & \checkmark & & \\
-Progressive bias &  & &\checkmark \\
+\begin{tabular}{|l|c|c|c|c|}
+\hline 
+Enhancement                 & Abbr.          & B          & K           & L \\ 
+\hline
+Early playout termination   & pd$x$          & \checkmark & \checkmark  &            \\
+Dynamic early termination   & det$x$         & \checkmark &             & \checkmark \\
+$\epsilon$-greedy playouts  & ege$\epsilon$  & \checkmark &             &            \\
+Node priors                 & np             & \checkmark &             &            \\
+Maximum backpropagation     &                & \checkmark &             &            \\
+Progressive bias            & PB             & \checkmark &             & \checkmark \\
+$\alpha\beta$ playouts      &                &            &             & \checkmark \\
+\hline
+Implicit minimax backups    & im$\alpha$     & \checkmark & \checkmark  & \checkmark \\
 \hline
 \end{tabular}
 \end{center} 
@@ -551,10 +557,11 @@ When we add node priors to our baseline, this rises to 78.0\%.
 When we also add implicit minimax backups ($\alpha = 0.6$), this rises again to 84.9\%. 
 We label this best performing player MCTS(im$0.6$,np). 
 Nonetheless, using the alternative baseline, we reran the initial $\alpha$ experiment. 
-Results are shown in Figure~\ref{fig:bt-alt-alpha}. Again, using implicit minimax backups  
-with $\alpha \in [0.1,0.6]$ gives an advantage in performance. 
-We label the best player in this figure using the alternative baseline MCTS(bl', im$0.4$, np). 
-We played the two best players against each other, and MCTS(im$0.6$,np) wins with 76.4\%. 
+Results are shown in Figure~\ref{fig:bt-alt-alpha}. 
+In this case the best range is $\alpha \in [0.5,0.6]$ for one second and $\alpha \in [0.5,0.6]$ for
+five seconds.
+We label the best player in this figure using the alternative baseline MCTS(bl', im$0.6$, np). 
+We played the two best players against each other, and MCTS(im$0.6$,np) wins 62.1\% of games. 
 Given this result, we conjecture that implicit minimax backups may benefit more when combined with 
 defensive and less granular evaluation functions in Breakthrough.
 
@@ -562,7 +569,7 @@ defensive and less granular evaluation functions in Breakthrough.
 \begin{center}
 \includegraphics[scale=0.68]{plots/bt-alt-alpha}
 \caption{Results of varying $\alpha$ in Breakthrough using the alternative baseline player.
-Each point represents 1000 games. \mlnote{Note: 5s exps still running...}} 
+Each point represents 1000 games.} 
 \label{fig:bt-alt-alpha}
 \end{center}
 \end{figure}
@@ -612,7 +619,7 @@ advantage in performance when using implicit minimax backups against the base pl
 \begin{figure}[t]
 \begin{center}
 \includegraphics[scale=0.7]{plots/loa-alpha}
-\caption{Results in LOA. Each data point represents 1000 games with 1 second of search time.} 
+\caption{Results in LOA. Each data point represents 1000 games with 1 second of search time. } 
 \label{fig:loa-alpha}
 \end{center}
 \end{figure}
@@ -635,7 +642,7 @@ $\neg$PB & MCTS             & $\alpha \beta$ & 2000 & 5  & 40.0       \\
 $\neg$PB & MCTS(im$\alpha$) & $\alpha \beta$ & 2000 & 5 & 51.0       \\
 \hline
 PB       & MCTS             & $\alpha \beta$ & 5800 & 5  & 61.8       \\
-PB       & MCTS(im$\alpha$) & $\alpha \beta$ & 5800 & 5  & 62.7       \\
+PB       & MCTS(im$\alpha$) & $\alpha \beta$ & 5800 & 5  & 62.6       \\
 \hline
 \end{tabular}
 \end{center}
@@ -676,11 +683,13 @@ implicit minimax backups against an $\alpha \beta$ player based on MIA. When pro
 increases the performance by 11 percentage points. There is also a small (but statistically insignificant) increase in 
 performance when progressive bias is enabled. 
 Also, at $\alpha = 0.2$, it seems that there is no statistically significant case of implicit minimax backups hurting performance. 
-In fact, this is true for all the domains and circumstances that we have tried. 
 
-\subsection{Discussion: Limitations}
-
-While we have shown positive results in a number of domains, we recognize that this technique is not universally applicable. Implicit minimax backups work because there is short-term tactical information which is not captured in the long-term playouts, but is captured by the implicit minimax procedure. Additionally, there must strategic information in the playouts which is not captured in the shallower minimax backups. Thus, success depends on both the domain and the evaluation function used. Implicit minimax backups did not improve performance in Chinese Checkers or the card game Hearts, but more work needs to be done to understand if we would find success with a better evaluation function.
+\subsubsection{Discussion: Limitations.} While we have shown positive results in a number of domains, we recognize that this 
+technique is not universally applicable. Implicit minimax backups work because there is short-term tactical information which 
+is not captured in the long-term playouts, but is captured by the implicit minimax procedure. Additionally, there must strategic 
+information in the playouts which is not captured in the shallower minimax backups. Thus, success depends on both the domain and 
+the evaluation function used. Implicit minimax backups did not improve performance in Chinese Checkers or the card game Hearts, 
+but more work needs to be done to understand if we would find success with a better evaluation function.
 
 \section{Conclusion}
 
@@ -696,9 +705,8 @@ For future work, we would like to apply the technique in other games, Amazons in
 particular. 
 We aim to compare the technique with sufficiency thresholds 
 of Gudmundsson \& Bj\"{o}rnsson (2013). 
-%and compare our Breakthrough player to Lorentz \& Horey on Little Golem. 
-We also plan to investigate decaying strategies for 
-$\alpha$ and incremental $\alpha \beta$ pruning.
+%We also plan to investigate decaying strategies for 
+%$\alpha$ and incremental $\alpha \beta$ pruning.
 The technique could also work in general game-playing agents using 
 evaluations learned during search~\cite{Finnsson10Learning}.
 
