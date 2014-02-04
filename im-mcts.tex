@@ -127,7 +127,7 @@ search paradigm that has been shown to increase performance in domains such as t
 general-game playing, real-time strategy games, single-agent planning, and more~\cite{mctssurvey}. 
 While the initial applications have been to games where heuristic evaluations are difficult to obtain, 
 progress in MCTS research has shown that heuristics can be effectively be combined in MCTS, even in games 
-where class minimax search has traditonally been preferred. 
+where class minimax search has traditionally been preferred. 
 
 The most popular MCTS algorithm is UCT~\cite{Kocsis06Bandit}, 
 which performs a single simulation from the root of the search tree to a terminal state at each iteration. 
@@ -151,7 +151,7 @@ backups are done {\it implicitly},
 as a simple extra step during the standard updates to the tree nodes, and always maintained 
 separately from win rate estimates obtained from playouts. These two separate information 
 sources are then used to guide MCTS simulations. 
-We show that combining heuristic evaluations in this way can lead to significantly stronger play peformance in three 
+We show that combining heuristic evaluations in this way can lead to significantly stronger play performance in three 
 separate domains: Breakthrough, Kalah, and Lines of Action. 
 
 \subsection{Related Work}
@@ -345,36 +345,6 @@ However, unlike MCTS-Solver and minimax hybrids, these modifications are based o
 proven wins and losses.
 %which might help the search in the opening and mid-games. 
 
-Define a binary-outcome game to be one with reward set containing only wins and losses, $R = \{ -1, 1 \}$. 
-MCTS-Solver changes the backup rule in a way that accounts for proven wins and losses.  
-Define $\top$ as a proven win, $\bot$ as a proven loss ($= +\infty, -\infty$ in MCTS-Solver), 
-we say that backup rule as {\it minimax-consistent} 
-if $\forall s \in \cG,$
-\[ 
-v^{\tau}_s = \left\{ \begin{array}{ll}
-\top & \mbox{if } \exists a \in \cA(s), \mbox{win}(s, s') \vee (s' \in \cG \wedge v^{\tau}_{s'} = \top), \\
-\bot & \mbox{if } \forall a \in \cA(s), \mbox{loss}(s, s') \vee (s' \in \cG \wedge v^{\tau}_{s'} = \bot), \end{array} \right. 
-\]
-where $\mbox{win}(s,s')$ is true if $s' \in \cZ$ and leads to a win for player $\tau(s)$ (and false otherwise), 
-and define losee similarly.
-
-\begin{proposition}
-If Algorithm~\ref{alg} in run on a binary-outcome game  
-using a minimax-consistent backup rule on line~\ref{alg:imeval} and $\alpha<1,C\ge1$, then
-$\forall s \in \cS, \lim_{n_s \rightarrow \infty} \hV(s) = V^*(s)$, where $V^*(s)$ is the 
-game-theoretic minimax value of state $s$.  
-\end{proposition}
-
-For this property to hold for all games and playout policies, 
-the algorithm must continue to explore so that eventually $\cG = \cS$. 
-On line \ref{alg:imselect}, unvisited actions ($n_{s,a} = 0$) must always be chosen first.  
-The UCT exploration term ensures that each node continues to be visited infinitely often 
-in the limit. 
-The property then follows from the analysis in \cite[Section 2.3]{Saffidine13PhdThesis}. 
-Our technique defines an information scheme that contains both the implicitly computed 
-minimax values as well as win rate estimates, where $\top$ and $\bot$ always override 
-approximations from estimators. 
-
 %While a badly chosen-evaluation function can still converge to the optimal value eventually with a minimax-consistent
 %backup rule, we are mainly concerned with how an evaluation function can help MCTS performance.
 %Our empirical evaluation will show that MCTS can benefit significantly from this added information, even with 
@@ -395,7 +365,7 @@ Unless otherwise stated, our implementations expand a new node every simulation,
 that is not in the tree. MCTS-Solver is enabled in all of our experiments since its overhead is negligible and
 never decreases performance. 
 Rewards are in $\{-1, 0, 1\}$ representing a loss, draw, and win.
-To ensure values in the same range, evaluation functions are scaled to $[-1,1]$ by passing a domain-dependant 
+To ensure values in the same range, evaluation functions are scaled to $[-1,1]$ by passing a domain-dependent 
 score differences through a cache-optimized sigmoid function. 
 When simulating, to avoid memory overhead, a single game state is modified and 
 moves are undone when returning from the recursive call.
@@ -431,7 +401,7 @@ domain knowledge. A popular technique is {\it early playout terminations}. When 
 is reached, a fixed-depth early playout terminations, hereby abbreviated to ``pd$x$'', plays $x$ moves according
 to the playout policy resulting in state $s$, and then terminates the playout returning $v_0(s)$. This method has
 shown to improve performance against baseline MCTS in Amazons, Kalah, and 
-Breakthrough~\cite{Lorentz08Amazons,RamanujanS11,Lorentz13Breakthrough}. A similar technique is 
+Breakthrough~\cite{Lorentz08Amazons,Ramanujan11Tradeoffs,Lorentz13Breakthrough}. A similar technique is 
 {\it dynamic early terminations}, which periodically checks the evaluation function (or other domain-dependent features)
 terminating only when some condition is met. 
 This approach has been used as a ``mercy rule'' in Go~\cite{Bouzy07Old} and quite successfully in 
@@ -505,10 +475,10 @@ $\hQ^{PB}(s,a) = (1-\alpha)\bQ + \alpha v^{\tau}_s/(n_{s,a} + 1)$. MCTS(im$0.4$)
 and 65.5\% in the latter. It is possible that a different decay function for
 $v^{\tau}_s$ will further improve the advantage, and we leave this as an interesting topic for future work. 
 
-Another question is whether to prefer implicit minimax over {\it node priors}~\cite{Gelly07Combining}, 
+Another question is whether to prefer implicit minimax over {\it node priors} (np)~\cite{Gelly07Combining}, 
 \ie initializing each new leaf node with wins and losses based on prior knowledge. We 
 use the node priors that worked well in~\cite{Lorentz13Breakthrough}
-which takes into account the saftey of surrounding pieces, and scaled the counts by the 
+which takes into account the safety of surrounding pieces, and scaled the counts by the 
 time setting (10 for one second, 50 for five seconds).
 We ran MCTS(im$\alpha$) against the baseline player where both players use node priors. 
 The results are shown at the bottom of Figure~\ref{fig:bt-base-alpha}. When combined at one second of 
@@ -527,7 +497,7 @@ several $T$ values are given in Table~\ref{tbl:maxbackprop}.
 \begin{center}
 \begin{tabular}{|c|ccccccc|}
 \hline
-                     & \multicolumn{7}{|c|}{$T / 1000$}             \\
+                     & \multicolumn{7}{|c|}{$T$ (in thousands)}             \\
 Time                & 0.1  & 0.5  & 1    & 5    & 10   & 20 & 30 \\
 \hline
 1s                 & 81.9 & 73.1 & 69.1 & 65.2 & 63.6 & 66.2 & 67.0 \\
@@ -535,7 +505,8 @@ Time                & 0.1  & 0.5  & 1    & 5    & 10   & 20 & 30 \\
 \hline
 \end{tabular}
 \end{center}
-\caption{Win rates (\%) of MCTS(im$0.4$) vs. maximim backpropagation in Breakthrough. }
+\caption{Win rates (\%) of MCTS(im$0.4$) vs. maximum backpropagation in Breakthrough, 
+for $T \in \{ 100, \cdots, 30000 \}$. }
 \label{tbl:maxbackprop}
 }
 \end{table}
@@ -606,7 +577,7 @@ and was used as a domain to compare MCTS variants to classic minimax search~\cit
 In running experiments from the initial position, we observed a noticeable first-player bias. Therefore, as
 was done in \cite{Ramanujan11Tradeoffs}, our experiments produce random starting board positions 
 without any stones placed in the stores. 
-Competiting players play one game and then swap seats to play a second game using the same board. A player 
+Competing players play one game and then swap seats to play a second game using the same board. A player 
 is declared a winner if that player won one of the games and at least tied the other game. If the same side 
 wins both games, the game is discarded. 
 Tournament results revealed that a pd$4$ early termination worked best. 
@@ -643,8 +614,8 @@ $\neg$PB & MCTS(im$\alpha$) & MCTS & 2600 & 10 & 63.80       \\
 $\neg$PB & MCTS             & $\alpha \beta$ & 2000 & 5  & 40.0       \\
 $\neg$PB & MCTS(im$\alpha$) & $\alpha \beta$ & 2000 & 5 & 51.0       \\
 \hline
-PB       & MCTS             & $\alpha \beta$ & 4600 & 5  & 61.3       \\
-PB       & MCTS(im$\alpha$) & $\alpha \beta$ & 4600 & 5  & 62.2       \\
+PB       & MCTS             & $\alpha \beta$ & 5800 & 5  & 61.8       \\
+PB       & MCTS(im$\alpha$) & $\alpha \beta$ & 5800 & 5  & 62.7       \\
 \hline
 \end{tabular}
 \end{center}
@@ -661,29 +632,31 @@ where the pieces are connected via adjacent and diagonals squares. A piece may m
 it may move depends on the total number of pieces in the line, including opponent pieces. A piece may jump over its own
 pieces but not opponent pieces. Captures occur by landing on opponent pieces. 
 
-For LOA, we have based our implementation on the state-of-the-art techniques described in \cite{Winands10MCTS-LOA}, 
+For LOA, we have based our MCTS implementation and enhancements on the state-of-the-art techniques described in \cite{Winands10MCTS-LOA}, 
 which has won several Computer Olympiad tournaments and is to the best of our knowledge the world's best AI for Lines of Action.
-The evaluation function used is the one described in \cite{Winands10MCTS-LOA} based on the features used in MIA~\cite{Winands06MIA}.
+The evaluation function used is the one based on the features used in MIA~\cite{Winands06MIA}.
 All of the results in LOA are based 100 opening board 
 positions.\footnote{\small https://dke.maastrichtuniversity.nl/m.winands/loa/} 
 
 We repeat the implicit minimax backups experiment with varying $\alpha$. At first, we use standard UCT without enhancements 
-and a simple playout that is selects moves non-uniformly at random based on the MIA features, and uses the early cut-off strategy. 
+and a simple playout that is selects moves non-uniformly at random based on the move categories, and uses the early cut-off strategy. 
 Then, we enable shallow $\alpha \beta$ searches in the playouts described in~\cite{Winands11AB}. 
 Finally, we enable the progressive bias based on move categories. The results for these 
 three different settings are shown in Figure~\ref{fig:loa-alpha}. As before, we notice that in the first two situations,
 implicit minimax backups with $\alpha \in [0.1,0.5]$ can lead to better performance. When the progressive bias based on move 
-categories is added, the advantange diminishes. However, we do notice that $\alpha \in [0.05,0.3]$ seems to not significantly 
+categories is added, the advantage diminishes. However, we do notice that $\alpha \in [0.05,0.3]$ seems to not significantly 
 decrease the performance. 
 
-The results are summarized in Table~\ref{tbl:loaresults}. From the graph, we reran $\alpha = 0.2$ with progressive bias for 
-32000 games giving a statistically significant (95\% confidence) win rate of 50.59\%. We also tried increasing the search time, 
+Additional results are summarized in Table~\ref{tbl:loaresults}. From the graph, we reran $\alpha = 0.2$ with progressive bias for 
+32000 games giving a statistically significant (95\% confidence) win rate of 50.59\%. 
+We also tried increasing the search time, in both cases (with and without progressive bias), 
 and observed a gain in performance at five and ten seconds. 
 In the past, the strongest LOA player was MIA which was based on the $\alpha \beta$ search. Therefore, we also test our MCTS with 
 implicit minimax backups against an $\alpha \beta$ player based on MIA. When progress bias is disabled, implicit minimax backups
 increases the performance by 11 percentage points. There is also notice a small (but statistically insignificant) increase in 
 performance when progressive bias is enabled. 
 Also, at $\alpha = 0.2$, there is no statistically significant case of implicit minimax backups hurting performance. 
+In fact, this is true for all the domains and circumstances that we have tried. 
 
 \subsection{Conclusion}
 
@@ -698,7 +671,7 @@ strong MCTS and classic $\alpha \beta$ players.
 For future work, we would like to apply the technique in other games, Amazons in 
 particular. 
 We aim to compare the technique with sufficiency thresholds 
-of Gudmunsson \& Bj\"{o}rnsson. 
+of Gudmundsson \& Bj\"{o}rnsson (2013). 
 %and compare our Breakthrough player to Lorentz \& Horey on Little Golem. 
 We also plan to investigate decaying strategies for 
 $\alpha$ and incremental $\alpha \beta$ pruning.

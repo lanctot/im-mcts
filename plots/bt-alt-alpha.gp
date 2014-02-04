@@ -1,9 +1,9 @@
 set terminal epslatex color colortext standalone
 set out 'bt-alt-alpha.tex'
-set title 'Performance of MCTS($\alpha$) using alternative baseline'
+set title 'Performance of MCTS(im$\alpha$) using alternative baseline'
 set multiplot
 set xlabel '$\alpha$'
-set ylabel '{\small Win rate of MCTS($\alpha$) vs. MCTS (\%)}'
+set ylabel '{\small Win rate of MCTS(im$\alpha$) vs. MCTS (\%)}'
 set xrange [0:1.1]
 set yrange [:80]
 plot "bt-base-1s-alpha.dat" using 1:2 with linespoints lt 1 lw 3 title '1 second per move', \

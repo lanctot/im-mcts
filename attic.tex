@@ -28,3 +28,35 @@ Some important things we might want to consider for the experiments and/or messa
 \item Seems like, at least from our observations of watching experiments in Breakthrough, implicit minimax could be better at 
       detecting/defending ``fortresses''~\cite{Guid12Fortress}. 
 \end{itemize}
+
+%%% removed as it was misleading! 
+Define a binary-outcome game to be one with reward set containing only wins and losses, $R = \{ -1, 1 \}$. 
+MCTS-Solver changes the backup rule in a way that accounts for proven wins and losses.  
+Define $\top$ as a proven win, $\bot$ as a proven loss ($= +\infty, -\infty$ in MCTS-Solver), 
+we say that backup rule as {\it minimax-consistent} 
+if $\forall s \in \cG,$
+\[ 
+v^{\tau}_s = \left\{ \begin{array}{ll}
+\top & \mbox{if } \exists a \in \cA(s), \mbox{win}(s, s') \vee (s' \in \cG \wedge v^{\tau}_{s'} = \top), \\
+\bot & \mbox{if } \forall a \in \cA(s), \mbox{loss}(s, s') \vee (s' \in \cG \wedge v^{\tau}_{s'} = \bot), \end{array} \right. 
+\]
+where $\mbox{win}(s,s')$ is true if $s' \in \cZ$ and leads to a win for player $\tau(s)$ (and false otherwise), 
+and define losee similarly.
+
+\begin{proposition}
+If Algorithm~\ref{alg} in run on a binary-outcome game  
+using a minimax-consistent backup rule on line~\ref{alg:imeval} and $\alpha<1,C\ge1$, then
+$\forall s \in \cS, \lim_{n_s \rightarrow \infty} \hV(s) = V^*(s)$, where $V^*(s)$ is the 
+game-theoretic minimax value of state $s$.  
+\end{proposition}
+
+For this property to hold for all games and playout policies, 
+the algorithm must continue to explore so that eventually $\cG = \cS$. 
+On line \ref{alg:imselect}, unvisited actions ($n_{s,a} = 0$) must always be chosen first.  
+The UCT exploration term ensures that each node continues to be visited infinitely often 
+in the limit. 
+The property then follows from the analysis in \cite[Section 2.3]{Saffidine13PhdThesis}. 
+Our technique defines an information scheme that contains both the implicitly computed 
+minimax values as well as win rate estimates, where $\top$ and $\bot$ always override 
+approximations from estimators. 
+

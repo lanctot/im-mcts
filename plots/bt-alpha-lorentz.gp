@@ -1,6 +1,6 @@
 set terminal epslatex color colortext standalone
 set out 'bt-alpha-lorentz.tex'
-set title 'Performance of MCTS($\alpha$) for different $\alpha$ in Breakthrough'
+set title 'Performance of MCTS(im$\alpha$) for different $\alpha$ in Breakthrough'
 set multiplot
 set xlabel '$\alpha$'
 set ylabel '{\small Win rate of MCTS(im$\alpha$) vs. MCTS (\%)}'
