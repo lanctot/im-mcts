@@ -186,12 +186,13 @@ MCTS players enhanced with evaluation functions outperform their minimax counter
 % use mcts-solver to motivate implicit minimax
 %\marcl{Also mention MCTS + minimax hybrids (Baier \& Winands) and Score-bounded MCTS (...))}
 
+
 One may want to combine minimax backups or searches without using an evaluation function. 
 The prime example is MCTS-Solver~\cite{Winands08Solver}, which backpropagates proven wins and losses as 
 extra information in MCTS. When a node is proven to be a 
 win or a loss, it no longer needs to be searched. This domain-independent modification greatly enhances 
 MCTS with negligible overhead. Score-bounded MCTS extends this idea to games with multiple 
-outcomes, leading to $\alpha \beta$ style pruning in the tree~\cite{Cazenave10ScoreBounded}. Finally, one can use hybrid
+outcomes, leading to $\alpha \beta$ style pruning in the tree~\cite{Cazenave10Score}. Finally, one can use hybrid
 minimax searches in the tree to initialize nodes during, enhance the playout, or to help MCTS-Solver 
 in backpropagation~\cite{Baier13MinimaxHybrids}.
 
@@ -406,10 +407,10 @@ Domain-dependent playout policies and optimizations are reported in each subsect
 
 \subsection{Breakthrough}
 
-Breakthrough is a turn-taking alternating move game played on an 8-by-8 chess board, where each player 
-contains 16 identical pieces on their initial two rows. 
-Each piece is allowed to move forward to an empty square, either straight or via the diagonals, but may only 
-capture via the diagonals like Chess pawns. The goal of the game is bring a piece to the furthest opponent row. 
+Breakthrough is a turn-taking alternating move game played on an 8-by-8 chess board. Each player 
+has 16 identical pieces on their first two rows. 
+A piece is allowed to move forward to an empty square, either straight or diagonal, but may only 
+capture diagonally like Chess pawns. A player wins by moving a single piece to the furthest opponent row. 
 
 Breakthrough was first introduced in general game-playing competitions and has been identified as a domain 
 that is particularly difficult for MCTS due to traps and uninformed playouts~\cite{Gudmindsson13Sufficiency}. 
@@ -419,11 +420,11 @@ Otherwise, a move is selected non-uniformly at random, where capturing undefende
 likely than other moves. 
 MCTS with this playout policy beats one using uniform random 94.3\% of the time.
 We use two evaluation functions, a simple one found in \cite{Schadd11PhdThesis} 
-that assigns each piece a score of 10 and the further row achieved as 2.5, and the one described in
+that assigns each piece a score of 10 and the further row achieved as 2.5, and the one described by
 \cite{Lorentz13Breakthrough}. 
 We base much of our analysis in Breakthrough on the Lorentz \& Holey player, which 
 at the time of publication had an ELO rating of 1910 on the Little Golem web site. 
-Currently, the ELO rating is 2010 and is the 8th highest-rated player out of over 300 Breakthrough players. 
+Currently, the ELO rating is 2010 which is the 8th highest out of over 300 Breakthrough players. 
 
 We compare to and combine our technique with number of previous ones to include  
 domain knowledge. A popular technique is {\it early playout terminations}. When a leaf node of the tree 
@@ -462,13 +463,13 @@ Each point represents 1000 games. Top excludes node priors, bottom includes node
 \end{center}
 \end{figure}
 
-We start with a set of experiments using the simple evaluation function. 
+We started with a set of experiments using the simple evaluation function. 
 We first determined the best playout strategy amongst fixed and dynamic early 
 terminations and $\epsilon$-greedy playouts.
 To tune parameters, we ran hierarchical elimination tournaments against players of the same type 
 where each head-to-head match consisted of 200 games with seats swapped halfway. 
-The parameter value sets are given in Appendix A.\footnote{Appendix A is included as a supplementary material. If accepted, it will be made 
-available as part of a technical report.}
+The parameter value sets are given in Appendix A.\footnote{Appendix A is included as a 
+supplementary material. If accepted, it will be made available as part of a technical report.}
 Our best fixed early terminations player was pd$20$ and best $\epsilon$-greedy player was ege$0.1$.
 Through systematic testing on 1000 games per pairing, we determined that the best playout 
 policy when using the simple evaluation function is the combination (ege$0.1$,det$0.5$), which 
@@ -476,13 +477,13 @@ we call the baseline player. The detailed test results are found in Appendix
 A.%however is likely explained by less 
 %overhead due to incremental evaluations and efficient transitions. 
 
-We then played MCTS with implicit minimax backups against this baseline player for a 
+We then played MCTS with implicit minimax backups, MCTS(im$\alpha$), against this baseline player for a 
 variety different values for $\alpha$. The results are shown in the top of Figure~\ref{fig:bt-base-alpha}.
 We see that implicit minimax backups give an advantage for $\alpha \in [0.1,0.6]$ under both one- and five-second 
 search times. 
 When $\alpha > 0.6$, MCTS(im$\alpha$) acts like greedy best-first minimax.
 To verify that the benefit was not only due to optimized playout policy, we played 
-MCTS(im$0.4$) against a baseline MCTS player where both used a playout policy without early terminations, 
+MCTS(im$0.4$) against a baseline MCTS player where both used a playout policy without any early terminations, 
 and with both players using pd$20$. MCTS(im$0.4$) won 82.3\% in the former and 87.2\% in the latter.
 
 %\begin{figure}[t]
@@ -668,7 +669,7 @@ positions.\footnote{\small https://dke.maastrichtuniversity.nl/m.winands/loa/}
 
 We repeat the implicit minimax backups experiment with varying $\alpha$. At first, we use standard UCT without enhancements 
 and a simple playout that is selects moves non-uniformly at random based on the MIA features, and uses the early cut-off strategy. 
-Then, we enable shallow $\alpha \beta$ searche in the playouts. 
+Then, we enable shallow $\alpha \beta$ searches in the playouts described in~\cite{Winands11AB}. 
 Finally, we enable the progressive bias based on move categories. The results for these 
 three different settings are shown in Figure~\ref{fig:loa-alpha}. As before, we notice that in the first two situations,
 implicit minimax backups with $\alpha \in [0.1,0.5]$ can lead to better performance. When the progressive bias based on move 

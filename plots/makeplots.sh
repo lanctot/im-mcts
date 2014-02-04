@@ -7,8 +7,9 @@ do
   f=`echo $file | awk -F'.' '{print $1}'`
   echo "building $f"
   #gnuplot < $f.gp
-  #gnuplot < $f.gp && latex $f.tex && dvips -o $f.ps $f.dvi && epstopdf $f.ps >/dev/null 
-  gnuplot < $f.gp && epstopdf $f.eps 
+  #gnuplot < $f.gp && latex $f.tex && dvips -o $f.ps $f.dvi && epstopdf $f.ps >/dev/null 2>/dev/null
+  gnuplot < $f.gp && pdflatex $f.tex >/dev/null 2>/dev/null
+  #gnuplot < $f.gp && epstopdf $f.eps 
 done
 
 
