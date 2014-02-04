@@ -104,8 +104,8 @@
 
 \begin{abstract}
 Monte Carlo Tree Search (MCTS) has improved the performance of game-playing engines in 
-domains such as Go, Hex, and general-game playing. MCTS has been shown to outperform 
-classic minimax search in games where good heuristic evaluations are difficult to obtain. 
+domains such as Go, Hex, and general-game playing. MCTS has been shown to outperform
+outperform classic alpha-beta search in games where good heuristic evaluations are difficult to obtain. 
 In recent years, combining ideas from traditional minimax search in MCTS has been shown to be advantageous in some domains, 
 such as Lines of Action, Amazons, and Breakthrough.
 In this paper, we propose 
@@ -127,13 +127,13 @@ search paradigm that has been shown to increase performance in domains such as t
 general-game playing, real-time strategy games, single-agent planning, and more~\cite{mctssurvey}. 
 While the initial applications have been to games where heuristic evaluations are difficult to obtain, 
 progress in MCTS research has shown that heuristics can be effectively be combined in MCTS, even in games 
-where class minimax search has traditionally been preferred. 
+where classic minimax search has traditionally been preferred. 
 
 The most popular MCTS algorithm is UCT~\cite{Kocsis06Bandit}, 
 which performs a single simulation from the root of the search tree to a terminal state at each iteration. 
 During the iterative process, a game tree is incrementally built by adding a 
 new leaf node to the tree on each iteration, whose nodes track statistical estimates such average payoffs. 
-With each new simulation, these estimates improve and help guide future simulations. 
+With each new simulation, these estimates improve and help to guide future simulations. 
 
 %The nodes in the tree are used to store statistical information regarding wins and losses, and backpropagation
 %policies are used to update parent estimates, and these improving estimates are then used to select actions 
@@ -192,7 +192,7 @@ The prime example is MCTS-Solver~\cite{Winands08Solver}, which backpropagates pr
 extra information in MCTS. When a node is proven to be a 
 win or a loss, it no longer needs to be searched. This domain-independent modification greatly enhances 
 MCTS with negligible overhead. Score-bounded MCTS extends this idea to games with multiple 
-outcomes, leading to $\alpha \beta$ style pruning in the tree~\cite{Cazenave10Score}. Finally, one can use hybrid
+outcomes, leading to $\alpha \beta$-style pruning in the tree~\cite{Cazenave10Score}. Finally, one can use hybrid
 minimax searches in the tree to initialize nodes during, enhance the playout, or to help MCTS-Solver 
 in backpropagation~\cite{Baier13MinimaxHybrids}.
 
@@ -416,8 +416,8 @@ Otherwise, a move is selected non-uniformly at random, where capturing undefende
 likely than other moves. 
 MCTS with this playout policy beats one using uniform random 94.3\% of the time.
 We use two evaluation functions, a simple one found in \cite{Schadd11PhdThesis} 
-that assigns each piece a score of 10 and the further row achieved as 2.5, and the one described by
-\cite{Lorentz13Breakthrough}. 
+that assigns each piece a score of 10 and the further row achieved as 2.5, and the more sophisticated 
+one described by \cite{Lorentz13Breakthrough}. 
 We base much of our analysis in Breakthrough on the Lorentz \& Holey player, which 
 at the time of publication had an ELO rating of 1910 on the Little Golem web site. 
 Currently, the ELO rating is 2010 which is the 8th highest out of over 300 Breakthrough players. 
@@ -678,15 +678,17 @@ Additional results are summarized in Table~\ref{tbl:loaresults}. From the graph,
 32000 games giving a statistically significant (95\% confidence) win rate of 50.59\%. 
 We also tried increasing the search time, in both cases (with and without progressive bias), 
 and observed a gain in performance at five and ten seconds. 
-In the past, the strongest LOA player was MIA which was based on the $\alpha \beta$ search. Therefore, we also test our MCTS with 
+In the past, the strongest LOA player was MIA which was based on $\alpha \beta$ search. Therefore, we also test our MCTS with 
 implicit minimax backups against an $\alpha \beta$ player based on MIA. When progressive bias is disabled, implicit minimax backups
 increases the performance by 11 percentage points. There is also a small (but statistically insignificant) increase in 
 performance when progressive bias is enabled. 
 Also, at $\alpha = 0.2$, it seems that there is no statistically significant case of implicit minimax backups hurting performance. 
 
 \subsubsection{Discussion: Limitations.} While we have shown positive results in a number of domains, we recognize that this 
-technique is not universally applicable. Implicit minimax backups work because there is short-term tactical information which 
-is not captured in the long-term playouts, but is captured by the implicit minimax procedure. Additionally, there must strategic 
+technique is not universally applicable. We believe that implicit minimax backups work because there is short-term tactical 
+information which 
+is not captured in the long-term playouts, but is captured by the implicit minimax procedure. Additionally, we suspect that 
+there must be strategic 
 information in the playouts which is not captured in the shallower minimax backups. Thus, success depends on both the domain and 
 the evaluation function used. Implicit minimax backups did not improve performance in Chinese Checkers or the card game Hearts, 
 but more work needs to be done to understand if we would find success with a better evaluation function.
@@ -697,8 +699,8 @@ We have introduced a new technique called implicit minimax backups for MCTS.
 Unlike previous methods, this techniques stores 
 the information from both sources separately, only combining the two sources to guide
 selection. This simple technique can lead to stronger play even with
-basic evaluation functions, in Breakthrough and Kalah. Furthermore, the technique helps 
-performance LOA, a larger, more complex domain with sophisticated knowledge and 
+basic evaluation functions, in Breakthrough and Kalah. Furthermore, the technique improves 
+performance in LOA, a larger, more complex domain with sophisticated knowledge and 
 strong MCTS and classic $\alpha \beta$ players.
 
 For future work, we would like to apply the technique in other games, Amazons in 
