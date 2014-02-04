@@ -374,6 +374,26 @@ All of the experiments include swapped seats to ensure that each player type pla
 an equal number of games as first player and as second player.
 All reported win rates are over 1000 played games unless specifically stated otherwise, such as in Lines of Action.
 Domain-dependent playout policies and optimizations are reported in each subsection.
+We will use a wide range of enhancements in each game. For reference, a summary is available in Table~\ref{table:enhancements}.
+
+\begin{table}[tb]
+{\small
+\caption{Enhancements tested in Breakthrough (B), Kalah (K) and Lines of Action (L).}
+\begin{center}
+\begin{tabular}{|l|c|c|c|}
+\hline Enhancement & B & K & L \\ \hline
+Early Playout Termination & \checkmark & & \\
+Dynamic Early Termination & \checkmark & & \\
+Node Priors & \checkmark & & \\
+ $\epsilon$-greedy playouts & \checkmark & & \\
+Maximum backup propagation & \checkmark & & \\
+Progressive bias &  & &\checkmark \\
+\hline
+\end{tabular}
+\end{center} 
+\label{table:enhancements} }
+\end{table}%
+
 
 \subsection{Breakthrough}
 
@@ -652,13 +672,17 @@ Additional results are summarized in Table~\ref{tbl:loaresults}. From the graph,
 We also tried increasing the search time, in both cases (with and without progressive bias), 
 and observed a gain in performance at five and ten seconds. 
 In the past, the strongest LOA player was MIA which was based on the $\alpha \beta$ search. Therefore, we also test our MCTS with 
-implicit minimax backups against an $\alpha \beta$ player based on MIA. When progress bias is disabled, implicit minimax backups
-increases the performance by 11 percentage points. There is also notice a small (but statistically insignificant) increase in 
+implicit minimax backups against an $\alpha \beta$ player based on MIA. When progressive bias is disabled, implicit minimax backups
+increases the performance by 11 percentage points. There is also a small (but statistically insignificant) increase in 
 performance when progressive bias is enabled. 
-Also, at $\alpha = 0.2$, there is no statistically significant case of implicit minimax backups hurting performance. 
+Also, at $\alpha = 0.2$, it seems that there is no statistically significant case of implicit minimax backups hurting performance. 
 In fact, this is true for all the domains and circumstances that we have tried. 
 
-\subsection{Conclusion}
+\subsection{Discussion: Limitations}
+
+While we have shown positive results in a number of domains, we recognize that this technique is not universally applicable. Implicit minimax backups work because there is short-term tactical information which is not captured in the long-term playouts, but is captured by the implicit minimax procedure. Additionally, there must strategic information in the playouts which is not captured in the shallower minimax backups. Thus, success depends on both the domain and the evaluation function used. Implicit minimax backups did not improve performance in Chinese Checkers or the card game Hearts, but more work needs to be done to understand if we would find success with a better evaluation function.
+
+\section{Conclusion}
 
 We have introduced a new technique called implicit minimax backups for MCTS. 
 Unlike previous methods, this techniques stores 
