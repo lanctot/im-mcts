@@ -10,3 +10,6 @@ mcts_h_ege0.1_efv0_det0.5_im0.4 vs.          mcts_h_ege0.1_efv0_det0.5_mbp10:   
 
 
 
+         mcts_h_ege0.1_efv0_det0.5_im0.4 vs.       mcts_h_ege0.1_efv0_det0.5_mbp10000:   636   364     0 (diff   272, games  1000) 63.60 36.40 +/- 2.98
+         mcts_h_ege0.1_efv0_det0.5_im0.4 vs.        mcts_h_ege0.1_efv0_det0.5_mbp3000:   655   345     0 (diff   310, games  1000) 65.50 34.50 +/- 2.95
+         mcts_h_ege0.1_efv0_det0.5_im0.4 vs.        mcts_h_ege0.1_efv0_det0.5_mbp5000:   652   348     0 (diff   304, games  1000) 65.20 34.80 +/- 2.95
