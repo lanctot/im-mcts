@@ -7,7 +7,7 @@ If accepted, we will clarify/improve the "Empirical Evaluation"+"Conclusion" sec
 
 During the mid-game, searches in Breakthrough average 12000-30000 simulations/second, depending on the enhancements used. In Kalah, it's 95000. In LOA, it's 16000 using the simple playouts and 4000 using alpha-beta playouts. 
 
-Regarding the comparison to minimax, LOA is well-known and has been extensively researched. It is especially relevant given previous work comparing MCTS/minimax. Experiments were performed in MC-LOA, a world-champion engine winning the latest Olympiad. The benchmark minimax player is MIA, the world-best minimax-player upon which MC-LOA is based, winning the previous 4 Olympiads. Both use state-of-the-art techniques, including highly-optimized alpha-beta playouts as well as a sophisticated evaluation function based on 14 years of research. MIA includes enhancements: static and dynamic move ordering, iterative deepening, killer moves, history heuristic, enhanced transposition table cutoffs, null-move pruning, multi-cut, realization probability search, quiescence search, and negascout/PVS. 
+We compare MCTS(im\alpha) to minimax in LOA which is well-known and has been extensively researched. It is especially relevant given previous work comparing MCTS/minimax. Experiments were performed in MC-LOA, a world-champion engine winning the latest Olympiad. The benchmark minimax player is MIA, the world-best minimax-player upon which MC-LOA is based, winning the previous 4 Olympiads. Both use state-of-the-art techniques, including highly-optimized alpha-beta playouts as well as a sophisticated evaluation function based on 14 years of research. MIA includes enhancements: static and dynamic move ordering, iterative deepening, killer moves, history heuristic, enhanced transposition table cutoffs, null-move pruning, multi-cut, realization probability search, quiescence search, and negascout/PVS. 
 
 We tested different evaluation functions in Breakthrough: a simple one, and a sophisticated one taken from a state-of-the-art engine (see "Empirical Evaluation".) Both are computed incrementally adding <1% overhead. 
 
@@ -19,7 +19,7 @@ Regarding baselines in Breakthrough: we used tournaments on thousands of games t
 
 To the best of our understanding, "virtual playouts" in the cited paper is equivalent to node priors, which we compare to in Breakthrough. 
 
-While Kalah is relatively less explored, we believe it nonetheless helps characterize the type of domain MCTS(im\alpha) will work in and complements relevant previous MCTS/minimax comparisons (Ramanujan & Selman 2011). It also produces a consistent alpha-vs-performance pattern.
+While Kalah is less explored, we believe it nonetheless helps characterize the type of domain MCTS(im\alpha) will work in and complements relevant previous MCTS/minimax comparisons (Ramanujan & Selman 2011). It also produces a consistent alpha-vs-performance pattern.
 
 Explaining the precise cause/source of the improvement requires further work. However, this paper shows that the approach leads to clear performance gains compared to state-of-the-art techniques, with recurring patters across three domains under varying experimental configurations. 
 
