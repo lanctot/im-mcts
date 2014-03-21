@@ -17,7 +17,7 @@ Terminal states are indeed considered perfect values (proven wins/losses/draws).
 
 Regarding baselines in Breakthrough: we used tournaments on thousands of games to determine the best combination, with details in the appendix (included in a technical report if accepted). Using the default playout policy, MCTS wins 94.3% of games against MCTS with uniform random playouts. Our best baseline MCTS(ege0.1,det0.5) beats MCTS using our default playout policy in 68.8% of games.  
 
-To the best of our understanding, "virtual playouts" in the cited paper is equivalent to node priors, which we compare to in Breakthrough. 
+To the best of our understanding, "virtual playouts" in the cited paper is equivalent to node priors, which we evaluate to in Breakthrough. 
 
 While Kalah is less explored, we believe it nonetheless helps characterize the type of domain MCTS(im\alpha) will work in and complements relevant previous MCTS/minimax comparisons (Ramanujan & Selman 2011). It also produces a consistent alpha-vs-performance pattern.
 
