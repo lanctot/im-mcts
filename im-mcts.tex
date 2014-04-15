@@ -783,37 +783,102 @@ an equal number of games as first player and as second player.
 All reported win rates are over 1000 played games unless specifically stated otherwise, such as in Lines of Action.
 Domain-dependent playout policies and optimizations are reported in each subsection.
 
-We will make use of a wide range of enhancements and experimental settings. To fascilitate the discussion, 
+We compare to and combine our technique with number of previous ones to include  
+domain knowledge. A popular recent technique is {\it early playout terminations}. When a leaf node of the tree 
+is reached, a fixed-depth early playout terminations, hereby abbreviated to ``fet$x$'', plays $x$ moves according
+to the playout policy resulting in state $s$, and then terminates the playout returning $v_0(s)$. This method has
+shown to improve performance against standard MCTS in Amazons, Kalah, and 
+Breakthrough~\cite{Lorentz08Amazons,Ramanujan11Tradeoffs,Lorentz13Breakthrough}. 
+
+A similar technique is {\it dynamic early terminations}, which periodically checks the evaluation function 
+(or other domain-dependent features) terminating only when some condition is met. 
+This approach has been used as a ``mercy rule'' in Go~\cite{Bouzy07Old} and quite successfully in 
+Lines of Action~\cite{Winands08MCTSSolver}.
+In our version, which we abbreviate ``det$x$'', a playout is terminated and returns $1$ if $v_0(s) \ge x$ and 
+$-1$ if $v_0(s) \le -x$. Another option is to use an $\epsilon$-greedy playout policy that chooses a successor randomly 
+with probability $\epsilon$ and successor state with the largest evaluation with probability $1-\epsilon$, with 
+improved performance in Chinese Checkers~\cite{Sturtevant08An,Nijssen12Playout}, abbreviated ``ege$\epsilon$''.
+
+To facilitate the discussion, 
 we will refer to each enhancement and setting using different labels. These enhancements and labels are described in 
 the text that follows. But, we also include, for reference, a summary of each in Table~\ref{table:enhancements}.
 
+To tune parameters in Kalah and Breakthrough, we ran hierarchical elimination tournaments against players of 
+the same type where each head-to-head match consisted of 200 games with seats swapped halfway. 
+All of the detailed results of these tournaments comparisons are contained in Appendix A.\footnote{Appendix A is supplementary material, located 
+at \url{http://mlanctot.info/tmp/mctsim-app.pdf}. If the paper is accepted, the details in this appendix 
+will be made available as part of a follow-up technical report.}
+
 \begin{table}[tb]
 {\small
-\caption{Enhancements tested in Breakthrough (B), Kalah (K) and Lines of Action (L).}
+\caption{Enhancements tested in Kalah (K), Breakthrough (B), and Lines of Action (L).}
 \begin{center}
 \begin{tabular}{|l|c|c|c|c|}
 \hline 
-Enhancement / Setting       & Abbr.          & B          & K           & L \\ 
-\hline
-Early playout termination   & fet$x$          & \checkmark & \checkmark  &            \\
-Dynamic early termination   & det$x$         & \checkmark &             & \checkmark \\
-$\epsilon$-greedy playouts  & ege$\epsilon$  & \checkmark &             &            \\
-Node priors                 & np             & \checkmark &             &            \\
-Maximum backpropagation     &                & \checkmark &             &            \\
-Progressive bias            & PB             & \checkmark &             & \checkmark \\
-$\alpha\beta$ playouts      &                &            &             & \checkmark \\
-\hline
-Implicit minimax backups    & im$\alpha$     & \checkmark & \checkmark  & \checkmark \\
-\hline
-Simple evaluation function  & efMS, efRS     & \checkmark & \checkmark  &            \\
-Sophisticated ev. function  & efLH, efWB     & \checkmark &             & \checkmark \\
-Baseline player              & bl           & \checkmark &             &            \\
-Alternative baseline settings & bl'          & \checkmark &             &            \\
+Enhancement / Setting       & Abbr.          & K           & B           & L \\ 
+\hline                                                                   
+Early playout termination   & fet$x$         & \checkmark  & \checkmark  &            \\
+Dynamic early termination   & det$x$         &             & \checkmark  & \checkmark \\
+$\epsilon$-greedy playouts  & ege$\epsilon$  &             & \checkmark  &            \\
+Node priors                 & np             &             & \checkmark  &            \\
+Maximum backpropagation     &                &             & \checkmark  &            \\
+Progressive bias            & PB             &             & \checkmark  & \checkmark \\
+$\alpha\beta$ playouts      &                &             &             & \checkmark \\
+\hline                                                                   
+Implicit minimax backups    & im$\alpha$     & \checkmark  & \checkmark  & \checkmark \\
+\hline                                                                   
+Simple evaluation function  & efRS, efMS     & \checkmark  & \checkmark  &            \\
+Sophisticated ev. function  & efLH, efWB     &             & \checkmark  & \checkmark \\
+Baseline player              & bl            &             & \checkmark  &            \\
+Alternative baseline settings & bl'          &             & \checkmark  &            \\
 \hline
 \end{tabular}
 \end{center} 
 \label{table:enhancements} }
 \end{table}%
+
+\subsection{Kalah}
+
+\begin{figure}
+\begin{center}
+\includegraphics[scale=0.68]{plots/kalah-alpha}
+\caption{Results in Kalah. Each data point is based on roughly 1000 games; win percentages are $\pm \approx$ 3.0\% 
+with 95\% confidence.}
+\label{fig:kalah-alpha}
+\end{center}
+\end{figure}
+
+Kalah is a turn-taking game in the Mancala family of games. Each player has six houses, each 
+initially containing four stones, and a store on the endpoint of the board, initially empty. 
+On their turn, a player chooses one of their houses, removes all the stones in it, and ``sows'' 
+the stones one per house in counter-clockwise fashion, skipping the opponent's store. 
+If the final stone lands in the player's store, that player gets another turn, and there is no 
+limit to then number of consecutive turns taken by same player. If the stone ends on a house owned
+by the player that contains no stones, then that player captures all the stones in the adjacent 
+opponent house, putting it into the player's store. The game plays until one player's houses are
+all empty; the opponent then moves their remaining stones to their store. The winner is the player
+who has collected the most stones in their store. 
+Kalah has been weakly solved for several different variants of Kalah~\cite{Irving00Solving}, 
+and was used as a domain to compare MCTS variants to classic minimax search~\cite{Ramanujan11Tradeoffs}.
+
+In running experiments from the initial position, we observed a noticeable first-player bias. Therefore, as
+was done in \cite{Ramanujan11Tradeoffs}, our experiments produce random starting board positions 
+without any stones placed in the stores. 
+Competing players play one game and then swap seats to play a second game using the same board. A player 
+is declared a winner if that player won one of the games and at least tied the other game. If the same side 
+wins both games, the game is discarded. 
+
+We then determined which playout enhancement led to the best baseline player. 
+Tournament results revealed that a fet$4$ early termination worked best. 
+
+The evaluation function was the same one used in \cite{Ramanujan11Tradeoffs}, the difference between stones
+in each player's stores. Results with one 
+second of search time are shown in Figure~\ref{fig:kalah-alpha}. 
+%As with the previous study employing MCTS, we notice that an evaluation function can be used to enhance the performance.
+%Here, we again notice the same patterns as in Breakthrough. 
+Here, we notice that within the range $\alpha \in [0.1,0.5]$ there is a clear 
+advantage in performance when using implicit minimax backups against the base player. 
+This graph has a recurring shape that we have seen in our other domains as well. 
 
 \subsection{Breakthrough}
 \label{sec:bt}
@@ -841,21 +906,6 @@ We base much of our analysis in Breakthrough on the Lorentz \& Horey player, whi
 at the time of publication had an ELO rating of 1910 on the Little Golem web site. 
 Currently, the ELO rating is 2098 which is the 4th highest out of over 300 Breakthrough players. 
 
-We compare to and combine our technique with number of previous ones to include  
-domain knowledge. A popular recent technique is {\it early playout terminations}. When a leaf node of the tree 
-is reached, a fixed-depth early playout terminations, hereby abbreviated to ``fet$x$'', plays $x$ moves according
-to the playout policy resulting in state $s$, and then terminates the playout returning $v_0(s)$. This method has
-shown to improve performance against standard MCTS in Amazons, Kalah, and 
-Breakthrough~\cite{Lorentz08Amazons,Ramanujan11Tradeoffs,Lorentz13Breakthrough}. 
-
-A similar technique is {\it dynamic early terminations}, which periodically checks the evaluation function 
-(or other domain-dependent features) terminating only when some condition is met. 
-This approach has been used as a ``mercy rule'' in Go~\cite{Bouzy07Old} and quite successfully in 
-Lines of Action~\cite{Winands08MCTSSolver}.
-In our version, which we abbreviate ``det$x$'', a playout is terminated and returns $1$ if $v_0(s) \ge x$ and 
-$-1$ if $v_0(s) \le -x$. Another option is to use an $\epsilon$-greedy playout policy that chooses a successor randomly 
-with probability $\epsilon$ and successor state with the largest evaluation with probability $1-\epsilon$, with 
-improved performance in Chinese Checkers~\cite{Sturtevant08An,Nijssen12Playout}, abbreviated ``ege$\epsilon$''.
 
 %Another popular technique is {\it maximimum backpropagation}, where certain number of visits in the \Update~procedure,
 %the valued backed up is the one of the best child instead of the sampled value from the simulation.
@@ -884,11 +934,6 @@ include experiments for the sophisticated evaluation function efLH.
 
 We first determined the best playout strategy amongst fixed and dynamic early 
 terminations and $\epsilon$-greedy playouts.
-To tune parameters, we ran hierarchical elimination tournaments against players of the same type 
-where each head-to-head match consisted of 200 games with seats swapped halfway. 
-The parameter value sets are given in Appendix A.\footnote{Appendix A is supplementary material, located 
-at \url{http://mlanctot.info/tmp/mctsim-app.pdf}. If the paper is accepted, the details in this appendix 
-will be made available as part of a follow-up technical report.}
 Our best fixed early terminations player was fet$20$ and best $\epsilon$-greedy player was ege$0.1$.
 Through systematic testing on 1000 games per pairing, we determined that the best playout 
 policy when using efMS is the combination (ege$0.1$,det$0.5$), which 
@@ -903,7 +948,6 @@ use it as our primary benchmark for comparison in the the rest of our experiment
 used as the playout policy for every MCTS player unless otherwise stated.
 As a final summary, this baseline player:
 \begin{enumerate}
-\item Uses an informed playout policy that was shown to beat MCTS with random playouts in 94.3\% of games.
 \item Uses ege$0.1$, an $\epsilon$-greedy playout policy with $\epsilon = 0.1$.
 \item Uses det$0.5$, dynamic early terminations where a playout is terminated early if the evaluation 
       of the state surpasses the thresholds of $<-0.5$ and $>+0.5$.
@@ -1001,7 +1045,7 @@ for $T \in \{ 100, \cdots, 30000 \}$. }
 We now run experiments using the more sophisticated evaluation function from~\cite{Lorentz13Breakthrough}, 
 efLH, that assigns specific piece count values depending on their position on the board. 
 Rather than repeating all of the above experiments, we chose simply to compare baselines and to repeat
-the initial experiment, all under 1 second of search time.
+the initial experiment, all using 1 second of search time.
 
 The best playout with this evaluation function is fet$20$ with node priors, which we call the alternative baseline, 
 abbreviated `` bl' ''.
@@ -1068,7 +1112,12 @@ Each point represents 1000 games.}
 {\small
 \begin{center}
 \begin{tabular}{ccccc|c}
-Ev. Func.  & Player            & Opp.             & $n$    & $t$ (s) & Res. (\%) \\
+Ev. Func.  & Player              & Opp.                 & $n$    & $t$ (s) & Res. (\%) \\
+\hline
+(Both)     & $\alpha\beta$(efMS) & $\alpha\beta$(efLH)  & 2000   & 1       & 70.40     \\
+(Both)     & $\alpha\beta$(efMS) & $\alpha\beta$(efLH)  &  500   & 5       & 53.40     \\
+(Both)     & $\alpha\beta$(efMS) & $\alpha\beta$(efLH)  &  400   & 10      & 31.25     \\
+\hline
 \hline
 efMS       & MCTS              & $\alpha\beta$    & 2000   & 1       & 27.55     \\     
 efMS       & MCTS              & $\alpha\beta$    & 1000   & 5       & 39.00     \\     
@@ -1098,7 +1147,8 @@ efLH       & MCTS(im$0.4$)     & $\alpha\beta$    &  130   & 120     & 59.23    
 \end{tabular}
 \end{center}
 \caption{Summary of results versus $\alpha\beta$. 
-Here, $n$ represents the number of games played and $t$ time in seconds per search.}
+Here, $n$ represents the number of games played and $t$ time in seconds per search.
+Win rates are for the Player (in the left column).}
 \label{tbl:ab_vs_mcts}
 }
 \end{table}
@@ -1113,63 +1163,49 @@ then all other captures, and finally regular moves.
 The results are listed in Table~\ref{tbl:ab_vs_mcts}.
 
 The first observation from these results is that the performance of MCTS increases versus 
-$\alpha\beta$ as search time increases. This is true under all cases, using either evaluation function, 
-with and without implicit minimax backups. This is similare to previous observations in 
+$\alpha\beta$ as search time increases. This is true in all cases, using either evaluation function, 
+with and without implicit minimax backups. This is similar to previous observations in 
 Lines of Action~\cite{Winands11AB} and multiplayer search~\cite{Sturtevant08icga,Nijssen13}.
 
 The second observation is that in every case, MCTS(im$0.4$) performs significantly better 
-against $\alpha\beta$ than the baseline player at the same search time. In fact, the win rate
-of MCTS(im$0.4$) is nearly twice that of the baseline player versus $\alpha\beta$. 
+against $\alpha\beta$ than the baseline player at the same search time. 
 Using efMS in Breakthrough with 5 seconds of search time, MCTS(im$0.4$) performs significantly 
 better than both the baseline MCTS player and $\alpha\beta$ search on their own. 
-Also, when using efLH, it takes more than 30 seconds of search time for the baseline player to perform
-as well as MCTS(im$0.4$) does at 1 second of search time, and the baseline player
-never performs as well as MCTS(im$0.4$) does at 5 seconds, even if it is given 120 seconds of search time.
 
 The third observation is that MCTS(im$\alpha$) benefits quite significantly from weak 
-heuristic information, more so than $\alpha\beta$. Conversely, $\alpha\beta$ seems to take
-better advantage of the sophisticated evaluation function. Nonetheless, there still seems to be 
-a point where, when given enough search time, the performance of 
-MCTS(im$0.4$) surpasses $\alpha\beta$. 
-
-\subsection{Kalah}
-
-\begin{figure}
-\begin{center}
-\includegraphics[scale=0.68]{plots/kalah-alpha}
-\caption{Results in Kalah. Each data point is based on roughly 1000 games; win percentages are $\pm \approx$ 3.0\% 
-with 95\% confidence.}
-\label{fig:loa-alpha}
-\end{center}
-\end{figure}
-
-Kalah is a turn-taking game in the Mancala family of games. Each player has six houses, each 
-initially containing four stones, and a store on the endpoint of the board, initially empty. 
-On their turn, a player chooses one of their houses, removes all the stones in it, and ``sows'' 
-the stones one per house in counter-clockwise fashion, skipping the opponent's store. 
-If the final stone lands in the player's store, that player gets another turn, and there is no 
-limit to then number of consecutive turns taken by same player. If the stone ends on a house owned
-by the player that contains no stones, then that player captures all the stones in the adjacent 
-opponent house, putting it into the player's store. The game plays until one player's houses are
-all empty; the opponent then moves their remaining stones to their store. The winner is the player
-who has collected the most stones in their store. 
-Kalah has been weakly solved for several different variants of Kalah~\cite{Irving00Solving}, 
-and was used as a domain to compare MCTS variants to classic minimax search~\cite{Ramanujan11Tradeoffs}.
-
-In running experiments from the initial position, we observed a noticeable first-player bias. Therefore, as
-was done in \cite{Ramanujan11Tradeoffs}, our experiments produce random starting board positions 
-without any stones placed in the stores. 
-Competing players play one game and then swap seats to play a second game using the same board. A player 
-is declared a winner if that player won one of the games and at least tied the other game. If the same side 
-wins both games, the game is discarded. 
-Tournament results revealed that a fet$4$ early termination worked best. 
-The evaluation function was simply the difference between stones in each player's stores. Results with one 
-second of search time are shown in Figure~\ref{fig:loa-alpha}. 
-%As with the previous study employing MCTS, we notice that an evaluation function can be used to enhance the performance.
-Here, we again notice the same patterns as in Breakthrough. Within the range $\alpha \in [0.1,0.5]$ there is a clear 
-advantage in performance when using implicit minimax backups against the base player. 
+heuristic information, more so than $\alpha\beta$. 
+When using efMS, MCTS takes less long to do better against $\alpha\beta$, possibly because MCTS makes 
+better use of weaker information. 
+When using efLH, $\alpha\beta$ preforms significantly better against MCTS at low time settings.  
+However, it is not quite clear whether this due to $\alpha\beta$ improving or MCTS worsening (indeed, 
+in the previous subsection we showed that the best implicit minimax player is the one that uses 
+the simpler evaluation function.) Therefore, we also include a comparison of the $\alpha\beta$ players
+using efMS versus efLH. What we see is that at 1 second, efMS benefits $\alpha\beta$ more, but as time 
+increases efLH seems to be preferred. 
+Nonetheless, when using efLH, there still seems to be a point where, if given enough search time
+the performance of MCTS(im$0.4$) surpasses that of $\alpha\beta$. 
 
 \subsection{Lines of Action}
+
+In subsection~\ref{sec:bt}, we compared the performance of MCTS(im$\alpha$) to a basic $\alpha\beta$
+search player. Our main question at this point is how MCTS(im$\alpha$) could perform in a game with 
+stronger play due to using proven enhancements in both $\alpha\beta$ and MCTS.
+For this analysis, we now consider the well-studied game Lines of Action (LOA). 
+
+LOA is a turn-taking alternating-move game played on an 8-by-8 board that uses checkers board and pieces.
+The goal is to connect all your pieces into a single connected group (of any size), 
+where the pieces are connected via adjacent and diagonals squares. A piece may move in any direction, but the number of squares 
+it may move depends on the total number of pieces in the line, including opponent pieces. A piece may jump over its own
+pieces but not opponent pieces. Captures occur by landing on opponent pieces. 
+
+The MCTS player is MC-LOA, whose implementation and enhancements are described in \cite{Winands10MCTS-LOA}. 
+MC-LOA is a world-champion engine winning the latest Olympiad. The benchmark $\alpha\beta$ player is MIA, the world-best $\alpha\beta$-player 
+upon which MC-LOA is based, winning 4 Olympiads. MC-LOA uses MCTS-Solver, progressive bias, and highly-optimized $\alpha\beta$
+playouts. MIA includes the following enhancements: static move ordering, iterative deepening, killer moves, history heuristic, enhanced 
+transposition table cutoffs, null-move pruning, multi-cut, realization probability search, quiescence search, and negascout/PVS. 
+The evaluation function used is the used in MIA~\cite{Winands06MIA}.
+All of the results in LOA are based 100 opening board 
+positions.\footnote{\small https://dke.maastrichtuniversity.nl/m.winands/loa/} 
 
 \begin{figure}[t]
 \begin{center}
@@ -1208,26 +1244,6 @@ Here, $n$ represents the number of games played and $t$ time in seconds per sear
 }
 \end{table}
 
-In subsection~\ref{sec:bt}, we compared the performance of MCTS(im$\alpha$) to a basic $\alpha\beta$
-search player. Our main question at this point is how MCTS(im$\alpha$) could perform in a game with 
-stronger play due to using proven enhancements in both $\alpha\beta$ and MCTS.
-For this analysis, we now consider the well-studied game Lines of Action (LOA). 
-
-LOA is a turn-taking alternating-move game played on an 8-by-8 board that uses checkers board and pieces.
-The goal is to connect all your pieces into a single connected group (of any size), 
-where the pieces are connected via adjacent and diagonals squares. A piece may move in any direction, but the number of squares 
-it may move depends on the total number of pieces in the line, including opponent pieces. A piece may jump over its own
-pieces but not opponent pieces. Captures occur by landing on opponent pieces. 
-
-The MCTS player is MC-LOA, whose implementation and enhancements are described in \cite{Winands10MCTS-LOA}. 
-MC-LOA is a world-champion engine winning the latest Olympiad. The benchmark $\alpha\beta$ player is MIA, the world-best $\alpha\beta$-player 
-upon which MC-LOA is based, winning the previous 4 Olympiads. Both use state-of-the-art techniques, including highly-optimized alpha-beta 
-playouts. MIA includes the following enhancements: static
-and dynamic move ordering, iterative deepening, killer moves, history heuristic, enhanced transposition table cutoffs, null-move pruning, 
-multi-cut, realization probability search, quiescence search, and negascout/PVS. 
-The evaluation function used is the used in MIA~\cite{Winands06MIA}.
-All of the results in LOA are based 100 opening board 
-positions.\footnote{\small https://dke.maastrichtuniversity.nl/m.winands/loa/} 
 
 We repeat the implicit minimax backups experiment with varying $\alpha$. At first, we use standard UCT without enhancements 
 and a simple playout that is selects moves non-uniformly at random based on the move categories, and uses the early cut-off strategy. 
@@ -1244,11 +1260,22 @@ We also tried increasing the search time, in both cases (with and without progre
 and observed a gain in performance at five and ten seconds. 
 In the past, the strongest LOA player was MIA which was based on $\alpha \beta$ search. Therefore, we also test our MCTS with 
 implicit minimax backups against an $\alpha \beta$ player based on MIA. When progressive bias is disabled, implicit minimax backups
-increases the performance by 11 percentage points. There is also a small (but statistically insignificant) increase in 
-performance when progressive bias is enabled. 
+increases the performance by 11 percentage points. There is also a small increase in performance when progressive bias is enabled. 
 Also, at $\alpha = 0.2$, it seems that there is no statistically significant case of implicit minimax backups hurting performance. 
 
+%\subsection{Discussion: Traps and Limitations} 
 \subsection{Discussion: Limitations} 
+
+%Add for camera-ready.
+%The initial motivation for this work was driven by the trap moves which pose problems in 
+%MCTS~\cite{Ramanujan11Tradeoffs,Baier13MinimaxHybrids,Gudmindsson13Sufficiency}. We tried to construct an example board in Breakthrough 
+%to demonstrate how implicit minimax backups deals with problems with traps. We were unable to do so, and we suspect the following
+%reasons. 
+%First, in our experience it seems that traps are effectively handled by improving the playout policy. Even without early terminations, 
+%simply having decisive and anti-decisive moves and preferring good capture moves seems to be enough to handle traps in Breakthrough.
+%Second, even when using random playouts, with sufficiently high simulations in an efficient implementation, shallow traps seem to be
+%handled effectively without any additional knowledge. Therefore, we now believe the explanation for the advantage offered by 
+%implicit minimax backups is somewhat more subtle than simply detecting and handling traps. 
 
 While we have shown positive results in a number of domains, we recognize that this 
 technique is not universally applicable. We believe that implicit minimax backups work because there is short-term tactical 
@@ -1265,14 +1292,24 @@ We have introduced a new technique called implicit minimax backups for MCTS.
 Unlike previous methods, this techniques stores 
 the information from both sources separately, only combining the two sources to guide
 selection. This simple technique can lead to stronger play even with
-basic evaluation functions, in Breakthrough and Kalah. Furthermore, the technique improves 
+simple evaluation functions, which is often readily available. 
+In Breakthrough, our evaluation shows that implicit minimax backups increases 
+the strength of MCTS significantly compared to similar techniques for improving MCTS
+using domain knowledge.
+Furthermore, the technique improves 
 performance in LOA, a larger, more complex domain with sophisticated knowledge and 
-strong MCTS and classic $\alpha \beta$ players.
+strong MCTS and $\alpha \beta$ players. 
+
+In most cases, $\alpha \in [0.15,0.4]$ seems to be a safe range, and we found generally 
+that the more knowledge that is already included in the MCTS baseline player, the lower
+the optimal $\alpha$ tends to be. In Breakthrough, this range is higher $[0.5,0.6]$ 
+when using node priors at lower time settings and when using the alternative baseline. 
 
 For future work, we would like to apply the technique in other games, Amazons in 
 particular. 
-We aim to compare the technique with sufficiency thresholds 
-of Gudmundsson \& Bj\"{o}rnsson (2013). 
+We hope to compare implicit minimax backups with sufficiency thresholds 
+of Gudmundsson \& Bj\"{o}rnsson~\cite{Gudmindsson13Sufficiency} and to other 
+minimax hybrids, such as those of Baier \& Winands~\cite{Baier13MinimaxHybrids}. 
 %We also plan to investigate decaying strategies for 
 %$\alpha$ and incremental $\alpha \beta$ pruning.
 The technique could also work in general game-playing agents using 
