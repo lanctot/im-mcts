@@ -816,6 +816,7 @@ Alternative baseline settings & bl'          & \checkmark &             &       
 \end{table}%
 
 \subsection{Breakthrough}
+\label{sec:bt}
 
 Breakthrough is a turn-taking alternating move game played on an 8-by-8 chess board. Each player 
 has 16 identical pieces on their first two rows. 
@@ -963,7 +964,7 @@ backpropagation in the original MCTS work~\cite{Coulom06Efficient}. This enhance
 %modifies line \ref{alg:retline2} of the algorithm to the following: 
 modifies line 23 of the algorithm to the following: 
 \[
-\mathbf{if}~n_{s,a} \ge T~\mathbf{then~return}~\max_{a \in \cA(s)} \bQ(s,a)~\mathbf{else~return}~r.
+\mathbf{if}~n_{s} \ge T~\mathbf{then~return}~\max_{a \in \cA(s)} \bQ(s,a)~\mathbf{else~return}~r.
 \]
 The results for several values of $T$ are given in Table~\ref{tbl:maxbackprop}. 
 
@@ -997,26 +998,32 @@ for $T \in \{ 100, \cdots, 30000 \}$. }
 
 \subsubsection*{MCTS Using Lorentz \& Horey Evaluation Function}
 
-We now run experienced using the more sophisticated evaluation function from~\cite{Lorentz13Breakthrough}, 
+We now run experiments using the more sophisticated evaluation function from~\cite{Lorentz13Breakthrough}, 
 efLH, that assigns specific piece count values depending on their position on the board. 
 Rather than repeating all of the above experiments, we chose simply to compare baselines and to repeat
-the initial experiment. 
+the initial experiment, all under 1 second of search time.
 
 The best playout with this evaluation function is fet$20$ with node priors, which we call the alternative baseline, 
 abbreviated `` bl' ''.
-Our baseline MCTS player wins 40.2\% of games against the alternative baseline. 
-When we add node priors to our baseline, this rises to 78.0\%. 
-When we also add implicit minimax backups ($\alpha = 0.6$), this rises again to 84.9\%. 
-We label this best performing player MCTS(im$0.6$,np). 
-Nonetheless, using the alternative baseline, we reran the initial $\alpha$ experiment. 
-Results are shown in Figure~\ref{fig:bt-alt-alpha}. 
-
+We reran the initial $\alpha$ experiment using the alternative baseline, 
+which uses the Lorentz \& Horey evaluation function, to find the best implicit minimax player using this 
+more sophisticated evaluation function. Results are shown in Figure~\ref{fig:bt-alt-alpha}. 
 In this case the best range is $\alpha \in [0.5,0.6]$ for one second and $\alpha \in [0.5,0.6]$ for
 five seconds.
-We label the best player in this figure using the alternative baseline MCTS(bl', im$0.6$, np). 
-We played the two best players against each other, and MCTS(im$0.6$,np) wins 62.1\% of games. 
-Given this result, we conjecture that implicit minimax backups may benefit more when combined with 
-defensive and less granular evaluation functions in Breakthrough.
+We label the best player in this figure using the alternative baseline MCTS(efLH,bl',im$0.6$). 
+
+In an effort to explain the relative strengths of each evaluation function, we then compared the two baseline players. 
+Our baseline MCTS player, MCTS(efMS,bl), wins 40.2\% of games against the alternative baseline, MCTS(efLH,bl'). 
+When we add node priors, MCTS(efMS,bl,np) wins 78.0\% of games against MCTS(efLH,bl'). 
+When we also add implicit minimax backups ($\alpha = 0.4$), the win rate of MCTS(efMS,bl,im$0.4$,np) versus MCTS(efLH,bl') rises again to 84.9\%. 
+Therefore, MCTS(im$\alpha$) seems to improve the player against a stronger benchmark player, even though it uses a simpler evaluation function. 
+
+We then played the two best players for the respective evaluation functions against each other, 
+that is we played MCTS(efMS,bl,im$0.4$) against MCTS(efLH,bl',im$0.6$). 
+MCTS(efMS,bl,im$0.4$) wins 62.1\% of games. 
+Given this result, we suspect that implicit minimax backups may benefit more easily when 
+combined with defensive and less granular evaluation functions in Breakthrough. We try to 
+further explain this finding in the next subsection.
 
 \begin{figure}[t]
 \begin{center}
@@ -1078,7 +1085,7 @@ efLH       & MCTS              & $\alpha\beta$    &  500   & 10      & 12.60    
 efLH       & MCTS              & $\alpha\beta$    &  500   & 20      & 18.80      \\     
 efLH       & MCTS              & $\alpha\beta$    &  500   & 30      & 19.40      \\     
 efLH       & MCTS              & $\alpha\beta$    &  500   & 60      & 24.95      \\     
-efLH       & MCTS              & $\alpha\beta$    &  400   & 120     & 24.44      \\     
+efLH       & MCTS              & $\alpha\beta$    &  130   & 120     & 25.38      \\     
 \hline
 efLH       & MCTS(im$0.4$)     & $\alpha\beta$    & 2000   & 1       & 24.05      \\     
 efLH       & MCTS(im$0.4$)     & $\alpha\beta$    & 1000   & 5       & 27.30      \\     
@@ -1086,7 +1093,7 @@ efLH       & MCTS(im$0.4$)     & $\alpha\beta$    &  500   & 10      & 32.60    
 efLH       & MCTS(im$0.4$)     & $\alpha\beta$    &  500   & 20      & 41.60      \\     
 efLH       & MCTS(im$0.4$)     & $\alpha\beta$    &  500   & 30      & 44.60      \\     
 efLH       & MCTS(im$0.4$)     & $\alpha\beta$    &  500   & 60      & 52.60      \\     
-efLH       & MCTS(im$0.4$)     & $\alpha\beta$    &  400   & 120     & 63.55      \\     
+efLH       & MCTS(im$0.4$)     & $\alpha\beta$    &  130   & 120     & 59.23      \\     
 \hline
 \end{tabular}
 \end{center}
@@ -1124,11 +1131,6 @@ heuristic information, more so than $\alpha\beta$. Conversely, $\alpha\beta$ see
 better advantage of the sophisticated evaluation function. Nonetheless, there still seems to be 
 a point where, when given enough search time, the performance of 
 MCTS(im$0.4$) surpasses $\alpha\beta$. 
-
-Note that these results could vary for implementations of $\alpha\beta$ that include one or more the 
-search enhancements using in game-tree search.
-However, we will show in Lines of Action that even with many of the heuristic enhancements enabled 
-in MIA, implicit minimax backups can still result in a significant improvement over $\alpha\beta$. 
 
 \subsection{Kalah}
 
@@ -1206,19 +1208,24 @@ Here, $n$ represents the number of games played and $t$ time in seconds per sear
 }
 \end{table}
 
+In subsection~\ref{sec:bt}, we compared the performance of MCTS(im$\alpha$) to a basic $\alpha\beta$
+search player. Our main question at this point is how MCTS(im$\alpha$) could perform in a game with 
+stronger play due to using proven enhancements in both $\alpha\beta$ and MCTS.
+For this analysis, we now consider the well-studied game Lines of Action (LOA). 
+
 LOA is a turn-taking alternating-move game played on an 8-by-8 board that uses checkers board and pieces.
 The goal is to connect all your pieces into a single connected group (of any size), 
 where the pieces are connected via adjacent and diagonals squares. A piece may move in any direction, but the number of squares 
 it may move depends on the total number of pieces in the line, including opponent pieces. A piece may jump over its own
 pieces but not opponent pieces. Captures occur by landing on opponent pieces. 
 
-The MCTS player is MC-LOA, implementation and enhancements on the state-of-the-art techniques described in \cite{Winands10MCTS-LOA}, 
-MC-LOA, a world-champion engine winning the latest Olympiad. The benchmark minimax player is MIA, the world-best minimax-player upon 
-which MC-LOA is based, winning the previous 4 Olympiads. Both use state-of-the-art techniques, including highly-optimized alpha-beta 
-playouts as well as a sophisticated evaluation function based on 14 years of research. MIA includes the following enhancements: static
+The MCTS player is MC-LOA, whose implementation and enhancements are described in \cite{Winands10MCTS-LOA}. 
+MC-LOA is a world-champion engine winning the latest Olympiad. The benchmark $\alpha\beta$ player is MIA, the world-best $\alpha\beta$-player 
+upon which MC-LOA is based, winning the previous 4 Olympiads. Both use state-of-the-art techniques, including highly-optimized alpha-beta 
+playouts. MIA includes the following enhancements: static
 and dynamic move ordering, iterative deepening, killer moves, history heuristic, enhanced transposition table cutoffs, null-move pruning, 
 multi-cut, realization probability search, quiescence search, and negascout/PVS. 
-The evaluation function used is the one based on the features used in MIA~\cite{Winands06MIA}.
+The evaluation function used is the used in MIA~\cite{Winands06MIA}.
 All of the results in LOA are based 100 opening board 
 positions.\footnote{\small https://dke.maastrichtuniversity.nl/m.winands/loa/} 
 
@@ -1241,7 +1248,9 @@ increases the performance by 11 percentage points. There is also a small (but st
 performance when progressive bias is enabled. 
 Also, at $\alpha = 0.2$, it seems that there is no statistically significant case of implicit minimax backups hurting performance. 
 
-\subsubsection{Discussion: Limitations.} While we have shown positive results in a number of domains, we recognize that this 
+\subsection{Discussion: Limitations} 
+
+While we have shown positive results in a number of domains, we recognize that this 
 technique is not universally applicable. We believe that implicit minimax backups work because there is short-term tactical 
 information which 
 is not captured in the long-term playouts, but is captured by the implicit minimax procedure. Additionally, we suspect that 
