@@ -683,17 +683,19 @@ selection in Equation~\ref{eq:select-ucb}, we use
 where $\alpha$ is a weight representing the influence of the heuristic minimax values.
 
 The entire process is summarized in Algorithm~\ref{alg}. There are three simple additions to vanilla MCTS,
-which are located on lines \ref{alg:imselect}, \ref{alg:imeval}, and \ref{alg:imexpand}.
+%which are located on lines \ref{alg:imselect}, \ref{alg:imeval}, and \ref{alg:imexpand}.
+which are located on lines 2, 8, and 13.
 During selection, $\hQ^{\mathit{IM}}$ from Equation~\ref{eq:imq} replaces $\bQ$ in 
 Equation~\ref{eq:select-ucb}. During backpropagation, the implicit minimax evaluations $v^{\tau}_s$ are updated based on 
 the children's values. For simplicity, a single $\max$ operator is used here since the evaluations are assumed to be in 
 view of player $\tau(s)$. Depending on how the game is modeled, the implementation may require keeping track of or  
-accounting for signs of rewards, for example a negamax model would include a sign switch from the returned child on 
-line~\ref{alg:imeval}. 
+accounting for signs of rewards. For example a negamax model would include a sign switches at the appropriate places 
+to ensure that the payoffs are in view of the current player at each node.  
+%line~\ref{alg:imeval}. 
 %\footnote{Domain-dependent inversions or scalings may be necessary to convert the rewards. These details are 
 %intentionally omitted from the pseudo-code for generality.}
 %The function $\alpha(n_s)$ will determine how much weight to attribute to these evaluations.  
-Finally, after a node expansion, on line~\ref{alg:imexpand}, the implicit minimax value is initialized to its heuristic
+Finally, after a node expansion, on 13, the implicit minimax value is initialized to its heuristic
 evaluation $v^{\tau}_s \leftarrow v^{\tau}_0(s)$. 
 
 \newcommand{\MCTS}{{\sc MCTS}}
@@ -706,7 +708,7 @@ evaluation $v^{\tau}_s \leftarrow v^{\tau}_0(s)$.
 \begin{algorithm2e}[t!]
   \Select$(s)$:\;
   \pushline
-    Let $A'$ be the set of actions $a \in \cA(s)$ maximizing $\hQ^{\mathit{IM}}(s,a) + C \sqrt{\frac{\ln n_s}{n_{s,a}}}$ \; \label{alg:imselect}
+    Let $A'$ be the set of actions $a \in \cA(s)$ maximizing $\hQ^{\mathit{IM}}(s,a) + C \sqrt{\frac{\ln n_s}{n_{s,a}}}$ \; 
     {\bf return} $a' \sim ${\sc Uniform}$(A')$ \;
   \popline
   \;
@@ -714,17 +716,17 @@ evaluation $v^{\tau}_s \leftarrow v^{\tau}_0(s)$.
   \pushline
     $r_s \leftarrow r_s + r$\;
     $n_s \leftarrow n_s + 1$\;
-    $v^{\tau}_s \leftarrow \max_{a \in \cA(s)} v^{\tau}_{s,a}$\; \label{alg:imeval}
+    $v^{\tau}_s \leftarrow \max_{a \in \cA(s)} v^{\tau}_{s,a}$ \; 
   \popline
   \;
   \Simulate$(s_{prev}, a_{prev}, s)$:\;
   \pushline
     \If{$s \not\in \cG$}{
       \Expand($s$)\;        
-      $v^{\tau}_s \leftarrow v^{\tau}_0(s)$ \; \label{alg:imexpand}
+      $v^{\tau}_s \leftarrow v^{\tau}_0(s)$ \; 
       $r \leftarrow $\Playout($s$)\;
       \Update($s,r$)\;
-      {\bf return} $r$\;                       \label{alg:retline1}
+      {\bf return} $r$\;                       
     }
     \Else{ 
       \lIf{$s \in \cZ$}{{\bf return} $\cR(s_{prev}, a_{prev}, s)$}
@@ -732,7 +734,7 @@ evaluation $v^{\tau}_s \leftarrow v^{\tau}_0(s)$.
       $s' \leftarrow \cT(s,a)$\;
       $r \leftarrow $\Simulate$(s,a,s')$\;
       \Update($s,r$)\;
-      {\bf return} $r$\;                       \label{alg:retline2}
+      {\bf return} $r$\;                      
     }
   \popline
   \;
@@ -755,7 +757,6 @@ proven wins and losses.
 %backup rule, we are mainly concerned with how an evaluation function can help MCTS performance.
 %Our empirical evaluation will show that MCTS can benefit significantly from this added information, even with 
 %simple heuristic evaluation functions.
-
 
 \section{Empirical Evaluation}
 
@@ -781,7 +782,10 @@ All of the experiments include swapped seats to ensure that each player type pla
 an equal number of games as first player and as second player.
 All reported win rates are over 1000 played games unless specifically stated otherwise, such as in Lines of Action.
 Domain-dependent playout policies and optimizations are reported in each subsection.
-We will make use of a wide range of enhancements. For reference, a summary is available in Table~\ref{table:enhancements}.
+
+We will make use of a wide range of enhancements and experimental settings. To fascilitate the discussion, 
+we will refer to each enhancement and setting using different labels. These enhancements and labels are described in 
+the text that follows. But, we also include, for reference, a summary of each in Table~\ref{table:enhancements}.
 
 \begin{table}[tb]
 {\small
@@ -789,9 +793,9 @@ We will make use of a wide range of enhancements. For reference, a summary is av
 \begin{center}
 \begin{tabular}{|l|c|c|c|c|}
 \hline 
-Enhancement                 & Abbr.          & B          & K           & L \\ 
+Enhancement / Setting       & Abbr.          & B          & K           & L \\ 
 \hline
-Early playout termination   & pd$x$          & \checkmark & \checkmark  &            \\
+Early playout termination   & fet$x$          & \checkmark & \checkmark  &            \\
 Dynamic early termination   & det$x$         & \checkmark &             & \checkmark \\
 $\epsilon$-greedy playouts  & ege$\epsilon$  & \checkmark &             &            \\
 Node priors                 & np             & \checkmark &             &            \\
@@ -801,11 +805,15 @@ $\alpha\beta$ playouts      &                &            &             & \check
 \hline
 Implicit minimax backups    & im$\alpha$     & \checkmark & \checkmark  & \checkmark \\
 \hline
+Simple evaluation function  & efMS, efRS     & \checkmark & \checkmark  &            \\
+Sophisticated ev. function  & efLH, efWB     & \checkmark &             & \checkmark \\
+Baseline player              & bl           & \checkmark &             &            \\
+Alternative baseline settings & bl'          & \checkmark &             &            \\
+\hline
 \end{tabular}
 \end{center} 
 \label{table:enhancements} }
 \end{table}%
-
 
 \subsection{Breakthrough}
 
@@ -820,28 +828,33 @@ Our playout policy always chooses a one-ply ``decisive'' wins and prevents immed
 losses~\cite{Teytaud10On}.
 Otherwise, a move is selected non-uniformly at random, where capturing undefended pieces are four times more
 likely than other moves. 
-MCTS with this playout policy beats one using uniform random 94.3\% of the time.
-We use two evaluation functions, a simple one found in \cite{Schadd11PhdThesis} 
-that assigns each piece a score of 10 and the further row achieved as 2.5, and the more sophisticated 
-one described by \cite{Lorentz13Breakthrough}. 
+MCTS with this informed playout policy beats the one using uniform random 94.3\% of the time. Therefore, this 
+playout policy leads to a clear improvement over random playouts, and so we so we only use it for the rest 
+of our experiments. 
+
+We use two evaluation functions. The first one is a simple one found in Maarten Schadd's thesis~\cite{Schadd11PhdThesis} 
+that assigns each piece a score of 10 and the further row achieved as 2.5, which we abbreviate ``efMS''. The second 
+one is the more sophisticated one giving specific point values for each individual square per player 
+described in a recent paper by Lorentz \& Horey~\cite{Lorentz13Breakthrough}, which we abbreviate ``efLH''. 
 We base much of our analysis in Breakthrough on the Lorentz \& Horey player, which 
 at the time of publication had an ELO rating of 1910 on the Little Golem web site. 
-Currently, the ELO rating is 2010 which is the 8th highest out of over 300 Breakthrough players. 
+Currently, the ELO rating is 2098 which is the 4th highest out of over 300 Breakthrough players. 
 
 We compare to and combine our technique with number of previous ones to include  
-domain knowledge. A popular technique is {\it early playout terminations}. When a leaf node of the tree 
-is reached, a fixed-depth early playout terminations, hereby abbreviated to ``pd$x$'', plays $x$ moves according
+domain knowledge. A popular recent technique is {\it early playout terminations}. When a leaf node of the tree 
+is reached, a fixed-depth early playout terminations, hereby abbreviated to ``fet$x$'', plays $x$ moves according
 to the playout policy resulting in state $s$, and then terminates the playout returning $v_0(s)$. This method has
-shown to improve performance against baseline MCTS in Amazons, Kalah, and 
-Breakthrough~\cite{Lorentz08Amazons,Ramanujan11Tradeoffs,Lorentz13Breakthrough}. A similar technique is 
-{\it dynamic early terminations}, which periodically checks the evaluation function (or other domain-dependent features)
-terminating only when some condition is met. 
+shown to improve performance against standard MCTS in Amazons, Kalah, and 
+Breakthrough~\cite{Lorentz08Amazons,Ramanujan11Tradeoffs,Lorentz13Breakthrough}. 
+
+A similar technique is {\it dynamic early terminations}, which periodically checks the evaluation function 
+(or other domain-dependent features) terminating only when some condition is met. 
 This approach has been used as a ``mercy rule'' in Go~\cite{Bouzy07Old} and quite successfully in 
 Lines of Action~\cite{Winands08MCTSSolver}.
 In our version, which we abbreviate ``det$x$'', a playout is terminated and returns $1$ if $v_0(s) \ge x$ and 
 $-1$ if $v_0(s) \le -x$. Another option is to use an $\epsilon$-greedy playout policy that chooses a successor randomly 
 with probability $\epsilon$ and successor state with the largest evaluation with probability $1-\epsilon$, with 
-improved performance in Chinese Checkers~\cite{Sturtevant08An,Nijssen12Playout}, abbreviated ege$\epsilon$.
+improved performance in Chinese Checkers~\cite{Sturtevant08An,Nijssen12Playout}, abbreviated ``ege$\epsilon$''.
 
 %Another popular technique is {\it maximimum backpropagation}, where certain number of visits in the \Update~procedure,
 %the valued backed up is the one of the best child instead of the sampled value from the simulation.
@@ -859,34 +872,55 @@ improved performance in Chinese Checkers~\cite{Sturtevant08An,Nijssen12Playout},
 \includegraphics[scale=0.7]{plots/bt-base-alpha}\\
 \includegraphics[scale=0.7]{plots/bt-basenp-alpha}
 \caption{Results in Breakthrough against 
-baseline player MCTS(ege$0.1$,det$0.5$).   
-Each point represents 1000 games. Top excludes node priors, bottom includes node priors.} 
+baseline player MCTS(ege$0.1$,det$0.5$). The implicit minimax player uses efMS. 
+Each point represents 1000 games. The top graph excludes node priors, bottom graph includes node priors.} 
 \label{fig:bt-base-alpha}
 \end{center}
 \end{figure}
 
-We started with a set of experiments using the simple evaluation function. 
+Our first set of experiments uses the simple evaluation function, efMS. At the end of this subsection, we 
+include experiments for the sophisticated evaluation function efLH.
+
 We first determined the best playout strategy amongst fixed and dynamic early 
 terminations and $\epsilon$-greedy playouts.
 To tune parameters, we ran hierarchical elimination tournaments against players of the same type 
 where each head-to-head match consisted of 200 games with seats swapped halfway. 
-The parameter value sets are given in Appendix A.\footnote{Appendix A is included as a 
-supplementary material. If accepted, it will be made available as part of a technical report.}
-Our best fixed early terminations player was pd$20$ and best $\epsilon$-greedy player was ege$0.1$.
+The parameter value sets are given in Appendix A.\footnote{Appendix A is supplementary material, located 
+at \url{http://mlanctot.info/tmp/mctsim-app.pdf}. If the paper is accepted, the details in this appendix 
+will be made available as part of a follow-up technical report.}
+Our best fixed early terminations player was fet$20$ and best $\epsilon$-greedy player was ege$0.1$.
 Through systematic testing on 1000 games per pairing, we determined that the best playout 
-policy when using the simple evaluation function is the combination (ege$0.1$,det$0.5$), which 
-we call the baseline player. The detailed test results are found in Appendix 
-A.%however is likely explained by less 
+policy when using efMS is the combination (ege$0.1$,det$0.5$), which 
+we call the baseline player, abbreviated as ``bl''. The detailed test results are found in Appendix A.
+To ensure that this combination of early termination strategies is indeed superior to just the informed 
+playout policy on its own, we also played it against MCTS using just informed playout policy on its own, 
+and MCTS(ege$0.1$,det$0.5$) won 68.8\% of these games.
+MCTS(ege$0.1$,det$0.5$) is the best baseline
+player that we could produce given three separate parameter-tuning tournaments, for all the playout enhancements 
+we have tried using efMS, over thousands of played games. Hence, we 
+use it as our primary benchmark for comparison in the the rest of our experiments, (ege$0.1$,det$0.5$) is 
+used as the playout policy for every MCTS player unless otherwise stated.
+As a final summary, this baseline player:
+\begin{enumerate}
+\item Uses an informed playout policy that was shown to beat MCTS with random playouts in 94.3\% of games.
+\item Uses ege$0.1$, an $\epsilon$-greedy playout policy with $\epsilon = 0.1$.
+\item Uses det$0.5$, dynamic early terminations where a playout is terminated early if the evaluation 
+      of the state surpasses the thresholds of $<-0.5$ and $>+0.5$.
+\end{enumerate}
+
+%however is likely explained by less 
 %overhead due to incremental evaluations and efficient transitions. 
 
 We then played MCTS with implicit minimax backups, MCTS(im$\alpha$), against this baseline player for a 
 variety different values for $\alpha$. The results are shown in the top of Figure~\ref{fig:bt-base-alpha}.
-We see that implicit minimax backups give an advantage for $\alpha \in [0.1,0.6]$ under both one- and five-second 
+Implicit minimax backups give an advantage for $\alpha \in [0.1,0.6]$ under both one- and five-second 
 search times. 
 When $\alpha > 0.6$, MCTS(im$\alpha$) acts like greedy best-first minimax.
-To verify that the benefit was not only due to optimized playout policy, we played 
-MCTS(im$0.4$) against a baseline MCTS player where both used a playout policy without any early terminations, 
-and with both players using pd$20$. MCTS(im$0.4$) won 82.3\% in the former and 87.2\% in the latter.
+To verify that the benefit was not only due to the optimized playout policy, we performed two experiments. 
+First, we played MCTS(im$0.4$) against an MCTS player where both players were forced to to use playout policy 
+without any early terminations (but still informed as mentioned above), and MCTS(im$0.4$) won 82.3\% of these games. 
+We then played MCTS(im$0.4$) against an MCTS player where both players used fet$20$, and
+MCTS(fet$20$,im$0.4$) won 87.2\% of these games.
 
 %\begin{figure}[t]
 %\begin{center}
@@ -900,16 +934,21 @@ and with both players using pd$20$. MCTS(im$0.4$) won 82.3\% in the former and 8
  
 The next question was whether the mixing static evaluation values themselves ($v_0(s)$) at node $s$ 
 was the source of the benefit or whether the minimax backup values ($v^{\tau}_s$) were the contributing factor.
-Therefore, we tried MCTS(im$0.4$) against a baseline player that uses constant bias over the static 
-evaluations, \ie uses an estimator $\hQ^{CB}(s,a) = (1-\alpha)\bQ + \alpha v_0(s')$, and also against a
-player using a progressive bias over the minimax backups, 
-$\hQ^{PB}(s,a) = (1-\alpha)\bQ + \alpha v^{\tau}_s/(n_{s,a} + 1)$. MCTS(im$0.4$) won 67.8\% in the former 
-and 65.5\% in the latter. It is possible that a different decay function for
-$v^{\tau}_s$ will further improve the advantage, and we leave this as an interesting topic for future work. 
+Therefore, we tried MCTS(bl, im$0.4$) against a baseline player that uses constant bias over the static 
+evaluations, \ie uses an estimator
+\[ \hQ^{CB}(s,a) = (1-\alpha)\bQ + \alpha v_0(s'),\] 
+in line 2, and also against a player using a progressive bias over the minimax backups, \ie 
+\[ \hQ^{PB}(s,a) = (1-\alpha)\bQ + \alpha v^{\tau}_s/(n_{s,a} + 1)\]
+in line 2.
+MCTS(bl,im$0.4$) won 67.8\% against MCTS(bl,$\hQ^{CB}$). 
+MCTS(bl,im$0.4$) won 65.5\% against MCTS(bl,$\hQ^{PB}$). 
+It is possible that a different decay function for $v^{\tau}_s$ will further improve the advantage, and we leave 
+this as an interesting topic for future work. 
 
-Another question is whether to prefer implicit minimax over {\it node priors} (np)~\cite{Gelly07Combining}, 
-\ie initializing each new leaf node with wins and losses based on prior knowledge. We 
-use the node priors that worked well in~\cite{Lorentz13Breakthrough}
+Another question is whether to prefer implicit minimax backups over {\it node priors} (np)~\cite{Gelly07Combining}, 
+\ie initializing each new leaf node with wins and losses based on prior knowledge. This technique showed initial
+success in Go, but has also been applied with success to path planning problems~\cite{Eyerich10High}.
+In our case, we use the node priors that worked well in~\cite{Lorentz13Breakthrough}
 which takes into account the safety of surrounding pieces, and scaled the counts by the 
 time setting (10 for one second, 50 for five seconds).
 We ran MCTS(im$\alpha$) against the baseline player where both players use node priors. 
@@ -919,10 +958,14 @@ seconds gives an advantage for $\alpha \in [0.1,0.6]$. To verify that the combin
 we played MCTS(im$0.6$) with and without node priors each against the baseline player. The player with
 node priors won 77.9\% and, from Figure 1, the one without won 63.3\%. 
 
-We then evaluated MCTS(im$0.4$) against {\it maximum backpropagation}~\cite{Coulom06Efficient}, 
-which modifies line \ref{alg:retline2} to:
-if $n_{s,a} \ge T$ return $\max_{a \in \cA(s)} \bQ(s,a)$ else return $r$. The results for
-several $T$ values are given in Table~\ref{tbl:maxbackprop}. 
+We then evaluated MCTS(im$0.4$) against {\it maximum backpropagation} proposed as an alternative 
+backpropagation in the original MCTS work~\cite{Coulom06Efficient}. This enhancement
+%modifies line \ref{alg:retline2} of the algorithm to the following: 
+modifies line 23 of the algorithm to the following: 
+\[
+\mathbf{if}~n_{s,a} \ge T~\mathbf{then~return}~\max_{a \in \cA(s)} \bQ(s,a)~\mathbf{else~return}~r.
+\]
+The results for several values of $T$ are given in Table~\ref{tbl:maxbackprop}. 
 
 \begin{table}[t]
 {\small
@@ -952,18 +995,22 @@ for $T \in \{ 100, \cdots, 30000 \}$. }
 %       mcts_h_ege0.1_efv0_det0.5_im0.4 vs.	   mcts_h_ege0.1_efv0_det0.5_mbp20000:   662   338     0 (diff   324, games  1000) 66.20 33.80 +/- 2.93
 %       mcts_h_ege0.1_efv0_det0.5_im0.4 vs.	   mcts_h_ege0.1_efv0_det0.5_mbp50000:   670   330     0 (diff   340, games  1000) 67.00 33.00 +/- 2.91
 
+\subsubsection*{MCTS Using Lorentz \& Horey Evaluation Function}
 
-Finally, we tried using the more sophisticated evaluation function from~\cite{Lorentz13Breakthrough}, 
-that assigns specific piece count values depending on their position on the board. 
-Rather than repeat all of the above experiments, we chose simply to compare baselines and to repeat
+We now run experienced using the more sophisticated evaluation function from~\cite{Lorentz13Breakthrough}, 
+efLH, that assigns specific piece count values depending on their position on the board. 
+Rather than repeating all of the above experiments, we chose simply to compare baselines and to repeat
 the initial experiment. 
-The best playout with this evaluation function is pd$20$ with node priors, which we call the alternative baseline. 
+
+The best playout with this evaluation function is fet$20$ with node priors, which we call the alternative baseline, 
+abbreviated `` bl' ''.
 Our baseline MCTS player wins 40.2\% of games against the alternative baseline. 
 When we add node priors to our baseline, this rises to 78.0\%. 
 When we also add implicit minimax backups ($\alpha = 0.6$), this rises again to 84.9\%. 
 We label this best performing player MCTS(im$0.6$,np). 
 Nonetheless, using the alternative baseline, we reran the initial $\alpha$ experiment. 
 Results are shown in Figure~\ref{fig:bt-alt-alpha}. 
+
 In this case the best range is $\alpha \in [0.5,0.6]$ for one second and $\alpha \in [0.5,0.6]$ for
 five seconds.
 We label the best player in this figure using the alternative baseline MCTS(bl', im$0.6$, np). 
@@ -980,8 +1027,108 @@ Each point represents 1000 games.}
 \end{center}
 \end{figure}
 
+\subsubsection*{Comparison to $\alpha\beta$ Search}
+
+% mcts
+%                                      ab vs.                   mcts_h_s_ege0.1_det0.5:  1449   551     0 (diff   898, games  2000) 72.45 27.55 +/- 1.96
+%                                      ab vs.                   mcts_h_s_ege0.1_det0.5:   610   390     0 (diff   220, games  1000) 61.00 39.00 +/- 3.02
+%                                      ab vs.                   mcts_h_s_ege0.1_det0.5:   262   238     0 (diff    24, games   500) 52.40 47.60 +/- 4.38
+%
+%                                  ab_ev1 vs.              mcts_h_s_ege0.1_det0.5_efv1:  1842   158     0 (diff  1684, games  2000) 92.10 7.90 +/- 1.18
+%                                  ab_ev1 vs.              mcts_h_s_ege0.1_det0.5_efv1:   892   108     0 (diff   784, games  1000) 89.20 10.80 +/- 1.92
+%                                  ab_ev1 vs.              mcts_h_s_ege0.1_det0.5_efv1:   437    63     0 (diff   374, games   500) 87.40 12.60 +/- 2.91
+%                                  ab_ev1 vs.              mcts_h_s_ege0.1_det0.5_efv1:   406    94     0 (diff   312, games   500) 81.20 18.80 +/- 3.42
+%                                  ab_ev1 vs.              mcts_h_s_ege0.1_det0.5_efv1:   403    97     0 (diff   306, games   500) 80.60 19.40 +/- 3.47
+%                                  ab_ev1 vs.              mcts_h_s_ege0.1_det0.5_efv1:   361   120     0 (diff   241, games   481) 75.05 24.95 +/- 3.87
+
+% im-mcts
+%                                      ab vs.             mcts_h_s_ege0.1_det0.5_im0.4:  1099   901     0 (diff   198, games  2000) 54.95 45.05 +/- 2.18
+%                                      ab vs.             mcts_h_s_ege0.1_det0.5_im0.4:   384   616     0 (diff  -232, games  1000) 38.40 61.60 +/- 3.01
+%                                      ab vs.             mcts_h_s_ege0.1_det0.5_im0.4:   191   309     0 (diff  -118, games   500) 38.20 61.80 +/- 4.26
+
+%                                  ab_ev1 vs.        mcts_h_s_ege0.1_det0.5_im0.4_efv1:  1519   481     0 (diff  1038, games  2000) 75.95 24.05 +/- 1.87
+%                                  ab_ev1 vs.        mcts_h_s_ege0.1_det0.5_im0.4_efv1:   727   273     0 (diff   454, games  1000) 72.70 27.30 +/- 2.76
+%                                  ab_ev1 vs.        mcts_h_s_ege0.1_det0.5_im0.4_efv1:   337   163     0 (diff   174, games   500) 67.40 32.60 +/- 4.11
+%                                  ab_ev1 vs.        mcts_h_s_ege0.1_det0.5_im0.4_efv1:   292   208     0 (diff    84, games   500) 58.40 41.60 +/- 4.32
+%                                  ab_ev1 vs.        mcts_h_s_ege0.1_det0.5_im0.4_efv1:   277   223     0 (diff    54, games   500) 55.40 44.60 +/- 4.36
+%                                  ab_ev1 vs.        mcts_h_s_ege0.1_det0.5_im0.4_efv1:   237   263     0 (diff   -26, games   500) 47.40 52.60 +/- 4.38
+
+
 %Through systematic testing, we found the best baseline with this evaluation 
 %function to use the pd$20$ playout. 
+
+\begin{table}[t]
+{\small
+\begin{center}
+\begin{tabular}{ccccc|c}
+Ev. Func.  & Player            & Opp.             & $n$    & $t$ (s) & Res. (\%) \\
+\hline
+efMS       & MCTS              & $\alpha\beta$    & 2000   & 1       & 27.55     \\     
+efMS       & MCTS              & $\alpha\beta$    & 1000   & 5       & 39.00     \\     
+efMS       & MCTS              & $\alpha\beta$    &  500   & 10      & 47.60     \\     
+\hline
+efMS       & MCTS(im$0.4$)     & $\alpha\beta$    & 2000   & 1       & 45.05     \\     
+efMS       & MCTS(im$0.4$)     & $\alpha\beta$    & 1000   & 5       & 61.60     \\     
+efMS       & MCTS(im$0.4$)     & $\alpha\beta$    &  500   & 10      & 61.80     \\     
+\hline
+\hline
+efLH       & MCTS              & $\alpha\beta$    & 2000   & 1       &  7.90      \\     
+efLH       & MCTS              & $\alpha\beta$    & 1000   & 5       & 10.80      \\     
+efLH       & MCTS              & $\alpha\beta$    &  500   & 10      & 12.60      \\     
+efLH       & MCTS              & $\alpha\beta$    &  500   & 20      & 18.80      \\     
+efLH       & MCTS              & $\alpha\beta$    &  500   & 30      & 19.40      \\     
+efLH       & MCTS              & $\alpha\beta$    &  500   & 60      & 24.95      \\     
+efLH       & MCTS              & $\alpha\beta$    &  400   & 120     & 24.44      \\     
+\hline
+efLH       & MCTS(im$0.4$)     & $\alpha\beta$    & 2000   & 1       & 24.05      \\     
+efLH       & MCTS(im$0.4$)     & $\alpha\beta$    & 1000   & 5       & 27.30      \\     
+efLH       & MCTS(im$0.4$)     & $\alpha\beta$    &  500   & 10      & 32.60      \\     
+efLH       & MCTS(im$0.4$)     & $\alpha\beta$    &  500   & 20      & 41.60      \\     
+efLH       & MCTS(im$0.4$)     & $\alpha\beta$    &  500   & 30      & 44.60      \\     
+efLH       & MCTS(im$0.4$)     & $\alpha\beta$    &  500   & 60      & 52.60      \\     
+efLH       & MCTS(im$0.4$)     & $\alpha\beta$    &  400   & 120     & 63.55      \\     
+\hline
+\end{tabular}
+\end{center}
+\caption{Summary of results versus $\alpha\beta$. 
+Here, $n$ represents the number of games played and $t$ time in seconds per search.}
+\label{tbl:ab_vs_mcts}
+}
+\end{table}
+
+Since implicit minimax backups enhances MCTS by using minimax-style updates, a natural 
+question is how it compares to $\alpha\beta$ search. 
+So, here we compare MCTS with implicit minimax backups versus $\alpha\beta$ search.
+Our $\alpha\beta$ search player uses iterative deepening and a static move ordering. 
+The static move ordering is based on the same information used in the informed playout
+policies: decisive and anti-decisive moves are first, then captures of defenseless pieces, 
+then all other captures, and finally regular moves.
+The results are listed in Table~\ref{tbl:ab_vs_mcts}.
+
+The first observation from these results is that the performance of MCTS increases versus 
+$\alpha\beta$ as search time increases. This is true under all cases, using either evaluation function, 
+with and without implicit minimax backups. This is similare to previous observations in 
+Lines of Action~\cite{Winands11AB} and multiplayer search~\cite{Sturtevant08icga,Nijssen13}.
+
+The second observation is that in every case, MCTS(im$0.4$) performs significantly better 
+against $\alpha\beta$ than the baseline player at the same search time. In fact, the win rate
+of MCTS(im$0.4$) is nearly twice that of the baseline player versus $\alpha\beta$. 
+Using efMS in Breakthrough with 5 seconds of search time, MCTS(im$0.4$) performs significantly 
+better than both the baseline MCTS player and $\alpha\beta$ search on their own. 
+Also, when using efLH, it takes more than 30 seconds of search time for the baseline player to perform
+as well as MCTS(im$0.4$) does at 1 second of search time, and the baseline player
+never performs as well as MCTS(im$0.4$) does at 5 seconds, even if it is given 120 seconds of search time.
+
+The third observation is that MCTS(im$\alpha$) benefits quite significantly from weak 
+heuristic information, more so than $\alpha\beta$. Conversely, $\alpha\beta$ seems to take
+better advantage of the sophisticated evaluation function. Nonetheless, there still seems to be 
+a point where, when given enough search time, the performance of 
+MCTS(im$0.4$) surpasses $\alpha\beta$. 
+
+Note that these results could vary for implementations of $\alpha\beta$ that include one or more the 
+search enhancements using in game-tree search.
+However, we will show in Lines of Action that even with many of the heuristic enhancements enabled 
+in MIA, implicit minimax backups can still result in a significant improvement over $\alpha\beta$. 
 
 \subsection{Kalah}
 
@@ -1013,7 +1160,7 @@ without any stones placed in the stores.
 Competing players play one game and then swap seats to play a second game using the same board. A player 
 is declared a winner if that player won one of the games and at least tied the other game. If the same side 
 wins both games, the game is discarded. 
-Tournament results revealed that a pd$4$ early termination worked best. 
+Tournament results revealed that a fet$4$ early termination worked best. 
 The evaluation function was simply the difference between stones in each player's stores. Results with one 
 second of search time are shown in Figure~\ref{fig:loa-alpha}. 
 %As with the previous study employing MCTS, we notice that an evaluation function can be used to enhance the performance.
@@ -1047,8 +1194,8 @@ $\neg$PB & MCTS(im$\alpha$) & MCTS & 2600 & 10 & 63.80       \\
 $\neg$PB & MCTS             & $\alpha \beta$ & 2000 & 5  & 40.0       \\
 $\neg$PB & MCTS(im$\alpha$) & $\alpha \beta$ & 2000 & 5 & 51.0       \\
 \hline
-PB       & MCTS             & $\alpha \beta$ & 5800 & 5  & 61.8       \\
-PB       & MCTS(im$\alpha$) & $\alpha \beta$ & 5800 & 5  & 62.6       \\
+PB       & MCTS             & $\alpha \beta$ & 20000 & 5  & 61.8       \\
+PB       & MCTS(im$\alpha$) & $\alpha \beta$ & 20000 & 5  & 63.3       \\
 \hline
 \end{tabular}
 \end{center}
@@ -1065,8 +1212,12 @@ where the pieces are connected via adjacent and diagonals squares. A piece may m
 it may move depends on the total number of pieces in the line, including opponent pieces. A piece may jump over its own
 pieces but not opponent pieces. Captures occur by landing on opponent pieces. 
 
-For LOA, we have based our MCTS implementation and enhancements on the state-of-the-art techniques described in \cite{Winands10MCTS-LOA}, 
-which has won several Computer Olympiad tournaments and is to the best of our knowledge the world's best AI for Lines of Action.
+The MCTS player is MC-LOA, implementation and enhancements on the state-of-the-art techniques described in \cite{Winands10MCTS-LOA}, 
+MC-LOA, a world-champion engine winning the latest Olympiad. The benchmark minimax player is MIA, the world-best minimax-player upon 
+which MC-LOA is based, winning the previous 4 Olympiads. Both use state-of-the-art techniques, including highly-optimized alpha-beta 
+playouts as well as a sophisticated evaluation function based on 14 years of research. MIA includes the following enhancements: static
+and dynamic move ordering, iterative deepening, killer moves, history heuristic, enhanced transposition table cutoffs, null-move pruning, 
+multi-cut, realization probability search, quiescence search, and negascout/PVS. 
 The evaluation function used is the one based on the features used in MIA~\cite{Winands06MIA}.
 All of the results in LOA are based 100 opening board 
 positions.\footnote{\small https://dke.maastrichtuniversity.nl/m.winands/loa/} 
