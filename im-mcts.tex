@@ -1263,19 +1263,21 @@ implicit minimax backups against an $\alpha \beta$ player based on MIA. When pro
 increases the performance by 11 percentage points. There is also a small increase in performance when progressive bias is enabled. 
 Also, at $\alpha = 0.2$, it seems that there is no statistically significant case of implicit minimax backups hurting performance. 
 
-%\subsection{Discussion: Traps and Limitations} 
-\subsection{Discussion: Limitations} 
-
+\subsection{Discussion: Traps and Limitations} 
+%\subsection{Discussion: Limitations} 
 %Add for camera-ready.
-%The initial motivation for this work was driven by the trap moves which pose problems in 
-%MCTS~\cite{Ramanujan11Tradeoffs,Baier13MinimaxHybrids,Gudmindsson13Sufficiency}. We tried to construct an example board in Breakthrough 
-%to demonstrate how implicit minimax backups deals with problems with traps. We were unable to do so, and we suspect the following
-%reasons. 
-%First, in our experience it seems that traps are effectively handled by improving the playout policy. Even without early terminations, 
-%simply having decisive and anti-decisive moves and preferring good capture moves seems to be enough to handle traps in Breakthrough.
-%Second, even when using random playouts, with sufficiently high simulations in an efficient implementation, shallow traps seem to be
-%handled effectively without any additional knowledge. Therefore, we now believe the explanation for the advantage offered by 
-%implicit minimax backups is somewhat more subtle than simply detecting and handling traps. 
+
+The initial motivation for this work was driven by the trap moves which pose problems in 
+MCTS~\cite{Ramanujan11Tradeoffs,Baier13MinimaxHybrids,Gudmindsson13Sufficiency}. We tried to construct an example board in Breakthrough 
+to demonstrate how implicit minimax backups deals with problems with traps. We were unable to do so, and we suspect the following
+reasons. 
+First, in our experience it seems that traps are effectively handled by enabling improving the playout policy. 
+Even without early terminations, 
+simply having decisive and anti-decisive moves and preferring good capture moves seems to be enough to handle traps in Breakthrough.
+Second, even when using random playouts, with sufficiently high simulations in an efficient implementation, shallow traps seem to be
+handled effectively without any additional knowledge, especially when MCTS-Solver is enabled, which is simple and requires no additional 
+knowledge. Therefore, we believe that the explanation for the advantage offered by implicit minimax backups is somewhat more subtle
+than simply detecting and handling traps. 
 
 While we have shown positive results in a number of domains, we recognize that this 
 technique is not universally applicable. We believe that implicit minimax backups work because there is short-term tactical 
