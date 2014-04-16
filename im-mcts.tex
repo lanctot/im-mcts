@@ -1271,12 +1271,12 @@ The initial motivation for this work was driven by the trap moves which pose pro
 MCTS~\cite{Ramanujan11Tradeoffs,Baier13MinimaxHybrids,Gudmindsson13Sufficiency}. We tried to construct an example board in Breakthrough 
 to demonstrate how implicit minimax backups deals with problems with traps. We were unable to do so, and we suspect the following
 reasons. 
-First, in our experience it seems that traps are effectively handled by enabling improving the playout policy. 
+First, in our experience it seems that traps are effectively handled by improving the playout policy. 
 Even without early terminations, 
 simply having decisive and anti-decisive moves and preferring good capture moves seems to be enough to handle traps in Breakthrough.
 Second, even when using random playouts, with sufficiently high simulations in an efficient implementation, shallow traps seem to be
-handled effectively without any additional knowledge, especially when MCTS-Solver is enabled, which is simple and requires no additional 
-knowledge. Therefore, we believe that the explanation for the advantage offered by implicit minimax backups is somewhat more subtle
+handled effectively without any additional knowledge, especially when MCTS-Solver is enabled. 
+Therefore, we believe that the explanation for the advantage offered by implicit minimax backups is more subtle
 than simply detecting and handling traps. 
 
 While we have shown positive results in a number of domains, we recognize that this 
@@ -1299,7 +1299,7 @@ In Breakthrough, our evaluation shows that implicit minimax backups increases
 the strength of MCTS significantly compared to similar techniques for improving MCTS
 using domain knowledge.
 Furthermore, the technique improves 
-performance in LOA, a larger, more complex domain with sophisticated knowledge and 
+performance in LOA, a more complex domain with sophisticated knowledge and 
 strong MCTS and $\alpha \beta$ players. 
 
 In most cases, $\alpha \in [0.15,0.4]$ seems to be a safe range, and we found generally 
