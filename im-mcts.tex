@@ -1136,13 +1136,13 @@ efLH       & MCTS              & $\alpha\beta$    &  500   & 30      & 19.40    
 efLH       & MCTS              & $\alpha\beta$    &  500   & 60      & 24.95      \\     
 efLH       & MCTS              & $\alpha\beta$    &  130   & 120     & 25.38      \\     
 \hline
-efLH       & MCTS(im$0.4$)     & $\alpha\beta$    & 2000   & 1       & 24.05      \\     
-efLH       & MCTS(im$0.4$)     & $\alpha\beta$    & 1000   & 5       & 27.30      \\     
-efLH       & MCTS(im$0.4$)     & $\alpha\beta$    &  500   & 10      & 32.60      \\     
-efLH       & MCTS(im$0.4$)     & $\alpha\beta$    &  500   & 20      & 41.60      \\     
-efLH       & MCTS(im$0.4$)     & $\alpha\beta$    &  500   & 30      & 44.60      \\     
-efLH       & MCTS(im$0.4$)     & $\alpha\beta$    &  500   & 60      & 52.60      \\     
-efLH       & MCTS(im$0.4$)     & $\alpha\beta$    &  130   & 120     & 59.23      \\     
+efLH       & MCTS(im$0.6$)     & $\alpha\beta$    & 2000   & 1       & 28.95      \\     
+efLH       & MCTS(im$0.6$)     & $\alpha\beta$    & 1000   & 5       & 39.30      \\     
+efLH       & MCTS(im$0.6$)     & $\alpha\beta$    &  500   & 10      & 41.20      \\     
+efLH       & MCTS(im$0.6$)     & $\alpha\beta$    &  500   & 20      & 45.80      \\     
+efLH       & MCTS(im$0.6$)     & $\alpha\beta$    &  500   & 30      & 46.20      \\     
+efLH       & MCTS(im$0.6$)     & $\alpha\beta$    &  500   & 60      & 55.60      \\     
+efLH       & MCTS(im$0.6$)     & $\alpha\beta$    &  130   & 120     & 61.54      \\     
 \hline
 \end{tabular}
 \end{center}
@@ -1167,7 +1167,7 @@ $\alpha\beta$ as search time increases. This is true in all cases, using either 
 with and without implicit minimax backups. This is similar to previous observations in 
 Lines of Action~\cite{Winands11AB} and multiplayer search~\cite{Sturtevant08icga,Nijssen13}.
 
-The second observation is that in every case, MCTS(im$0.4$) performs significantly better 
+The second observation is that in every case, MCTS(im$\alpha$) performs significantly better 
 against $\alpha\beta$ than the baseline player at the same search time. 
 Using efMS in Breakthrough with 5 seconds of search time, MCTS(im$0.4$) performs significantly 
 better than both the baseline MCTS player and $\alpha\beta$ search on their own. 
@@ -1183,7 +1183,7 @@ the simpler evaluation function.) Therefore, we also include a comparison of the
 using efMS versus efLH. What we see is that at 1 second, efMS benefits $\alpha\beta$ more, but as time 
 increases efLH seems to be preferred. 
 Nonetheless, when using efLH, there still seems to be a point where, if given enough search time
-the performance of MCTS(im$0.4$) surpasses that of $\alpha\beta$. 
+the performance of MCTS(im$0.6$) surpasses that of $\alpha\beta$. 
 
 \subsection{Lines of Action}
 
