@@ -439,7 +439,7 @@
 
 %\author{Author1 Author2 Author3 Author4}
 
-\author{\IEEEauthorblockN{Marc Lanctot$^1$, Tom Pepels$^1$, Mark H.~M. Winands$^1$, and Nathan R. Sturtevant$^2$}
+\author{\IEEEauthorblockN{Marc Lanctot$^1$, Mark H.~M. Winands$^1$, Tom Pepels$^1$, and Nathan R. Sturtevant$^2$}
 \IEEEauthorblockA{$^1$Department of Knowledge Engineering, Maastricht University}
 \IEEEauthorblockA{$^2$Computer Science Department, University of Denver}
 \{marc.lanctot,tom.pepels,m.winands\}@maastrichtuniversity.nl, sturtevant@cs.du.edu}
@@ -983,7 +983,7 @@ Therefore, we tried MCTS(bl, im$0.4$) against a baseline player that uses consta
 evaluations, \ie uses an estimator
 \[ \hQ^{CB}(s,a) = (1-\alpha)\bQ + \alpha v_0(s'),\] 
 in line 2, and also against a player using a progressive bias over the minimax backups, \ie 
-\[ \hQ^{PB}(s,a) = (1-\alpha)\bQ + \alpha v^{\tau}_s/(n_{s,a} + 1)\]
+\[ \hQ^{PB}(s,a) = (1-\alpha)\bQ + \alpha v^{\tau}_{s,a}/(n_{s,a} + 1)\]
 in line 2.
 MCTS(bl,im$0.4$) won 67.8\% against MCTS(bl,$\hQ^{CB}$). 
 MCTS(bl,im$0.4$) won 65.5\% against MCTS(bl,$\hQ^{PB}$). 
