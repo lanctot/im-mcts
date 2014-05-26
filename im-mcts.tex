@@ -598,8 +598,8 @@ The prime example is MCTS-Solver~\cite{Winands08Solver}, which backpropagates pr
 extra information in MCTS. When a node is proven to be a 
 win or a loss, it no longer needs to be searched. This domain-independent modification greatly enhances 
 MCTS with negligible overhead. Score-bounded MCTS extends this idea to games with multiple 
-outcomes, leading to $\alpha \beta$-style pruning in the tree~\cite{Cazenave10Score}. Finally, one can use hybrid
-minimax searches in the tree to initialize nodes during, enhance the playout, or to help MCTS-Solver 
+outcomes, leading to $\alpha \beta$-style pruning in the tree~\cite{Cazenave10Score}. Finally, one can use shallow-depth
+minimax searches in the tree to initialize nodes during expansion, enhance the playout, or to help MCTS-Solver 
 in backpropagation~\cite{Baier13MinimaxHybrids}.
 
 Finally, recent work has attempted to explain and identify some of the shortcomings that arise from estimates in 
