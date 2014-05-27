@@ -1,5 +1,6 @@
 \documentclass{article}
 
+\usepackage{color}
 \usepackage[left=1in,right=1in,top=0.75in,bottom=0.75in]{geometry}
 %\usepackage{nopageno}
 
@@ -36,7 +37,12 @@ im$\alpha$     & $\{ 0, .05, .1, .15, \ldots, .55, .6, .75, 1 \}$ \\
 
 \subsection{Kalah Playout Optimization}
 
+{\bf {\color{red} Missing: epsilon-greedy and comparisons to fet.}}
+
 \subsubsection{Fixed Early Termination Tournament}
+
+Each matchup included 1000 games, but only the wins and losses are removed. The remaining
+matches were draws. 
 
 \begin{verbatim}
 round 1
@@ -69,7 +75,7 @@ Winner: mcts_h_fet4
 \end{verbatim}
 
 
-\subsection{Breakthrough Playout Enhancement Optimization}
+\subsection{Breakthrough Playout Enhancement Optimization (using efMS evaluator)}
 
 \subsubsection{Fixed Early Terminations Tournament}
 
@@ -137,12 +143,6 @@ Winner: mcts_h_ege0.1
 
 \subsubsection{Tournament Winner Comparisons}
 
-%
-%               mcts_h_ege0.1_det0.5_efv0 vs.                       mcts_h_ege0.1_efv0:   738   262     0 (diff   476, games  1000) 73.80 26.20 +/- 2.73
-%               mcts_h_ege0.1_det0.5_efv0 vs.                  mcts_h_fet20_det0.5_efv0:   633   367     0 (diff   266, games  1000) 63.30 36.70 +/- 2.99
-%                      mcts_h_ege0.1_efv0 vs.                         mcts_h_fet20_efv0:   557   443     0 (diff   114, games  1000) 55.70 44.30 +/- 3.08
-%                      mcts_h_ege0.1_efv0 vs.                          mcts_h_fet4_efv0:   768   232     0 (diff   536, games  1000) 76.80 23.20 +/- 2.62
-
 \begin{table}[h!]
 \begin{center}
 \begin{tabular}{|c|c|ccc|}
@@ -159,5 +159,101 @@ MCTS(ege$0.1$)          & MCTS(fet$4$)           & 768 (76.8)   & 232 (23.2)   &
 \caption{Breakthrough playout comparisons.}
 \end{table}
 
+\subsection{Breakthrough Playout Enhancement Optimization (using efLH evaluator)}
+
+\subsubsection{Fixed Early Terminations Tournament}
+
+\begin{verbatim}
+round 1
+
+winner mcts_h_efv1_fet0 (118) vs. loser mcts_h_efv1_fet1000 (82)
+winner mcts_h_efv1_fet1 (129) vs. loser mcts_h_efv1_fet100 (71)
+winner mcts_h_efv1_fet2 (113) vs. loser mcts_h_efv1_fet50 (87)
+winner mcts_h_efv1_fet3 (101) vs. loser mcts_h_efv1_fet30 (99)
+winner mcts_h_efv1_fet20 (121) vs. loser mcts_h_efv1_fet4 (79)
+winner mcts_h_efv1_fet5 (100) vs. loser mcts_h_efv1_fet16 (100)
+winner mcts_h_efv1_fet8 (102) vs. loser mcts_h_efv1_fet12 (98)
+mcts_h_efv1_fet10 gets a by
+
+round 2
+
+winner mcts_h_efv1_fet10 (108) vs. loser mcts_h_efv1_fet0 (92)
+winner mcts_h_efv1_fet8 (112) vs. loser mcts_h_efv1_fet1 (88)
+winner mcts_h_efv1_fet5 (115) vs. loser mcts_h_efv1_fet2 (85)
+winner mcts_h_efv1_fet20 (123) vs. loser mcts_h_efv1_fet3 (77)
+
+round 3
+
+winner mcts_h_efv1_fet20 (110) vs. loser mcts_h_efv1_fet10 (90)
+winner mcts_h_efv1_fet8 (101) vs. loser mcts_h_efv1_fet5 (99)
+
+round 4
+
+winner mcts_h_efv1_fet8 (106) vs. loser mcts_h_efv1_fet20 (94)
+
+Winner: mcts_h_efv1_fet8
+\end{verbatim}
+
+\subsubsection{Epsilon-greedy Playout Tournament}
+
+\begin{verbatim}
+round 1
+
+winner mcts_h_efv1_ege1.0 (136) vs. loser mcts_h_efv1_ege0.0 (64)
+winner mcts_h_efv1_ege0.9 (121) vs. loser mcts_h_efv1_ege0.05 (79)
+winner mcts_h_efv1_ege0.1 (110) vs. loser mcts_h_efv1_ege0.8 (90)
+winner mcts_h_efv1_ege0.7 (103) vs. loser mcts_h_efv1_ege0.15 (97)
+winner mcts_h_efv1_ege0.6 (104) vs. loser mcts_h_efv1_ege0.2 (96)
+winner mcts_h_efv1_ege0.3 (100) vs. loser mcts_h_efv1_ege0.5 (100)
+mcts_h_efv1_ege0.4 gets a by
+
+round 2
+
+winner mcts_h_efv1_ege1.0 (122) vs. loser mcts_h_efv1_ege0.4 (78)
+winner mcts_h_efv1_ege0.3 (101) vs. loser mcts_h_efv1_ege0.9 (99)
+winner mcts_h_efv1_ege0.6 (116) vs. loser mcts_h_efv1_ege0.1 (84)
+mcts_h_efv1_ege0.7 gets a by
+
+round 3
+
+winner mcts_h_efv1_ege0.7 (102) vs. loser mcts_h_efv1_ege1.0 (98)
+winner mcts_h_efv1_ege0.3 (105) vs. loser mcts_h_efv1_ege0.6 (95)
+
+round 4
+
+winner mcts_h_efv1_ege0.3 (110) vs. loser mcts_h_efv1_ege0.7 (90)
+
+Winner: mcts_h_efv1_ege0.3
+\end{verbatim}
+
+\subsection{Tournament Winner Comparisons}
+
+%    mcts_s_h_efv1_pd20 vs.                        mcts_s_h_efv1_pd8:   514   486     0 (diff    28, games  1000) 51.40 48.60 +/- 3.10
+%  mcts_s_h_efv1_ege0.3 vs.                       mcts_s_h_efv1_pd20:   340   660     0 (diff  -320, games  1000) 34.00 66.00 +/- 2.94
+%  mcts_s_h_efv1_ege0.3 vs.                     mcts_s_h_efv1_ege0.7:   510   490     0 (diff    20, games  1000) 51.00 49.00 +/- 3.10
+%  mcts_s_h_efv1_ege0.7 vs.                       mcts_s_h_efv1_pd20:   194   806     0 (diff  -612, games  1000) 19.40 80.60 +/- 2.45
+%  mcts_s_h_efv1_ege0.3 vs.                        mcts_s_h_efv1_pd8:   354   646     0 (diff  -292, games  1000) 35.40 64.60 +/- 2.96
+%  mcts_s_h_efv1_ege0.7 vs.                        mcts_s_h_efv1_pd8:   255   745     0 (diff  -490, games  1000) 25.50 74.50 +/- 2.70
+
+{\bf {\color{red} Missing: comparisons with det added.}}
+
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{|c|c|ccc|}
+\hline
+Player A & Player B                  & A Wins (\%)  & B Wins (\%)  & Ties \\ 
+\hline
+MCTS(fet$8$)   & MCTS(fet$20$)       & 514 (51.4)   & 486 (48.6)   & 0    \\
+MCTS(ege$0.3$) & MCTS(fet$0.7$)      & 510 (51.0)   & 490 (49.0)   & 0    \\
+\hline
+MCTS(ege$0.3$) & MCTS(fet$8$)        & 354 (35.4)   & 646 (64.6)   & 0    \\
+MCTS(ege$0.3$) & MCTS(fet$20$)       & 340 (34.0)   & 660 (66.0)   & 0    \\
+MCTS(ege$0.7$) & MCTS(fet$8$)        & 255 (25.5)   & 745 (74.5)   & 0    \\
+MCTS(ege$0.7$) & MCTS(fet$20$)       & 194 (19.4)   & 806 (80.6)   & 0    \\
+\hline
+\end{tabular}
+\end{center}
+\caption{Breakthrough playout comparisons.}
+\end{table}
 
 \end{document}
