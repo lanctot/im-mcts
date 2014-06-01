@@ -152,7 +152,9 @@
 
 \author{Marc Lanctot$^1$, Mark H.M. Winands$^1$, Tom Pepels$^1$, Nathan R. Sturtevant$^2$ \\
 \hspace{-1cm}$^1$ Department of Knowledge Engineering, Maastricht University\\
-\hspace{-1cm}$^2$ Computer Science Department, University of Denver\\}
+\hspace{-1cm}$^2$ Computer Science Department, University of Denver\\
+\vspace{0.3cm}
+\hspace{-0.5cm}{\small\{marc.lanctot,m.winands,tom.pepels\}@maastrichtuniversity.nl, sturtevant@cs.du.edu}}
 
 \date{}
 
@@ -368,9 +370,12 @@ to ensure that the payoffs are in view of the current player at each node.
 %intentionally omitted from the pseudo-code for generality.}
 %The function $\alpha(n_s)$ will determine how much weight to attribute to these evaluations.  
 Finally, \Expand\xspace adds all children nodes to the tree, sets their implicit minimax values to their initial
-heuristic values on line 13, and does a one-ply backup on line 14. A more memory-efficient implementation  
-could add just a single child is, as was done in our experiments in Lines of Action, without fundamentally changing
-the algorithm. 
+heuristic values on line 13, and does a one-ply backup on line 14. 
+A more memory-efficient implementation could add just a single child without fundamentally changing
+the algorithm, as was done in our experiments in Lines of Action.
+
+%% NOTE: extra semicolons neede on some lines to make arXiv compiler show it properly and 
+%%       not mess with the line numbers!!
 
 \begin{algorithm2e}[t!]
   \Select$(s)$:\;
@@ -388,16 +393,16 @@ the algorithm.
   \;
   \Simulate$(s_{parent}, a_{parent}, s)$:\;
   \pushline
-    \If{$s \not\in \cG$}{
+    \If{$\exists a \in \cA(s), s' = \cT(s,a) \not\in \cG$}{
       \Expand($s$)\;      
-      \lFor{$a \in \cA(s), s' = \cT(s,a)$}{$v_{s'} \leftarrow v_0(s')$}
+      \lFor{$a \in \cA(s), s' = \cT(s,a)$}{$v_{s'} \leftarrow v_0(s')$\;}
       $v^{\tau}_s \leftarrow \max_{a \in \cA(s)} v^{\tau}_{s,a}$ \; 
       $r \leftarrow $\Playout($s$)\;
       \Update($s,r$)\;
       {\bf return} $r$\;                       
     }
     \Else{ 
-      \lIf{$s \in \cZ$}{{\bf return} $\cR(s_{parent}, a_{parent}, s)$}
+      \lIf{$s \in \cZ$}{{\bf return} $\cR(s_{parent}, a_{parent}, s)$\;}
       $a \leftarrow $\Select$(s)$\;
       $s' \leftarrow \cT(s,a)$\;
       $r \leftarrow $\Simulate$(s,a,s')$\;
@@ -408,7 +413,7 @@ the algorithm.
   \;
   \MCTS($s_0$):\;
   \pushline
-    \lWhile{\mbox{time left}}{\Simulate$(-,-,s_0)$}
+    \lWhile{\mbox{time left}}{\Simulate$(-,-,s_0)$ \;}
     {\bf return} $\argmax_{a \in \cA(s_0)} n_{s_0,a}$\; 
   \popline
   \vspace{0.3cm}
