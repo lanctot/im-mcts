@@ -1,0 +1,435 @@
+
+\documentclass{article}
+
+% For figures
+\usepackage{graphicx} % more modern
+%\usepackage{epsfig} % less modern
+\usepackage{subfigure} 
+
+% For citations
+\usepackage{natbib}
+%\usepackage{named}
+
+% For algorithms
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+% As of 2011, we use the hyperref package to produce hyperlinks in the
+% resulting PDF.  If this breaks your system, please commend out the
+% following usepackage line and replace \usepackage{icml2012} with
+% \usepackage[nohyperref]{icml2012} above.
+\usepackage{hyperref}
+
+% Packages hyperref and algorithmic misbehave sometimes.  We can fix
+% this with the following command.
+\newcommand{\theHalgorithm}{\arabic{algorithm}}
+
+% Employ the following version of the ``usepackage'' statement for
+% submitting the draft version of the paper for review.  This will set
+% the note in the first column to ``Under review.  Do not distribute.''
+% Employ this version of the ``usepackage'' statement after the paper has
+% been accepted, when creating the final version.  This will set the
+% note in the first column to ``Appearing in''
+% \usepackage[accepted]{icml2012}
+
+\usepackage{times}
+\usepackage{helvet}
+\usepackage{courier}
+\usepackage{color}
+\usepackage{colortbl}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{latexsym} 
+\usepackage{multirow}
+\usepackage{verbatim}
+\usepackage{amsthm}
+
+\usepackage[margin=1in]{geometry}
+
+\newcommand{\II}{\mathcal{I}}
+\newcommand{\PP}{\check{\mathcal{P}}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\EV}{\mathbb{E}}
+\newcommand{\cE}{\mathcal{E}}
+\newcommand{\VAR}{\mathbb{V}}
+\newcommand{\abs}[1]{\left|#1\right|}
+\newcommand{\Qed}{$\blacksquare$}
+\newtheorem{definition}{Definition}
+\newtheorem{fact}{Fact}
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}{Corollary}
+\newtheorem{condition}{Condition}
+%\newenvironment{proof}{\begin{trivlist}\item[\hspace{\labelsep}{\bf\noindent Proof: }]}{\hspace{\stretch{1}}\rule{1ex}{1ex}\end{trivlist}}
+\newcommand{\defword}[1]{\textbf{\boldmath{#1}}}
+\newcommand{\citejustyear}[1]{\cite{#1}}
+
+\def\etal{\textit{et al.}}
+\def\ie{\textit{i.e.}}
+\def\eg{\textit{e.g.}}
+
+\newtheorem{df}{Definition}
+\newtheorem*{definition4}{Definition 4}
+\newtheorem{notation}{Notation}
+\newtheorem*{theorem2}{Theorem 2}
+\newtheorem*{theorem3}{Theorem 3}
+\newtheorem{theorem1}{Theorem}
+\newtheorem*{lemmaA}{Lemma A}
+\newtheorem{lemma}{Lemma}[section]
+\newtheorem{col}{Corollary}\newcommand{\bt}{\begin{theorem}\em}
+\newcommand{\et}{\end{theorem}}
+%\newcommand{\qed}{$\Box$}
+\newcommand{\Proof}{{\noindent\bf Proof. }}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+\def\etal{\textit{et al.}}
+\def\ie{\textit{i.e.}}
+\def\eg{\textit{e.g.}}
+
+\newcommand{\nin}{\noindent}
+
+\setlength{\intextsep}{10pt plus 2pt minus 2pt}
+
+\newcommand{\bea}{\begin{eqnarray}}
+\newcommand{\eea}{\end{eqnarray}}
+
+\newcommand{\bdf}{\begin{df}\em}
+\newcommand{\edf}{\end{df}}
+
+\newcommand{\ben}{\begin{enumerate}}
+\newcommand{\een}{\end{enumerate}}
+
+\newcommand{\dist}{\operatorname{dist}}
+
+\newcommand{\avg}{\operatorname{avg}}
+
+\definecolor{grey}{rgb}{0.4,0.4,0.4}
+\definecolor{loselots}{rgb}{1,0.4,0.4}
+\definecolor{losesome}{rgb}{1,0.6,0.6}
+\definecolor{losebit}{rgb}{1,0.8,0.8}
+\definecolor{tie}{rgb}{1,1,1}
+\definecolor{winbit}{rgb}{0.8,1,0.8}
+\definecolor{winsome}{rgb}{0.6,1,0.6}
+\definecolor{winlots}{rgb}{0.4,1,0.4}
+
+
+%\icmltitle{No-Regret Learning in Extensive-Form Games with Imperfect Recall}
+\title{Monte Carlo Tree Search with Heuristic Evaluations\\using Implicit Minimax Backups}
+
+\author{Marc Lanctot$^1$, Mark H.M. Winands$^1$, Tom Pepels$^1$, Nathan R. Sturtevant$^2$ \\
+\hspace{-1cm}$^1$ Department of Knowledge Engineering, Maastricht University\\
+\hspace{-1cm}$^2$ Computer Science Department, University of Denver\\}
+
+\date{}
+
+% The \icmltitle you define below is probably too long as a header.
+% Therefore, a short form for the running title is supplied here:
+%\icmltitlerunning{No-Regret Learning in Extensive-Form Games with Imperfect Recall}
+
+\newif\iftechreport
+\techreporttrue
+
+\begin{document} 
+
+% It is OKAY to include author information, even for blind
+% submissions: the style file will automatically remove it for you
+% unless you've provided the [accepted] option to the icml2012
+% package.
+%\icmlauthor{Your Name}{email@yourdomain.edu}
+%\icmladdress{Your Fantastic Institute,
+%            314159 Pi St., Palo Alto, CA 94306 USA}
+%\icmlauthor{Your CoAuthor's Name}{email@coauthordomain.edu}
+%\icmladdress{Their Fantastic Institute,
+%            27182 Exp St., Toronto, ON M6H 2T1 CANADA}
+
+\maketitle
+\allowdisplaybreaks
+% You may provide any keywords that you 
+% find helpful for describing your paper; these are used to populate 
+% the "keywords" metadata in the PDF but will not be shown in the document
+%\icmlkeywords{boring formatting information, machine learning, ICML}
+
+\begin{abstract} 
+Monte Carlo Tree Search (MCTS) has improved the performance of game-playing engines in 
+domains such as Go, Hex, and general-game playing. MCTS has been shown to outperform
+outperform classic alpha-beta search in games where good heuristic evaluations are difficult to obtain. 
+In recent years, combining ideas from traditional minimax search in MCTS has been shown to be advantageous in some domains, 
+such as Lines of Action, Amazons, and Breakthrough.
+In this paper, we propose 
+a new way to use heuristic evaluations to guide the MCTS search by storing the two sources of 
+information, estimated win rates and heuristic evaluations, separately. 
+Rather than using the heuristic evaluations to replace the playouts, 
+our technique backs them up {\it implicitly} during its MCTS simulations. 
+These learned evaluation values are then used to guide future simulations. 
+Compared to current techniques, we show that using implicit minimax backups  
+leads to stronger play performance in Breakthrough, Lines of Action, and Kalah. 
+\end{abstract} 
+
+%
+%%% BEGIN PAPER CONTENT
+%
+
+%
+%%% END PAPER CONTENT
+%
+
+
+\bibliography{im-mcts}
+\bibliographystyle{plainnat}
+
+\appendix
+
+\section{Appendix A: Game Images}
+
+\section{Appendix B: Tournaments and Playout Comparisons}
+
+This appendix includes details of the results of played games to determine the best baseline players. 
+
+\subsection{Parameter Values for Breakthrough and Kalah}
+
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+Technique & Parameter set \\
+\hline
+fet$x$          & $\{ 0, 1, \ldots, 5, 8, 10, 12, 16, 20, 30, 50, 100, 1000 \}$ \\
+det$x$         & $\{ .1, .2, .3, , .4, .5, .55, .6, .65, .7, .75, .8, .85, .9 \}$ \\
+ege$\epsilon$  & $\{ 0, .05, .1, .15, .2, .3, .4, .5, .6, .7, .8, .9, 1 \}$ \\
+im$\alpha$     & $\{ 0, .05, .1, .15, \ldots, .55, .6, .75, 1 \}$ \\
+\hline
+\end{tabular}
+\end{center}
+\caption{Parameter value sets.}
+\label{tbl:parmsets}
+\end{table}
+
+\subsection{Kalah Playout Optimization}
+
+{\bf {\color{red} Missing: epsilon-greedy and comparisons to fet.}}
+
+\subsubsection{Fixed Early Termination Tournament}
+
+Each matchup included 1000 games, but only the wins and losses are removed. The remaining
+matches were draws. 
+
+\begin{verbatim}
+round 1
+
+winner mcts_h_fet0 (368) vs. loser mcts_h_fet1000 (61)
+winner mcts_h_fet1 (408) vs. loser mcts_h_fet100 (61)
+winner mcts_h_fet2 (458) vs. loser mcts_h_fet50 (61)
+winner mcts_h_fet3 (460) vs. loser mcts_h_fet30 (37)
+winner mcts_h_fet4 (429) vs. loser mcts_h_fet20 (44)
+winner mcts_h_fet5 (223) vs. loser mcts_h_fet10 (83)
+mcts_h_fet8 gets a by
+
+round 2
+
+winner mcts_h_fet0 (181) vs. loser mcts_h_fet8 (169)
+winner mcts_h_fet5 (189) vs. loser mcts_h_fet1 (116)
+winner mcts_h_fet4 (166) vs. loser mcts_h_fet2 (115)
+mcts_h_fet3 gets a by
+
+round 3
+
+winner mcts_h_fet3 (161) vs. loser mcts_h_fet0 (124)
+winner mcts_h_fet4 (132) vs. loser mcts_h_fet5 (122)
+
+round 4
+
+winner mcts_h_fet4 (139) vs. loser mcts_h_fet3 (110)
+
+Winner: mcts_h_fet4
+\end{verbatim}
+
+
+\subsection{Breakthrough Playout Enhancement Optimization (using efMS evaluator)}
+
+{\bf {\color{red} Missing: det tuning.}}
+
+\subsubsection{Fixed Early Terminations Tournament}
+
+\begin{verbatim}
+round 1
+
+winner mcts_h_fet1000 (115) vs. loser mcts_h_fet0 (85)
+winner mcts_h_fet100 (117) vs. loser mcts_h_fet1 (83)
+winner mcts_h_fet50 (108) vs. loser mcts_h_fet2 (92)
+winner mcts_h_fet30 (138) vs. loser mcts_h_fet3 (62)
+winner mcts_h_fet20 (129) vs. loser mcts_h_fet4 (71)
+winner mcts_h_fet10 (129) vs. loser mcts_h_fet5 (71)
+mcts_h_fet8 gets a by
+
+round 2
+
+winner mcts_h_fet8 (108) vs. loser mcts_h_fet1000 (92)
+winner mcts_h_fet10 (112) vs. loser mcts_h_fet100 (88)
+winner mcts_h_fet20 (128) vs. loser mcts_h_fet50 (72)
+mcts_h_fet30 gets a by
+
+round 3
+
+winner mcts_h_fet30 (113) vs. loser mcts_h_fet8 (87)
+winner mcts_h_fet20 (104) vs. loser mcts_h_fet10 (96)
+
+round 4
+
+winner mcts_h_fet20 (104) vs. loser mcts_h_fet30 (96)
+
+Winner: mcts_h_fet20
+\end{verbatim}
+
+\subsubsection{Epsilon-greedy Playout Tournament}
+
+\begin{verbatim}
+round 1
+
+winner mcts_h_ege0.0 (156) vs. loser mcts_h_ege1.0 (44)
+winner mcts_h_ege0.05 (155) vs. loser mcts_h_ege0.9 (45)
+winner mcts_h_ege0.1 (156) vs. loser mcts_h_ege0.8 (44)
+winner mcts_h_ege0.15 (153) vs. loser mcts_h_ege0.7 (47)
+winner mcts_h_ege0.2 (151) vs. loser mcts_h_ege0.6 (49)
+winner mcts_h_ege0.3 (119) vs. loser mcts_h_ege0.5 (81)
+mcts_h_ege0.4 gets a by
+
+round 2
+
+winner mcts_h_ege0.0 (115) vs. loser mcts_h_ege0.4 (85)
+winner mcts_h_ege0.05 (119) vs. loser mcts_h_ege0.3 (81)
+winner mcts_h_ege0.1 (125) vs. loser mcts_h_ege0.2 (75)
+mcts_h_ege0.15 gets a by
+
+round 3
+
+winner mcts_h_ege0.15 (103) vs. loser mcts_h_ege0.0 (97)
+winner mcts_h_ege0.1 (110) vs. loser mcts_h_ege0.05 (90)
+
+round 4
+
+winner mcts_h_ege0.1 (108) vs. loser mcts_h_ege0.15 (92)
+
+Winner: mcts_h_ege0.1
+\end{verbatim}
+
+\subsubsection{Tournament Winner Comparisons}
+
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{|c|c|ccc|}
+\hline
+Player A & Player B                             & A Wins (\%)  & B Wins (\%)  & Ties \\ 
+\hline
+MCTS(ege$0.1$,det$0.5$) & MCTS(ege$0.1$)        & 738 (78.2)   & 262 (26.2)   & 0    \\
+MCTS(ege$0.1$,det$0.5$) & MCTS(fet$20$,det$0.5$) & 633 (63.3)   & 367 (36.7)   & 0    \\
+MCTS(ege$0.1$)          & MCTS(fet$20$)          & 557 (55.7)   & 443 (44.3)   & 0    \\
+MCTS(ege$0.1$)          & MCTS(fet$4$)           & 768 (76.8)   & 232 (23.2)   & 0    \\
+\hline
+\end{tabular}
+\end{center}
+\caption{Breakthrough playout comparisons.}
+\end{table}
+
+\subsection{Breakthrough Playout Enhancement Optimization (using efLH evaluator)}
+
+\subsubsection{Fixed Early Terminations Tournament}
+
+\begin{verbatim}
+round 1
+
+winner mcts_h_efv1_fet0 (118) vs. loser mcts_h_efv1_fet1000 (82)
+winner mcts_h_efv1_fet1 (129) vs. loser mcts_h_efv1_fet100 (71)
+winner mcts_h_efv1_fet2 (113) vs. loser mcts_h_efv1_fet50 (87)
+winner mcts_h_efv1_fet3 (101) vs. loser mcts_h_efv1_fet30 (99)
+winner mcts_h_efv1_fet20 (121) vs. loser mcts_h_efv1_fet4 (79)
+winner mcts_h_efv1_fet5 (100) vs. loser mcts_h_efv1_fet16 (100)
+winner mcts_h_efv1_fet8 (102) vs. loser mcts_h_efv1_fet12 (98)
+mcts_h_efv1_fet10 gets a by
+
+round 2
+
+winner mcts_h_efv1_fet10 (108) vs. loser mcts_h_efv1_fet0 (92)
+winner mcts_h_efv1_fet8 (112) vs. loser mcts_h_efv1_fet1 (88)
+winner mcts_h_efv1_fet5 (115) vs. loser mcts_h_efv1_fet2 (85)
+winner mcts_h_efv1_fet20 (123) vs. loser mcts_h_efv1_fet3 (77)
+
+round 3
+
+winner mcts_h_efv1_fet20 (110) vs. loser mcts_h_efv1_fet10 (90)
+winner mcts_h_efv1_fet8 (101) vs. loser mcts_h_efv1_fet5 (99)
+
+round 4
+
+winner mcts_h_efv1_fet8 (106) vs. loser mcts_h_efv1_fet20 (94)
+
+Winner: mcts_h_efv1_fet8
+\end{verbatim}
+
+\subsubsection{Epsilon-greedy Playout Tournament}
+
+\begin{verbatim}
+round 1
+
+winner mcts_h_efv1_ege1.0 (136) vs. loser mcts_h_efv1_ege0.0 (64)
+winner mcts_h_efv1_ege0.9 (121) vs. loser mcts_h_efv1_ege0.05 (79)
+winner mcts_h_efv1_ege0.1 (110) vs. loser mcts_h_efv1_ege0.8 (90)
+winner mcts_h_efv1_ege0.7 (103) vs. loser mcts_h_efv1_ege0.15 (97)
+winner mcts_h_efv1_ege0.6 (104) vs. loser mcts_h_efv1_ege0.2 (96)
+winner mcts_h_efv1_ege0.3 (100) vs. loser mcts_h_efv1_ege0.5 (100)
+mcts_h_efv1_ege0.4 gets a by
+
+round 2
+
+winner mcts_h_efv1_ege1.0 (122) vs. loser mcts_h_efv1_ege0.4 (78)
+winner mcts_h_efv1_ege0.3 (101) vs. loser mcts_h_efv1_ege0.9 (99)
+winner mcts_h_efv1_ege0.6 (116) vs. loser mcts_h_efv1_ege0.1 (84)
+mcts_h_efv1_ege0.7 gets a by
+
+round 3
+
+winner mcts_h_efv1_ege0.7 (102) vs. loser mcts_h_efv1_ege1.0 (98)
+winner mcts_h_efv1_ege0.3 (105) vs. loser mcts_h_efv1_ege0.6 (95)
+
+round 4
+
+winner mcts_h_efv1_ege0.3 (110) vs. loser mcts_h_efv1_ege0.7 (90)
+
+Winner: mcts_h_efv1_ege0.3
+\end{verbatim}
+
+\subsection{Tournament Winner Comparisons}
+
+%    mcts_s_h_efv1_pd20 vs.                        mcts_s_h_efv1_pd8:   514   486     0 (diff    28, games  1000) 51.40 48.60 +/- 3.10
+%  mcts_s_h_efv1_ege0.3 vs.                       mcts_s_h_efv1_pd20:   340   660     0 (diff  -320, games  1000) 34.00 66.00 +/- 2.94
+%  mcts_s_h_efv1_ege0.3 vs.                     mcts_s_h_efv1_ege0.7:   510   490     0 (diff    20, games  1000) 51.00 49.00 +/- 3.10
+%  mcts_s_h_efv1_ege0.7 vs.                       mcts_s_h_efv1_pd20:   194   806     0 (diff  -612, games  1000) 19.40 80.60 +/- 2.45
+%  mcts_s_h_efv1_ege0.3 vs.                        mcts_s_h_efv1_pd8:   354   646     0 (diff  -292, games  1000) 35.40 64.60 +/- 2.96
+%  mcts_s_h_efv1_ege0.7 vs.                        mcts_s_h_efv1_pd8:   255   745     0 (diff  -490, games  1000) 25.50 74.50 +/- 2.70
+
+{\bf {\color{red} Missing: comparisons with det added.}}
+
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{|c|c|ccc|}
+\hline
+Player A & Player B                  & A Wins (\%)  & B Wins (\%)  & Ties \\ 
+\hline
+MCTS(fet$8$)   & MCTS(fet$20$)       & 514 (51.4)   & 486 (48.6)   & 0    \\
+MCTS(ege$0.3$) & MCTS(fet$0.7$)      & 510 (51.0)   & 490 (49.0)   & 0    \\
+\hline
+MCTS(ege$0.3$) & MCTS(fet$8$)        & 354 (35.4)   & 646 (64.6)   & 0    \\
+MCTS(ege$0.3$) & MCTS(fet$20$)       & 340 (34.0)   & 660 (66.0)   & 0    \\
+MCTS(ege$0.7$) & MCTS(fet$8$)        & 255 (25.5)   & 745 (74.5)   & 0    \\
+MCTS(ege$0.7$) & MCTS(fet$20$)       & 194 (19.4)   & 806 (80.6)   & 0    \\
+\hline
+\end{tabular}
+\end{center}
+\caption{Breakthrough playout comparisons.}
+\end{table}
+
+
+
+
+\end{document} 
