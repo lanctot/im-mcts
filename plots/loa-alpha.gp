@@ -1,6 +1,6 @@
-set terminal epslatex color colortext standalone
+set terminal epslatex color colortext standalone header "\\usepackage[T1]{fontenc}\n\\usepackage{mathptmx}\n\\usepackage{helvet}"
 set out 'loa-alpha.tex'
-set title 'Performance of MCTS(im$\alpha$) for different $\alpha$ in LOA'
+set title 'Performance of MCTS(im$\alpha$) against different benchmark players in LOA'
 set multiplot
 set xlabel '$\alpha$'
 set ylabel '{\small Win rate of MCTS(im$\alpha$) (\%)}'

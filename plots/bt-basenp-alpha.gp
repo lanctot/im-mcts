@@ -1,9 +1,9 @@
-set terminal epslatex color colortext standalone
+set terminal epslatex color colortext standalone header "\\usepackage[T1]{fontenc}\n\\usepackage{mathptmx}\n\\usepackage{helvet}"
 set out 'bt-basenp-alpha.tex'
-set title 'Performance of MCTS(im$\alpha$,np) for different $\alpha$ in Breakthrough'
+set title 'Performance of MCTS(bl,np,im$\alpha$) vs. MCTS(bl,np) in Breakthrough'
 set multiplot
 set xlabel '$\alpha$'
-set ylabel '{\small Win rate of MCTS(im$\alpha$,np) vs. MCTS(np) (\%)}'
+set ylabel '{\small Win rate of MCTS(bl,np,im$\alpha$) (\%)}'
 set xrange [0:1.1]
 set yrange [:80]
 plot "bt-basenp-1s-alpha.dat" using 1:2 with linespoints lt 1 lw 3 title '1 second / move', \

@@ -8,7 +8,10 @@ do
   echo "building $f"
   #gnuplot < $f.gp
   #gnuplot < $f.gp && latex $f.tex && dvips -o $f.ps $f.dvi && epstopdf $f.ps >/dev/null 2>/dev/null
-  gnuplot < $f.gp && pdflatex $f.tex >/dev/null 2>/dev/null
+  
+  #gnuplot < $f.gp && pdflatex $f.tex >/dev/null 2>/dev/null
+  gnuplot < $f.gp && pdflatex $f.tex 
+
   #gnuplot < $f.gp && epstopdf $f.eps 
 done
 

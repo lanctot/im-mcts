@@ -539,7 +539,7 @@ is declared a winner if that player won one of the games and at least tied the o
 wins both games, the game is discarded. 
 
 The default playout policy chooses a move uniformly at random. 
-We determined which playout enhancement led to the best baseline player. 
+We determined which playout enhancement led to the best player. 
 Tournament results revealed that a fet$4$ early termination worked best. 
 
 The evaluation function was the same one used in \cite{Ramanujan11Tradeoffs}, the difference between stones
@@ -594,7 +594,7 @@ at the time of publication had an ELO rating of 1910 on the Little Golem web sit
 \includegraphics[scale=0.7]{plots/bt-base-alpha}\\
 \includegraphics[scale=0.7]{plots/bt-basenp-alpha}
 \caption{Results in Breakthrough against 
-baseline player MCTS(ege$0.1$,det$0.5$). The implicit minimax player uses efMS. 
+baseline player MCTS(ipp,ege$0.1$,det$0.5$). 
 Each point represents 1000 games. The top graph excludes node priors, bottom graph includes node priors.} 
 \label{fig:bt-base-alpha}
 \end{center}
@@ -988,7 +988,7 @@ Also, even with random playouts, an efficient implementation with MCTS-Solver ha
 %handled effectively without any additional knowledge, especially when MCTS-Solver is enabled. 
 Therefore, we believe that the explanation for the advantage offered by implicit minimax backups is more subtle
 than simply detecting and handling traps. In watching several Breakthrough games, it seems that MCTS with implicit minimax backups 
-builds ``fortress'' structures \cite{Guid12Fortress} that are handled better than standard MCTS.  
+builds ``fortress'' structures \cite{Guid12Fortress} that are then handled better than standard MCTS.  
 
 While we have shown positive results in a number of domains, we recognize that this 
 technique is not universally applicable. We believe that implicit minimax backups work because there is short-term tactical 
@@ -1019,7 +1019,7 @@ when using node priors at lower time settings and when using the alternative bas
 For future work, we would like to apply the technique in other games, Amazons in 
 particular. 
 Also, we plan to investigate improving initial evaluations $v_0(s)$ using quiescence search.
-Upper and lower bounds could be maintaing for $\alpha\beta$ pruning.
+Upper and lower bounds could be maintained for $\alpha\beta$ pruning.
 We hope to compare implicit minimax backups with sufficiency thresholds 
 of Gudmundsson \& Bj\"{o}rnsson~\cite{Gudmindsson13Sufficiency} and to other 
 minimax hybrids, such as those of Baier \& Winands~\cite{Baier13MinimaxHybrids}. 
