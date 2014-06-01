@@ -7,7 +7,7 @@
 \usepackage{subfigure} 
 
 % For citations
-\usepackage{natbib}
+%\usepackage{natbib}
 %\usepackage{named}
 
 % For algorithms
@@ -185,7 +185,7 @@
 
 \begin{abstract} 
 Monte Carlo Tree Search (MCTS) has improved the performance of game-playing engines in 
-domains such as Go, Hex, and general-game playing. MCTS has been shown to outperform
+domains such as Go, Hex, and general game playing. MCTS has been shown to outperform
 outperform classic alpha-beta search in games where good heuristic evaluations are difficult to obtain. 
 In recent years, combining ideas from traditional minimax search in MCTS has been shown to be advantageous in some domains, 
 such as Lines of Action, Amazons, and Breakthrough.
@@ -511,7 +511,7 @@ Alt. baseline (ipp,fet$20$,np)        & bl'  &             & \checkmark  &      
 
 \begin{figure}[t!]
 \begin{center}
-\includegraphics[scale=0.68]{plots/kalah-alpha}
+\includegraphics[scale=0.68]{kalah-alpha.pdf}
 \caption{Results in Kalah. Playouts use fet$4$. Each data point is based on roughly 1000 
 games; win percentages are $\pm \approx$ 3.0\% with 95\% confidence.}
 \label{fig:kalah-alpha}
@@ -591,8 +591,8 @@ at the time of publication had an ELO rating of 1910 on the Little Golem web sit
 
 \begin{figure}[t!]
 \begin{center}
-\includegraphics[scale=0.7]{plots/bt-base-alpha}\\
-\includegraphics[scale=0.7]{plots/bt-basenp-alpha}
+\includegraphics[scale=0.7]{bt-base-alpha.pdf}\\
+\includegraphics[scale=0.7]{bt-basenp-alpha.pdf}
 \caption{Results in Breakthrough against 
 baseline player MCTS(ipp,ege$0.1$,det$0.5$). 
 Each point represents 1000 games. The top graph excludes node priors, bottom graph includes node priors.} 
@@ -780,7 +780,7 @@ further explain this finding in the next subsection.\\
 
 \begin{figure}[t!]
 \begin{center}
-\includegraphics[scale=0.68]{plots/bt-alt-alpha}
+\includegraphics[scale=0.68]{bt-alt-alpha.pdf}
 \caption{Results of varying $\alpha$ in Breakthrough using the alternative baseline player.
 Each point represents 1000 games.} 
 \label{fig:bt-alt-alpha}
@@ -920,7 +920,7 @@ positions.\footnote{\small https://dke.maastrichtuniversity.nl/m.winands/loa/}
 
 \begin{figure}[t!]
 \begin{center}
-\includegraphics[scale=0.7]{plots/loa-alpha}
+\includegraphics[scale=0.7]{loa-alpha.pdf}
 \caption{Results in LOA. Each data point represents 1000 games with 1 second of search time. } 
 \label{fig:loa-alpha}
 \end{center}
@@ -1041,7 +1041,7 @@ Organisation for Scientific Research (NWO) in the framework of the project Go4Na
 \bibliography{im-mcts}
 \bibliographystyle{plain}
 
-\vspace{20cm}
+\vspace{10cm}
 
 \appendix
 
@@ -1056,7 +1056,7 @@ This appendix shows images of each game to help visualize the objectives.
 
 \begin{figure}[h!]
 \begin{center}
-\includegraphics[scale=0.21]{images/kalah2}
+\includegraphics[scale=0.21]{kalah2.pdf}
 \end{center}
 \caption{An example position in Kalah (with only 4 stones in each house.) 
 Retrieved June 1st.
@@ -1065,7 +1065,7 @@ Image source: http://upload.wikimedia.org/wikipedia/commons/6/6d/Wooden\_Mancala
 
 \begin{figure}[h!]
 \begin{center}
-\includegraphics[scale=0.4]{images/break01}
+\includegraphics[scale=0.4]{break01.pdf}
 \end{center}
 \caption{Breakthrough initial position, as depicted on the online turn-based game web site Little Golem. 
 Retrieved June 1st, 2014. 
@@ -1075,7 +1075,7 @@ Image source: http://www.littlegolem.net/jsp/games/break01.png.
 
 \begin{figure}[h!]
 \begin{center}
-\includegraphics[scale=0.4]{images/LOA}
+\includegraphics[scale=0.4]{LOA.pdf}
 \end{center}
 \caption{Starting position of Lines of Action. 
 Retrieved June 1st, 2014. 
