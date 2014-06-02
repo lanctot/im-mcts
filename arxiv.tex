@@ -205,6 +205,11 @@ leads to stronger play performance in Breakthrough, Lines of Action, and Kalah.
 %%% BEGIN PAPER CONTENT
 %
 
+%%% Note: when copying to arXiv paper, do the following: 
+  % - add \vspace under the fact subsections in breakthrough section
+  % - add \; after the single statement (inside braces) in the \lIf and \lFor in algorithm
+  %   this will not look right when built but will disply properly when built on arXiv
+
 \section{Introduction}
 
 Monte Carlo Tree Search (MCTS)~\cite{Coulom06Efficient,Kocsis06Bandit} is a simulation-based best-first
@@ -298,7 +303,8 @@ $\cT : \cS \times \cA \mapsto \Delta \cS$ is a {\it transition function} mapping
 each state and action to a distribution over successor states. Finally, $\cR : \cS \times \cA \times \cS \mapsto R$ 
 is a {\it reward function} mapping (state, action, successor state) triplets to numerical rewards. 
 
-A two-player perfect information game is an MDP with a specific form.
+A two-player perfect information game is an MDP with a specific form.\footnote{Our model is 
+similar to Alternating Markov Games~\cite{Littman96ageneralized}.}
 Denote $\cZ = \{ s \in \cS: \cA(s) = \emptyset \} \subset \cS$ the set of {\it terminal states}. 
 In addition, for all nonterminal states $s' \in \cS - \cZ$, $\cR(s,a,s') = 0$. 
 There is a {\it player identity function} $\tau : \cS - \cZ \mapsto \{1,2\}$. 
@@ -323,7 +329,7 @@ maintained for each node $s$: the cumulative reward, $r_s$, and visit count, $n_
 By popular convention, we define $r_{s,a} = r_{s'}$ where $s' = \cT(s,a)$, and similarly $n_{s,a} = n_{s'}$. 
 Also, we use $r^{\tau}_s$ to denote the reward at state $s$ {\it with respect to player} $\tau(s)$. 
 
-Let $\hV(s)$ an estimator of the win rate starting from node $s$ and $\hQ(s,a)$ for the state-action pair. 
+Let $\hQ(s,a)$ be an estimator for the value of state-action pair $(s,a)$, where $s \in \cA(s)$. 
 For example, one popular estimator is the observed mean over all simulations 
 $Q(s,a) = r^{\tau}_{s,a} / n_{s,a}$. 
 The most widely-used selection policy is based on a bandit algorithm called Upper Confidence Bounds 
@@ -374,9 +380,6 @@ heuristic values on line 13, and does a one-ply backup on line 14.
 A more memory-efficient implementation could add just a single child without fundamentally changing
 the algorithm, as was done in our experiments in Lines of Action.
 
-%% NOTE: extra semicolons neede on some lines to make arXiv compiler show it properly and 
-%%       not mess with the line numbers!!
-
 \begin{algorithm2e}[t!]
   \Select$(s)$:\;
   \pushline
@@ -395,14 +398,14 @@ the algorithm, as was done in our experiments in Lines of Action.
   \pushline
     \If{$\exists a \in \cA(s), s' = \cT(s,a) \not\in \cG$}{
       \Expand($s$)\;      
-      \lFor{$a \in \cA(s), s' = \cT(s,a)$}{$v_{s'} \leftarrow v_0(s')$\;}
+      \lFor{$a \in \cA(s), s' = \cT(s,a)$}{$v_{s'} \leftarrow v_0(s')$ \; }
       $v^{\tau}_s \leftarrow \max_{a \in \cA(s)} v^{\tau}_{s,a}$ \; 
       $r \leftarrow $\Playout($s$)\;
       \Update($s,r$)\;
       {\bf return} $r$\;                       
     }
     \Else{ 
-      \lIf{$s \in \cZ$}{{\bf return} $\cR(s_{parent}, a_{parent}, s)$\;}
+      \lIf{$s \in \cZ$}{{\bf return} $\cR(s_{parent}, a_{parent}, s)$ \; }
       $a \leftarrow $\Select$(s)$\;
       $s' \leftarrow \cT(s,a)$\;
       $r \leftarrow $\Simulate$(s,a,s')$\;
@@ -413,7 +416,7 @@ the algorithm, as was done in our experiments in Lines of Action.
   \;
   \MCTS($s_0$):\;
   \pushline
-    \lWhile{\mbox{time left}}{\Simulate$(-,-,s_0)$ \;}
+    \lWhile{\mbox{time left}}{\Simulate$(-,-,s_0)$ \; }
     {\bf return} $\argmax_{a \in \cA(s_0)} n_{s_0,a}$\; 
   \popline
   \vspace{0.3cm}
@@ -478,12 +481,13 @@ we will refer to each enhancement and setting using different labels. These enha
 the text that follows. But, we also include, for reference, a summary of each in Table~\ref{table:enhancements}.
 
 Experiments are performed in three domains: Kalah, Breakthrough, and Lines of Action. Example images of each 
-game are shown in Appendix \ref{app:images}.
+game are shown in Appendix A.\footnotemark[1]
 To tune parameters in Kalah and Breakthrough, hierarchical elimination tournaments are run where each 
 head-to-head match consisted of at least 200 games with seats swapped halfway. 
-Detailed results of these tournaments and comparisons are contained in Appendix \ref{app:results}.
+Detailed results of these tournaments and comparisons are contained in Appendix B.\footnotemark[1]
+\footnotetext[1]{Appendices are included in~\cite{Lanctot14immcts-arxiv}.}
 
-\begin{table}[t!]
+\begin{table}[tb]
 {\small
 \caption{Enhancements tested in Kalah (K), Breakthrough (B), and Lines of Action (L).}
 \begin{center}
@@ -514,9 +518,9 @@ Alt. baseline (ipp,fet$20$,np)        & bl'  &             & \checkmark  &      
 
 \subsection{Kalah}
 
-\begin{figure}[t!]
+\begin{figure}
 \begin{center}
-\includegraphics[scale=0.68]{kalah-alpha.pdf}
+\includegraphics[scale=0.68]{kalah-alpha}
 \caption{Results in Kalah. Playouts use fet$4$. Each data point is based on roughly 1000 
 games; win percentages are $\pm \approx$ 3.0\% with 95\% confidence.}
 \label{fig:kalah-alpha}
@@ -554,7 +558,6 @@ second of search time are shown in Figure~\ref{fig:kalah-alpha}.
 %Here, we again notice the same patterns as in Breakthrough. 
 Here, we notice that within the range $\alpha \in [0.1,0.5]$ there is a clear 
 advantage in performance when using implicit minimax backups against the base player. 
-This graph has a recurring shape that we have seen in our other domains as well. 
 
 \subsection{Breakthrough}
 \label{sec:bt}
@@ -574,7 +577,8 @@ MCTS with this {\it improved playout policy} (abbreviated ``ipp'') beats the one
 94.3\% of the time. This playout policy leads to a clear improvement over random playouts, and so it is enabled 
 by default from this point on.
 
-We use two evaluation functions. The first one is a simple one found in Maarten Schadd's thesis~\cite{Schadd11PhdThesis} 
+In Breakthrough, two different evaluation functions were used. The first one is a simple one found in 
+Maarten Schadd's thesis~\cite{Schadd11PhdThesis} 
 that assigns each piece a score of 10 and the further row achieved as 2.5, which we abbreviate ``efMS''. The second 
 one is the more sophisticated one giving specific point values for each individual square per player 
 described in a recent paper by Lorentz \& Horey~\cite{Lorentz13Breakthrough}, which we abbreviate ``efLH''. 
@@ -594,12 +598,12 @@ at the time of publication had an ELO rating of 1910 on the Little Golem web sit
 %heuristic knowledge is as a means of {\it progressive bias} which has been rather successful
 %in Go~\cite{Gelly07Combining,ChaslotWHUB2008} and Lines of Action~\cite{Winands10MCTS-LOA}.
 
-\begin{figure}[t!]
+\begin{figure}[t]
 \begin{center}
-\includegraphics[scale=0.7]{bt-base-alpha.pdf}\\
-\includegraphics[scale=0.7]{bt-basenp-alpha.pdf}
+\includegraphics[scale=0.7]{bt-base-alpha}\\
+\includegraphics[scale=0.7]{bt-basenp-alpha}
 \caption{Results in Breakthrough against 
-baseline player MCTS(ipp,ege$0.1$,det$0.5$). 
+baseline player MCTS(ipp,ege$0.1$,det$0.5$).  
 Each point represents 1000 games. The top graph excludes node priors, bottom graph includes node priors.} 
 \label{fig:bt-base-alpha}
 \end{center}
@@ -613,15 +617,15 @@ terminations and $\epsilon$-greedy playouts.
 Our best fixed early terminations player was fet$20$ and best $\epsilon$-greedy player was ege$0.1$.
 Through systematic testing on 1000 games per pairing, we determined that the best playout 
 policy when using efMS is the combination (ege$0.1$,det$0.5$). 
-The detailed test results are found in Appendix \ref{app:results}.
+The detailed test results are found in Appendix B in \cite{Lanctot14immcts-arxiv}.
 To ensure that this combination of early termination strategies is indeed superior to just the improved 
 playout policy on its own, we also played MCTS(ipp,ege$0.1$,det$0.5$) against MCTS(ipp). 
 MCTS(ipp,ege$0.1$,det$0.5$) won 68.8\% of these games.
 MCTS(ipp,ege$0.1$,det$0.5$) is the best baseline player that we could produce given three separate 
 parameter-tuning tournaments, for all the playout enhancements we have tried using efMS, over 
 thousands of played games. Hence, we use it as our primary benchmark for comparison in the 
-rest of our experiments. For convenience, we abbreviate this baseline player (MCTS(ipp,ege$0.1$,det$0.5$))
-to MCTS(bl). 
+rest of our experiments with efMS. 
+For convenience, we abbreviate this baseline player (MCTS(ipp,ege$0.1$,det$0.5$)) to MCTS(bl). 
 %(ipp,ege$0.1$,det$0.5$) is used as the playout policy for every MCTS player unless otherwise stated.
 %As a final summary, this baseline player:
 %\begin{enumerate}
@@ -657,16 +661,17 @@ MCTS(ipp,fet$20$). MCTS(ipp,fet$20$,im$0.4$) won 87.2\% of these games.
 The next question was whether the mixing static evaluation values themselves ($v_0(s)$) at node $s$ 
 was the source of the benefit or whether the minimax backup values ($v^{\tau}_s$) were the contributing factor.
 Therefore, we tried MCTS(bl, im$0.4$) against a baseline player that uses constant bias over the static 
-evaluations, \ie uses $\hQ^{CB}(s,a) = (1-\alpha)Q + \alpha v_0(s')$,
-and also against a player using a progressive bias over the minimax backups, \ie 
-$\hQ^{PB}(s,a) = (1-\alpha)Q + \alpha v^{\tau}_{s,a}/(n_{s,a} + 1)$
+evaluations, \ie uses 
+\[ \hQ^{CB}(s,a) = (1-\alpha)Q + \alpha v_0(s'), \mbox{ where } s' = \cT(s,a),\]
+and also against a player using a progressive bias of the implicit minimax values, \ie 
+\[ \hQ^{PB}(s,a) = (1-\alpha)Q + \alpha v^{\tau}_{s,a}/(n_{s,a} + 1), \]
 with $\alpha = 0.4$ in both cases.
 MCTS(bl,im$0.4$) won 67.8\% against MCTS(bl,$\hQ^{CB}$). 
 MCTS(bl,im$0.4$) won 65.5\% against MCTS(bl,$\hQ^{PB}$). 
 A different decay function for the weight placed on $v^{\tau}_s$ could further improve 
 the advantage of implicit minimax backups. We leave this as a topic for future work. 
 
-\begin{table}[t!]
+\begin{table}[t]
 \begin{center}
 \begin{tabular}{|c|c|c|c|}
 \hline
@@ -705,11 +710,11 @@ backpropagation in the original MCTS work~\cite{Coulom06Efficient}. This enhance
 %modifies line \ref{alg:retline2} of the algorithm to the following: 
 modifies line 24 of the algorithm to the following: 
 \[
-\mathbf{if}~n_{s} \ge T~\mathbf{then~return}~\max_{a \in \cA(s)} Q(s,a)~\mathbf{else~return}~r.
+\mathbf{if}~n_{s} \ge T~\mathbf{then~return}~\max_{a \in \cA(s)} \hQ(s,a)~\mathbf{else~return}~r.
 \]
 The results for several values of $T$ are given in Table~\ref{tbl:maxbackprop}. 
 
-\begin{table}[t!]
+\begin{table}[t]
 %{\small
 \begin{center}
 \begin{tabular}{|c|ccccccc|}
@@ -740,7 +745,8 @@ The results are shown at the bottom of Figure~\ref{fig:bt-base-alpha}. When comb
 search time, implicit minimax backups still seem to give an advantage for $\alpha \in [0.5,0.6]$, and at five 
 seconds gives an advantage for $\alpha \in [0.1,0.6]$. To verify that the combination is complementary,
 we played MCTS(bl,im$0.6$) with and without node priors each against the baseline player. The player with
-node priors won 77.9\% and the one without won 63.3\%. \\
+node priors won 77.9\% and the one without won 63.3\%. 
+
 
 %            mcts_h_ege0.1_efv0_det0.5 vs.      mcts_h_pd20_np10:   402   598     0 (diff  -196, games  1000) 40.20 59.80 +/- 3.04
 %            mcts_h_ege0.1_efv0_det0.5 vs.       mcts_h_pd4_np10:   576   424     0 (diff   152, games  1000) 57.60 42.40 +/- 3.06
@@ -753,7 +759,7 @@ node priors won 77.9\% and the one without won 63.3\%. \\
 
 \noindent{\it MCTS Using Lorentz \& Horey Evaluation Function}
 
-\vspace{0.1cm}
+\vspace{0.2cm}
 
 We now run experiments using the more sophisticated evaluation function from~\cite{Lorentz13Breakthrough}, 
 efLH, that assigns specific piece count values depending on their position on the board. 
@@ -781,11 +787,11 @@ that is we played MCTS(efMS,bl,np,im$0.4$) against MCTS(efLH,bl',im$0.6$).
 MCTS(efMS,bl,np,im$0.4$) wins 53.40\% of games. 
 Given this result, we suspect that implicit minimax backups may benefit more easily when 
 combined with defensive and less granular evaluation functions in Breakthrough. We try to 
-further explain this finding in the next subsection.\\
+further explain this finding in the next subsection.
 
-\begin{figure}[t!]
+\begin{figure}[t]
 \begin{center}
-\includegraphics[scale=0.68]{bt-alt-alpha.pdf}
+\includegraphics[scale=0.68]{bt-alt-alpha}
 \caption{Results of varying $\alpha$ in Breakthrough using the alternative baseline player.
 Each point represents 1000 games.} 
 \label{fig:bt-alt-alpha}
@@ -794,7 +800,7 @@ Each point represents 1000 games.}
 
 \noindent {\it Comparison to $\alpha\beta$ Search} 
 
-\vspace{0.1cm}
+\vspace{0.2cm}
 
 % mcts
 %                                      ab vs.                   mcts_h_s_ege0.1_det0.5:  1449   551     0 (diff   898, games  2000) 72.45 27.55 +/- 1.96
@@ -824,8 +830,7 @@ Each point represents 1000 games.}
 %Through systematic testing, we found the best baseline with this evaluation 
 %function to use the pd$20$ playout. 
 
-\begin{table}[t!]
-{\small
+\begin{table}[t]
 \begin{center}
 \begin{tabular}{ccccc|c}
 Ev. Func.  & Player              & Opp.                 & $n$    & $t$ (s) & Res. (\%) \\
@@ -835,30 +840,30 @@ Ev. Func.  & Player              & Opp.                 & $n$    & $t$ (s) & Res
 (Both)     & $\alpha\beta$(efMS) & $\alpha\beta$(efLH)  &  400   & 10      & 31.25     \\
 \hline
 \hline
-efMS       & MCTS              & $\alpha\beta$    & 2000   & 1       & 27.55     \\     
-efMS       & MCTS              & $\alpha\beta$    & 1000   & 5       & 39.00     \\     
-efMS       & MCTS              & $\alpha\beta$    &  500   & 10      & 47.60     \\     
+efMS       & MCTS(bl)              & $\alpha\beta$    & 2000   & 1       & 27.55     \\     
+efMS       & MCTS(bl)              & $\alpha\beta$    & 1000   & 5       & 39.00     \\     
+efMS       & MCTS(bl)              & $\alpha\beta$    &  500   & 10      & 47.60     \\     
 \hline
-efMS       & MCTS(im$0.4$)     & $\alpha\beta$    & 2000   & 1       & 45.05     \\     
-efMS       & MCTS(im$0.4$)     & $\alpha\beta$    & 1000   & 5       & 61.60     \\     
-efMS       & MCTS(im$0.4$)     & $\alpha\beta$    &  500   & 10      & 61.80     \\     
+efMS       & MCTS(bl,im$0.4$)     & $\alpha\beta$    & 2000   & 1       & 45.05     \\     
+efMS       & MCTS(bl,im$0.4$)     & $\alpha\beta$    & 1000   & 5       & 61.60     \\     
+efMS       & MCTS(bl,im$0.4$)     & $\alpha\beta$    &  500   & 10      & 61.80     \\     
 \hline
 \hline
-efLH       & MCTS              & $\alpha\beta$    & 2000   & 1       &  7.90      \\     
-efLH       & MCTS              & $\alpha\beta$    & 1000   & 5       & 10.80      \\     
-efLH       & MCTS              & $\alpha\beta$    &  500   & 10      & 12.60      \\     
-efLH       & MCTS              & $\alpha\beta$    &  500   & 20      & 18.80      \\     
-efLH       & MCTS              & $\alpha\beta$    &  500   & 30      & 19.40      \\     
-efLH       & MCTS              & $\alpha\beta$    &  500   & 60      & 24.95      \\     
-efLH       & MCTS              & $\alpha\beta$    &  130   & 120     & 25.38      \\     
+efLH       & MCTS(bl')              & $\alpha\beta$    & 2000   & 1       &  7.90      \\     
+efLH       & MCTS(bl')              & $\alpha\beta$    & 1000   & 5       & 10.80      \\     
+efLH       & MCTS(bl')              & $\alpha\beta$    &  500   & 10      & 12.60      \\     
+efLH       & MCTS(bl')              & $\alpha\beta$    &  500   & 20      & 18.80      \\     
+efLH       & MCTS(bl')              & $\alpha\beta$    &  500   & 30      & 19.40      \\     
+efLH       & MCTS(bl')              & $\alpha\beta$    &  500   & 60      & 24.95      \\     
+efLH       & MCTS(bl')              & $\alpha\beta$    &  130   & 120     & 25.38      \\     
 \hline
-efLH       & MCTS(im$0.6$)     & $\alpha\beta$    & 2000   & 1       & 28.95      \\     
-efLH       & MCTS(im$0.6$)     & $\alpha\beta$    & 1000   & 5       & 39.30      \\     
-efLH       & MCTS(im$0.6$)     & $\alpha\beta$    &  500   & 10      & 41.20      \\     
-efLH       & MCTS(im$0.6$)     & $\alpha\beta$    &  500   & 20      & 45.80      \\     
-efLH       & MCTS(im$0.6$)     & $\alpha\beta$    &  500   & 30      & 46.20      \\     
-efLH       & MCTS(im$0.6$)     & $\alpha\beta$    &  500   & 60      & 55.60      \\     
-efLH       & MCTS(im$0.6$)     & $\alpha\beta$    &  130   & 120     & 61.54      \\     
+efLH       & MCTS(bl',im$0.6$)     & $\alpha\beta$    & 2000   & 1       & 28.95      \\     
+efLH       & MCTS(bl',im$0.6$)     & $\alpha\beta$    & 1000   & 5       & 39.30      \\     
+efLH       & MCTS(bl',im$0.6$)     & $\alpha\beta$    &  500   & 10      & 41.20      \\     
+efLH       & MCTS(bl',im$0.6$)     & $\alpha\beta$    &  500   & 20      & 45.80      \\     
+efLH       & MCTS(bl',im$0.6$)     & $\alpha\beta$    &  500   & 30      & 46.20      \\     
+efLH       & MCTS(bl',im$0.6$)     & $\alpha\beta$    &  500   & 60      & 55.60      \\     
+efLH       & MCTS(bl',im$0.6$)     & $\alpha\beta$    &  130   & 120     & 61.54      \\     
 \hline
 \end{tabular}
 \end{center}
@@ -866,7 +871,6 @@ efLH       & MCTS(im$0.6$)     & $\alpha\beta$    &  130   & 120     & 61.54    
 Here, $n$ represents the number of games played and $t$ time in seconds per search.
 Win rates are for the Player (in the left column).}
 \label{tbl:ab_vs_mcts}
-}
 \end{table}
 
 %Since implicit minimax backups enhances MCTS by using minimax-style updates, 
@@ -923,16 +927,15 @@ The evaluation function used is the used in MIA~\cite{Winands06MIA}.
 All of the results in LOA are based 100 opening board 
 positions.\footnote{\small https://dke.maastrichtuniversity.nl/m.winands/loa/} 
 
-\begin{figure}[t!]
+\begin{figure}[t]
 \begin{center}
-\includegraphics[scale=0.7]{loa-alpha.pdf}
+\includegraphics[scale=0.7]{loa-alpha}
 \caption{Results in LOA. Each data point represents 1000 games with 1 second of search time. } 
 \label{fig:loa-alpha}
 \end{center}
 \end{figure}
 
-\begin{table}[th]
-{\small
+\begin{table}[t]
 \begin{center}
 \begin{tabular}{ccccc|c}
 Options & Player        & Opp. & $n$ & $t$ & Res. (\%) \\
@@ -957,7 +960,6 @@ PB       & MCTS(im$\alpha$) & $\alpha \beta$ & 20000 & 5  & 63.3       \\
 All MCTS players use $\alpha \beta$ playouts and MCTS(im$\alpha$) players use $\alpha = 0.2$. 
 Here, $n$ represents the number of games played and $t$ time in seconds per search.}
 \label{tbl:loaresults}
-}
 \end{table}
 
 
@@ -1038,7 +1040,6 @@ evaluations learned during search~\cite{Finnsson10Learning}.
 Organisation for Scientific Research (NWO) in the framework of the project Go4Nature, grant number 612.000.938. 
 }
 
-
 %
 %%% END PAPER CONTENT
 %
@@ -1046,7 +1047,7 @@ Organisation for Scientific Research (NWO) in the framework of the project Go4Na
 \bibliography{im-mcts}
 \bibliographystyle{plain}
 
-\vspace{10cm}
+\vspace{20cm}
 
 \appendix
 
@@ -1114,13 +1115,10 @@ im$\alpha$     & $\{ 0, .05, .1, .15, \ldots, .55, .6, .75, 1 \}$ \\
 
 \subsection{Kalah Playout Optimization}
 
-% MISSING!
-%{\bf {\color{red} Missing: epsilon-greedy and comparisons to fet.}}
+In Kalah, each matchup included 1000 games, but only the wins 
+and losses are shown. The remaining matches were draws. 
 
 \subsubsection{Fixed Early Termination Tournament}
-
-Each matchup included 1000 games, but only the wins and losses are removed. The remaining
-matches were draws. 
 
 \begin{verbatim}
 round 1
@@ -1151,6 +1149,41 @@ winner mcts_h_fet4 (139) vs. loser mcts_h_fet3 (110)
 
 Winner: mcts_h_fet4
 \end{verbatim}
+
+\subsubsection{Epsilon-greedy Playout Tournament}
+
+\begin{verbatim}
+round 1
+
+winner mcts_h_ege1.0 (232) vs. loser mcts_h_ege0.0 (205)
+winner mcts_h_ege0.9 (224) vs. loser mcts_h_ege0.05 (210)
+winner mcts_h_ege0.1 (207) vs. loser mcts_h_ege0.8 (195)
+winner mcts_h_ege0.15 (219) vs. loser mcts_h_ege0.7 (213)
+winner mcts_h_ege0.2 (244) vs. loser mcts_h_ege0.6 (211)
+winner mcts_h_ege0.3 (233) vs. loser mcts_h_ege0.5 (197)
+mcts_h_ege0.4 gets a by
+
+round 2
+
+winner mcts_h_ege1.0 (276) vs. loser mcts_h_ege0.4 (173)
+winner mcts_h_ege0.9 (231) vs. loser mcts_h_ege0.3 (195)
+winner mcts_h_ege0.1 (212) vs. loser mcts_h_ege0.2 (196)
+mcts_h_ege0.15 gets a by
+
+round 3
+
+winner mcts_h_ege1.0 (218) vs. loser mcts_h_ege0.15 (206)
+winner mcts_h_ege0.9 (206) vs. loser mcts_h_ege0.1 (194)
+
+round 4
+
+winner mcts_h_ege1.0 (229) vs. loser mcts_h_ege0.9 (177)
+
+Winner: mcts_h_ege1.0
+\end{verbatim}
+
+\subsubsection{Tournament Winner Comparisons}
+
 
 
 \subsection{Breakthrough Playout Enhancements (using efMS evaluator)}
