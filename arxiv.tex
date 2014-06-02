@@ -151,8 +151,8 @@
 \title{Monte Carlo Tree Search with Heuristic Evaluations\\using Implicit Minimax Backups}
 
 \author{Marc Lanctot$^1$, Mark H.M. Winands$^1$, Tom Pepels$^1$, Nathan R. Sturtevant$^2$ \\
-\hspace{-1cm}$^1$ Department of Knowledge Engineering, Maastricht University\\
-\hspace{-1cm}$^2$ Computer Science Department, University of Denver\\
+\hspace{-0.5cm}$^1$Department of Knowledge Engineering, Maastricht University\\
+\hspace{-0.5cm}$^2$Computer Science Department, University of Denver\\
 \vspace{0.3cm}
 \hspace{-0.5cm}{\small\{marc.lanctot,m.winands,tom.pepels\}@maastrichtuniversity.nl, sturtevant@cs.du.edu}}
 
@@ -1096,6 +1096,8 @@ This appendix includes details of the results of played games to determine the b
 
 \subsection{Parameter Values for Breakthrough and Kalah}
 
+Table~\ref{tbl:parmvalues} shows the parameter values that were used in parameter-tuning experiments.
+
 \begin{table}[h!]
 \begin{center}
 \begin{tabular}{|l|l|}
@@ -1109,20 +1111,19 @@ im$\alpha$     & $\{ 0, .05, .1, .15, \ldots, .55, .6, .75, 1 \}$ \\
 \hline
 \end{tabular}
 \end{center}
-\caption{Parameter value sets.}
+\caption{Parameter value sets. \label{tbl:parmvalues}}
 \label{tbl:parmsets}
 \end{table}
 
 \subsection{Kalah Playout Optimization}
 
-In Kalah, each matchup included 1000 games, but only the wins 
-and losses are shown. The remaining matches were draws. 
+In Kalah, each matchup included 1000 games, but as mentioned in the main part of the 
+paper, only the wins and losses are shown and unbalanced boards are removed. 
 
 \subsubsection{Fixed Early Termination Tournament}
 
 \begin{verbatim}
 round 1
-
 winner mcts_h_fet0 (368) vs. loser mcts_h_fet1000 (61)
 winner mcts_h_fet1 (408) vs. loser mcts_h_fet100 (61)
 winner mcts_h_fet2 (458) vs. loser mcts_h_fet50 (61)
@@ -1132,19 +1133,16 @@ winner mcts_h_fet5 (223) vs. loser mcts_h_fet10 (83)
 mcts_h_fet8 gets a by
 
 round 2
-
 winner mcts_h_fet0 (181) vs. loser mcts_h_fet8 (169)
 winner mcts_h_fet5 (189) vs. loser mcts_h_fet1 (116)
 winner mcts_h_fet4 (166) vs. loser mcts_h_fet2 (115)
 mcts_h_fet3 gets a by
 
 round 3
-
 winner mcts_h_fet3 (161) vs. loser mcts_h_fet0 (124)
 winner mcts_h_fet4 (132) vs. loser mcts_h_fet5 (122)
 
 round 4
-
 winner mcts_h_fet4 (139) vs. loser mcts_h_fet3 (110)
 
 Winner: mcts_h_fet4
@@ -1154,7 +1152,6 @@ Winner: mcts_h_fet4
 
 \begin{verbatim}
 round 1
-
 winner mcts_h_ege1.0 (232) vs. loser mcts_h_ege0.0 (205)
 winner mcts_h_ege0.9 (224) vs. loser mcts_h_ege0.05 (210)
 winner mcts_h_ege0.1 (207) vs. loser mcts_h_ege0.8 (195)
@@ -1164,19 +1161,16 @@ winner mcts_h_ege0.3 (233) vs. loser mcts_h_ege0.5 (197)
 mcts_h_ege0.4 gets a by
 
 round 2
-
 winner mcts_h_ege1.0 (276) vs. loser mcts_h_ege0.4 (173)
 winner mcts_h_ege0.9 (231) vs. loser mcts_h_ege0.3 (195)
 winner mcts_h_ege0.1 (212) vs. loser mcts_h_ege0.2 (196)
 mcts_h_ege0.15 gets a by
 
 round 3
-
 winner mcts_h_ege1.0 (218) vs. loser mcts_h_ege0.15 (206)
 winner mcts_h_ege0.9 (206) vs. loser mcts_h_ege0.1 (194)
 
 round 4
-
 winner mcts_h_ege1.0 (229) vs. loser mcts_h_ege0.9 (177)
 
 Winner: mcts_h_ege1.0
@@ -1184,7 +1178,38 @@ Winner: mcts_h_ege1.0
 
 \subsubsection{Tournament Winner Comparisons}
 
+% oops, forgot to run it with parseres-noties
 
+% mcts_s_h_ege0.9 vs.                             mcts_s_h_pd3:    74   976   950 (diff  -902, games  2000) 7.05 92.95 +/- 1.55
+% mcts_s_h_ege0.9 vs.                             mcts_s_h_pd4:    66  1032   902 (diff  -966, games  2000) 6.01 93.99 +/- 1.41
+% mcts_s_h_ege1.0 vs.                             mcts_s_h_pd3:    93   912   995 (diff  -819, games  2000) 9.25 90.75 +/- 1.79
+% mcts_s_h_ege1.0 vs.                             mcts_s_h_pd4:    71   949   980 (diff  -878, games  2000) 6.96 93.04 +/- 1.56
+
+%    mcts_s_h_pd3 vs.                             mcts_s_h_pd4:   245   257  1498 (diff   -12, games  2000) 48.80 51.20 +/- 4.37
+% mcts_s_h_ege0.9 vs.                          mcts_s_h_ege1.0:   389   465  1146 (diff   -76, games  2000) 45.55 54.45 +/- 3.34
+
+Table~\ref{tbl:kalah-toptourney} shows the results of the top playout winners.
+Each data point in the following table includes 2000 games. As mentioned in the main part of the paper, draws due to unbalanced 
+boards are not counted. 
+
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{|c|c|cc|}
+\hline
+Player A & Player B                  & A Wins (\%)  & B Wins (\%)   \\ 
+\hline
+MCTS(fet$3$)   & MCTS(fet$4$)        & 245 (48.80)   & 257 (51.20)    \\
+MCTS(ege$0.9$) & MCTS(ege$1.0$)      & 389 (45.55)   & 465 (54.45)    \\
+\hline
+MCTS(ege$0.9$) & MCTS(fet$3$)        &  74 (7.05)   & 976 (92.95)    \\
+MCTS(ege$0.9$) & MCTS(fet$4$)        &  66 (6.01)   & 1032 (93.99)    \\
+MCTS(ege$1.0$) & MCTS(fet$3$)        &  93 (9.25)   & 912 (90.75)    \\
+MCTS(ege$1.0$) & MCTS(fet$4$)        &  71 (6.96)   & 949 (93.04)    \\
+\hline
+\end{tabular}
+\end{center}
+\caption{Kalah playout comparisons. \label{tbl:kalah-toptourney}}
+\end{table}
 
 \subsection{Breakthrough Playout Enhancements (using efMS evaluator)}
 
@@ -1195,7 +1220,6 @@ Winner: mcts_h_ege1.0
 
 \begin{verbatim}
 round 1
-
 winner mcts_h_fet1000 (115) vs. loser mcts_h_fet0 (85)
 winner mcts_h_fet100 (117) vs. loser mcts_h_fet1 (83)
 winner mcts_h_fet50 (108) vs. loser mcts_h_fet2 (92)
@@ -1205,19 +1229,16 @@ winner mcts_h_fet10 (129) vs. loser mcts_h_fet5 (71)
 mcts_h_fet8 gets a by
 
 round 2
-
 winner mcts_h_fet8 (108) vs. loser mcts_h_fet1000 (92)
 winner mcts_h_fet10 (112) vs. loser mcts_h_fet100 (88)
 winner mcts_h_fet20 (128) vs. loser mcts_h_fet50 (72)
 mcts_h_fet30 gets a by
 
 round 3
-
 winner mcts_h_fet30 (113) vs. loser mcts_h_fet8 (87)
 winner mcts_h_fet20 (104) vs. loser mcts_h_fet10 (96)
 
 round 4
-
 winner mcts_h_fet20 (104) vs. loser mcts_h_fet30 (96)
 
 Winner: mcts_h_fet20
@@ -1227,7 +1248,6 @@ Winner: mcts_h_fet20
 
 \begin{verbatim}
 round 1
-
 winner mcts_h_ege0.0 (156) vs. loser mcts_h_ege1.0 (44)
 winner mcts_h_ege0.05 (155) vs. loser mcts_h_ege0.9 (45)
 winner mcts_h_ege0.1 (156) vs. loser mcts_h_ege0.8 (44)
@@ -1237,25 +1257,24 @@ winner mcts_h_ege0.3 (119) vs. loser mcts_h_ege0.5 (81)
 mcts_h_ege0.4 gets a by
 
 round 2
-
 winner mcts_h_ege0.0 (115) vs. loser mcts_h_ege0.4 (85)
 winner mcts_h_ege0.05 (119) vs. loser mcts_h_ege0.3 (81)
 winner mcts_h_ege0.1 (125) vs. loser mcts_h_ege0.2 (75)
 mcts_h_ege0.15 gets a by
 
 round 3
-
 winner mcts_h_ege0.15 (103) vs. loser mcts_h_ege0.0 (97)
 winner mcts_h_ege0.1 (110) vs. loser mcts_h_ege0.05 (90)
 
 round 4
-
 winner mcts_h_ege0.1 (108) vs. loser mcts_h_ege0.15 (92)
 
 Winner: mcts_h_ege0.1
 \end{verbatim}
 
 \subsubsection{Tournament Winner Comparisons}
+
+Table~\ref{tbl:bt-efMS-toptourney} shows the results of the top playout winners.
 
 \begin{table}[h!]
 \begin{center}
@@ -1270,7 +1289,7 @@ MCTS(ege$0.1$)          & MCTS(fet$4$)           & 768 (76.8)   & 232 (23.2)   &
 \hline
 \end{tabular}
 \end{center}
-\caption{Breakthrough playout comparisons.}
+\caption{Breakthrough playout comparisons. \label{tbl:bt-efMS-toptourney}}
 \end{table}
 
 \subsection{Breakthrough Playout Enhancements (using efLH evaluator)}
@@ -1279,7 +1298,6 @@ MCTS(ege$0.1$)          & MCTS(fet$4$)           & 768 (76.8)   & 232 (23.2)   &
 
 \begin{verbatim}
 round 1
-
 winner mcts_h_efv1_fet0 (118) vs. loser mcts_h_efv1_fet1000 (82)
 winner mcts_h_efv1_fet1 (129) vs. loser mcts_h_efv1_fet100 (71)
 winner mcts_h_efv1_fet2 (113) vs. loser mcts_h_efv1_fet50 (87)
@@ -1290,19 +1308,16 @@ winner mcts_h_efv1_fet8 (102) vs. loser mcts_h_efv1_fet12 (98)
 mcts_h_efv1_fet10 gets a by
 
 round 2
-
 winner mcts_h_efv1_fet10 (108) vs. loser mcts_h_efv1_fet0 (92)
 winner mcts_h_efv1_fet8 (112) vs. loser mcts_h_efv1_fet1 (88)
 winner mcts_h_efv1_fet5 (115) vs. loser mcts_h_efv1_fet2 (85)
 winner mcts_h_efv1_fet20 (123) vs. loser mcts_h_efv1_fet3 (77)
 
 round 3
-
 winner mcts_h_efv1_fet20 (110) vs. loser mcts_h_efv1_fet10 (90)
 winner mcts_h_efv1_fet8 (101) vs. loser mcts_h_efv1_fet5 (99)
 
 round 4
-
 winner mcts_h_efv1_fet8 (106) vs. loser mcts_h_efv1_fet20 (94)
 
 Winner: mcts_h_efv1_fet8
@@ -1312,7 +1327,6 @@ Winner: mcts_h_efv1_fet8
 
 \begin{verbatim}
 round 1
-
 winner mcts_h_efv1_ege1.0 (136) vs. loser mcts_h_efv1_ege0.0 (64)
 winner mcts_h_efv1_ege0.9 (121) vs. loser mcts_h_efv1_ege0.05 (79)
 winner mcts_h_efv1_ege0.1 (110) vs. loser mcts_h_efv1_ege0.8 (90)
@@ -1322,19 +1336,16 @@ winner mcts_h_efv1_ege0.3 (100) vs. loser mcts_h_efv1_ege0.5 (100)
 mcts_h_efv1_ege0.4 gets a by
 
 round 2
-
 winner mcts_h_efv1_ege1.0 (122) vs. loser mcts_h_efv1_ege0.4 (78)
 winner mcts_h_efv1_ege0.3 (101) vs. loser mcts_h_efv1_ege0.9 (99)
 winner mcts_h_efv1_ege0.6 (116) vs. loser mcts_h_efv1_ege0.1 (84)
 mcts_h_efv1_ege0.7 gets a by
 
 round 3
-
 winner mcts_h_efv1_ege0.7 (102) vs. loser mcts_h_efv1_ege1.0 (98)
 winner mcts_h_efv1_ege0.3 (105) vs. loser mcts_h_efv1_ege0.6 (95)
 
 round 4
-
 winner mcts_h_efv1_ege0.3 (110) vs. loser mcts_h_efv1_ege0.7 (90)
 
 Winner: mcts_h_efv1_ege0.3
@@ -1352,6 +1363,8 @@ Winner: mcts_h_efv1_ege0.3
 % MISSING!
 %{\bf {\color{red} Missing: comparisons with det added.}}
 
+Table~\ref{tbl:bt-efLH-toptourney} shows the results of the top playout winners.
+
 \begin{table}[h!]
 \begin{center}
 \begin{tabular}{|c|c|ccc|}
@@ -1368,10 +1381,9 @@ MCTS(ege$0.7$) & MCTS(fet$20$)       & 194 (19.4)   & 806 (80.6)   & 0    \\
 \hline
 \end{tabular}
 \end{center}
-\caption{Breakthrough playout comparisons.}
+\caption{Breakthrough playout comparisons. \label{tbl:bt-efLH-toptourney}}
 \end{table}
 
-
-
-
 \end{document} 
+
+
