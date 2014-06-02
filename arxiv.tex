@@ -1176,7 +1176,7 @@ winner mcts_h_ege1.0 (229) vs. loser mcts_h_ege0.9 (177)
 Winner: mcts_h_ege1.0
 \end{verbatim}
 
-\subsubsection{Tournament Winner Comparisons}
+\subsubsection{Kalah Tournament Winner Comparisons}
 
 % oops, forgot to run it with parseres-noties
 
@@ -1188,7 +1188,7 @@ Winner: mcts_h_ege1.0
 %    mcts_s_h_pd3 vs.                             mcts_s_h_pd4:   245   257  1498 (diff   -12, games  2000) 48.80 51.20 +/- 4.37
 % mcts_s_h_ege0.9 vs.                          mcts_s_h_ege1.0:   389   465  1146 (diff   -76, games  2000) 45.55 54.45 +/- 3.34
 
-Table~\ref{tbl:kalah-toptourney} shows the results of the top playout winners.
+Table~\ref{tbl:kalah-toptourney} shows the results of the top Kalah playout winners.
 Each data point in the following table includes 2000 games. As mentioned in the main part of the paper, draws due to unbalanced 
 boards are not counted. 
 
@@ -1272,9 +1272,9 @@ winner mcts_h_ege0.1 (108) vs. loser mcts_h_ege0.15 (92)
 Winner: mcts_h_ege0.1
 \end{verbatim}
 
-\subsubsection{Tournament Winner Comparisons}
+\subsubsection{Breakthrough Tournament Winner Comparisons (using efMS)}
 
-Table~\ref{tbl:bt-efMS-toptourney} shows the results of the top playout winners.
+Table~\ref{tbl:bt-efMS-toptourney} shows the results of the top Breakthrough playout winners using efMS.
 
 \begin{table}[h!]
 \begin{center}
@@ -1289,7 +1289,7 @@ MCTS(ege$0.1$)          & MCTS(fet$4$)           & 768 (76.8)   & 232 (23.2)   &
 \hline
 \end{tabular}
 \end{center}
-\caption{Breakthrough playout comparisons. \label{tbl:bt-efMS-toptourney}}
+\caption{Breakthrough playout comparisons using efMS. \label{tbl:bt-efMS-toptourney}}
 \end{table}
 
 \subsection{Breakthrough Playout Enhancements (using efLH evaluator)}
@@ -1351,7 +1351,7 @@ winner mcts_h_efv1_ege0.3 (110) vs. loser mcts_h_efv1_ege0.7 (90)
 Winner: mcts_h_efv1_ege0.3
 \end{verbatim}
 
-\subsection{Tournament Winner Comparisons}
+\subsection{Breakthrough Tournament Winner Comparisons (using efLH)}
 
 %    mcts_s_h_efv1_pd20 vs.                        mcts_s_h_efv1_pd8:   514   486     0 (diff    28, games  1000) 51.40 48.60 +/- 3.10
 %  mcts_s_h_efv1_ege0.3 vs.                       mcts_s_h_efv1_pd20:   340   660     0 (diff  -320, games  1000) 34.00 66.00 +/- 2.94
@@ -1363,7 +1363,7 @@ Winner: mcts_h_efv1_ege0.3
 % MISSING!
 %{\bf {\color{red} Missing: comparisons with det added.}}
 
-Table~\ref{tbl:bt-efLH-toptourney} shows the results of the top playout winners.
+Table~\ref{tbl:bt-efLH-toptourney} shows the results of the top Breakthrough playout winners using efLH.
 
 \begin{table}[h!]
 \begin{center}
@@ -1381,7 +1381,7 @@ MCTS(ege$0.7$) & MCTS(fet$20$)       & 194 (19.4)   & 806 (80.6)   & 0    \\
 \hline
 \end{tabular}
 \end{center}
-\caption{Breakthrough playout comparisons. \label{tbl:bt-efLH-toptourney}}
+\caption{Breakthrough playout comparisons using efLH. \label{tbl:bt-efLH-toptourney}}
 \end{table}
 
 \end{document} 
