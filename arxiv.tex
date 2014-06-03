@@ -481,11 +481,10 @@ we will refer to each enhancement and setting using different labels. These enha
 the text that follows. But, we also include, for reference, a summary of each in Table~\ref{table:enhancements}.
 
 Experiments are performed in three domains: Kalah, Breakthrough, and Lines of Action. Example images of each 
-game are shown in Appendix A.\footnotemark[1]
+game are shown in Appendix A.
 To tune parameters in Kalah and Breakthrough, hierarchical elimination tournaments are run where each 
 head-to-head match consisted of at least 200 games with seats swapped halfway. 
-Detailed results of these tournaments and comparisons are contained in Appendix B.\footnotemark[1]
-\footnotetext[1]{Appendices are included in~\cite{Lanctot14immcts-arxiv}.}
+Detailed results of these tournaments and comparisons are contained in Appendix B.
 
 \begin{table}[tb]
 {\small
@@ -617,7 +616,7 @@ terminations and $\epsilon$-greedy playouts.
 Our best fixed early terminations player was fet$20$ and best $\epsilon$-greedy player was ege$0.1$.
 Through systematic testing on 1000 games per pairing, we determined that the best playout 
 policy when using efMS is the combination (ege$0.1$,det$0.5$). 
-The detailed test results are found in Appendix B in \cite{Lanctot14immcts-arxiv}.
+The detailed test results are found in Appendix B.
 To ensure that this combination of early termination strategies is indeed superior to just the improved 
 playout policy on its own, we also played MCTS(ipp,ege$0.1$,det$0.5$) against MCTS(ipp). 
 MCTS(ipp,ege$0.1$,det$0.5$) won 68.8\% of these games.
