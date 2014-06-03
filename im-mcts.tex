@@ -623,7 +623,7 @@ MCTS, specifically compared to situations where classic minimax search has histo
 well~\cite{Ramanujan10Understanding,Ramanujan10On}. 
 Attempts have been made to overcome the problem of {\it traps} or {\it optimistic moves}, \ie moves that initially seem 
 promising but then later prove to be bad, such as sufficiency 
-thresholds~\cite{Gudmindsson13Sufficiency} and shallow minimax searches~\cite{Baier13MinimaxHybrids}. 
+thresholds~\cite{Gudmundsson13Sufficiency} and shallow minimax searches~\cite{Baier13MinimaxHybrids}. 
 
 %We show that implicit minimax backups also improve performance in domains with tactical short-term goals. 
 
@@ -635,8 +635,8 @@ $\cT : \cS \times \cA \mapsto \Delta \cS$ is a {\it transition function} mapping
 each state and action to a distribution over successor states. Finally, $\cR : \cS \times \cA \times \cS \mapsto R$ 
 is a {\it reward function} mapping (state, action, successor state) triplets to numerical rewards. 
 
-A two-player perfect information game is an MDP with a specific form.\footnote{Our model is 
-similar to Alternating Markov Games~\cite{Littman96ageneralized}.}
+A two-player perfect information game is an MDP with a specific form.
+%\footnote{Our model is similar to Alternating Markov Games~\cite{Littman96ageneralized}.}
 Denote $\cZ = \{ s \in \cS: \cA(s) = \emptyset \} \subset \cS$ the set of {\it terminal states}. 
 In addition, for all nonterminal states $s' \in \cS - \cZ$, $\cR(s,a,s') = 0$. 
 There is a {\it player identity function} $\tau : \cS - \cZ \mapsto \{1,2\}$. 
@@ -700,8 +700,9 @@ located on lines 2, 8, 13, and 14.
 During selection, $\hQ^{\mathit{IM}}$ from Equation~\ref{eq:imq} replaces $Q$ in 
 Equation~\ref{eq:select-ucb}. During backpropagation, the implicit minimax evaluations $v^{\tau}_s$ are updated based on 
 the children's values. For simplicity, a single $\max$ operator is used here since the evaluations are assumed to be in 
-view of player $\tau(s)$. Depending on how the game is modeled, the implementation may require keeping track of or  
-accounting for signs of rewards. For example a negamax model would include a sign switches at the appropriate places 
+view of player $\tau(s)$. 
+Depending on the implementation, the signs of rewards may depend on $\tau(s)$ and/or $\tau(s')$.
+For example a negamax implementation would include sign inversions at the appropriate places 
 to ensure that the payoffs are in view of the current player at each node.  
 %line~\ref{alg:imeval}. 
 %\footnote{Domain-dependent inversions or scalings may be necessary to convert the rewards. These details are 
@@ -900,7 +901,7 @@ A piece is allowed to move forward to an empty square, either straight or diagon
 capture diagonally like Chess pawns. A player wins by moving a single piece to the furthest opponent row. 
 
 Breakthrough was first introduced in general game-playing competitions and has been identified as a domain 
-that is particularly difficult for MCTS due to traps and uninformed playouts~\cite{Gudmindsson13Sufficiency}. 
+that is particularly difficult for MCTS due to traps and uninformed playouts~\cite{Gudmundsson13Sufficiency}. 
 Our playout policy always chooses a one-ply ``decisive'' wins and prevents immediate ``anti-decisive'' 
 losses~\cite{Teytaud10On}.
 Otherwise, a move is selected non-uniformly at random, where capturing undefended pieces are four times more
@@ -1318,7 +1319,7 @@ Also, at $\alpha = 0.2$, it seems that there is no statistically significant cas
 %Add for camera-ready.
 
 The initial motivation for this work was driven by the trap moves which pose problems in 
-MCTS~\cite{Ramanujan11Tradeoffs,Baier13MinimaxHybrids,Gudmindsson13Sufficiency}. We tried to construct an example board in Breakthrough 
+MCTS~\cite{Ramanujan11Tradeoffs,Baier13MinimaxHybrids,Gudmundsson13Sufficiency}. We tried to construct an example board in Breakthrough 
 to demonstrate how implicit minimax backups deals with problems with traps. We were unable to do so. In our experience, 
 traps are effectively handled by the improved playout policy. Even without early terminations, 
 simply having decisive and anti-decisive moves and preferring good capture moves seems to be enough to handle traps in Breakthrough.
@@ -1335,7 +1336,9 @@ information which
 is not captured in the long-term playouts, but is captured by the implicit minimax procedure. Additionally, we suspect that 
 there must be strategic 
 information in the playouts which is not captured in the shallower minimax backups. Thus, success depends on both the domain and 
-the evaluation function used. Implicit minimax backups did not improve performance in Chinese Checkers or the card game Hearts, 
+the evaluation function used. 
+We also ran experiments for implicit minimax backups in Chinese Checkers and the card game Hearts, 
+and there was no significant improvement in performance,  
 but more work needs to be done to understand if we would find success with a better evaluation function.
 
 \section{Conclusion}
@@ -1350,22 +1353,22 @@ using domain knowledge. Furthermore, the technique improves
 performance in LOA, a more complex domain with sophisticated knowledge and 
 strong MCTS and $\alpha \beta$ players. 
 
-In most cases, $\alpha \in [0.15,0.4]$ seems to be a safe range, and we found generally 
-that the more knowledge that is already included in the MCTS baseline player, the lower
-the optimal $\alpha$ tends to be. In Breakthrough, this range is higher $[0.5,0.6]$ 
+The range $\alpha \in [0.15,0.4]$ seems to be a safe, and we found 
+that the more knowledge already included in the MCTS player, the lower
+the optimal $\alpha$ tends to be. In Breakthrough, this range is higher, $[0.5,0.6]$, 
 when using node priors at lower time settings and when using the alternative baseline. 
 
-For future work, we would like to apply the technique in other games, Amazons in 
-particular. 
-Also, we plan to investigate improving initial evaluations $v_0(s)$ using quiescence search.
-Upper and lower bounds could be maintained for $\alpha\beta$ pruning.
-We hope to compare implicit minimax backups with sufficiency thresholds 
-of Gudmundsson \& Bj\"{o}rnsson~\cite{Gudmindsson13Sufficiency} and to other 
-minimax hybrids, such as those of Baier \& Winands~\cite{Baier13MinimaxHybrids}. 
-%We also plan to investigate decaying strategies for 
-%$\alpha$ and incremental $\alpha \beta$ pruning.
-The technique could also work in general game-playing agents using 
-evaluations learned during search~\cite{Finnsson10Learning}.
+For future work, we would like to apply the technique in other games, such as Amazons, 
+and plan to investigate improving initial evaluations $v_0(s)$ using quiescence search.
+We hope to compare or combine implicit minimax backups to/with other 
+minimax hybrids from ~\cite{Baier13MinimaxHybrids}. 
+Differences between $v^{\tau}_{s,a}$ and $Q(s,a)$ could indicate parts of the tree that require 
+more search and hence help guide selection. 
+Parameters could be modified online. For example, $\alpha$ could be changed based on the outcomes
+of each choice made during the game, and $Q(s,a)$ could be used for online search 
+bootstrapping of evaluation function weights~\cite{Veness09Bootstrapping}.
+Finally, the technique could also work in general game-playing using learned
+evaluations~\cite{Finnsson10Learning}.
 
 {\small
 \noindent {\bf Acknowledgments.} This work is partially funded by the Netherlands 
