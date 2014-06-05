@@ -767,8 +767,8 @@ efLH, that assigns specific piece count values depending on their position on th
 Rather than repeating all of the above experiments, we chose simply to compare baselines and to repeat
 the initial experiment, all using 1 second of search time.
 
-The best playout with this evaluation function is fet$20$ with node priors, which we call the alternative baseline, 
-abbreviated bl'.
+The best playout with this evaluation function is fet$20$ with node priors, which we call the 
+alternative baseline, abbreviated bl'.
 That is, we abbreviate MCTS(ipp,fet$20$,np) to MCTS(bl').
 We reran the initial $\alpha$ experiment using the alternative baseline, 
 which uses the Lorentz \& Horey evaluation function, to find the best implicit minimax player using this 
@@ -781,14 +781,20 @@ In an effort to explain the relative strengths of each evaluation function, we t
 Our baseline MCTS player, MCTS(efMS,bl), wins 40.2\% of games against the alternative baseline, MCTS(efLH,bl'). 
 When we add node priors, MCTS(efMS,bl,np) wins 78.0\% of games against MCTS(efLH,bl'). 
 When we also add implicit minimax backups ($\alpha = 0.4$), the win rate of MCTS(efMS,bl,im$0.4$,np) versus MCTS(efLH,bl') rises again to 84.9\%. 
-Implicit minimax backups improves performance against a stronger benchmark player, even when using a simpler evaluation function. 
+Implicit minimax backups improves performance against a strong benchmark player, even when using a simpler evaluation function. 
 
-We then played the two best players for the respective evaluation functions against each other, 
+We then played the two best players the respective evaluation functions against each other, 
 that is we played MCTS(efMS,bl,np,im$0.4$) against MCTS(efLH,bl',im$0.6$). 
-MCTS(efMS,bl,np,im$0.4$) wins 53.40\% of games. 
-Given this result, we suspect that implicit minimax backups may benefit more easily when 
-combined with defensive and less granular evaluation functions in Breakthrough. We try to 
-further explain this finding in the next subsection. \\
+MCTS(efMS,bl,np,im$0.4$) wins 53.40\% of games.
+Given these results, it could be that a more defensive and less granular evaluation function is preferred 
+in Breakthrough when given only 1 second of search time. 
+The results in our comparison to $\alpha\beta$ in the next subsection seem to suggest this as well.
+
+%This result could indicate that implicit minimax
+%benefits from more defensive and less granular evaluation function in 
+%It is possible that implicit minimax backups may benefit more when 
+%combined with defensive and less granular evaluation functions in Breakthrough. 
+%We try to further explain this finding in the next subsection. \\
 
 \begin{figure}[t]
 \begin{center}
@@ -886,7 +892,7 @@ The results are listed in Table~\ref{tbl:ab_vs_mcts}.
 The first observation from these results is that the performance of MCTS increases versus 
 $\alpha\beta$ as search time increases. This is true in all cases, using either evaluation function, 
 with and without implicit minimax backups. This is similar to previous observations in 
-Lines of Action~\cite{Winands11AB} and multiplayer search~\cite{Sturtevant08icga,Nijssen13}.
+Lines of Action~\cite{Winands11AB} and multiplayer search~\cite{Nijssen13,Sturtevant08icga}.
 
 The second observation is that in every case, MCTS(im$\alpha$) performs significantly better 
 against $\alpha\beta$ than the baseline player at the same search time. 
@@ -1055,7 +1061,7 @@ Organisation for Scientific Research (NWO) in the framework of the project Go4Na
 
 \appendix
 
-\section{Appendix A: Game Images}
+\section{Game Images}
 \label{app:images}
 
 This appendix shows images of each game to help visualize the objectives.
@@ -1093,7 +1099,7 @@ Image source: http://upload.wikimedia.org/wikipedia/commons/1/1b/Lines\_of\_Acti
 \label{fig:loa-image}}
 \end{figure}
 
-\section{Appendix B: Tournaments and Playout Comparisons}
+\section{Tournaments and Playout Comparisons}
 \label{app:results}
 
 This appendix includes details of the results of played games to determine the best baseline players. 
@@ -1215,6 +1221,8 @@ MCTS(ege$1.0$) & MCTS(fet$4$)        &  71 (6.96)   & 949 (93.04)    \\
 \caption{Kalah playout comparisons. \label{tbl:kalah-toptourney}}
 \end{table}
 
+\vspace{10cm}
+
 \subsection{Breakthrough Playout Enhancements (using efMS evaluator)}
 
 \subsubsection{Fixed Early Terminations Tournament}
@@ -1276,9 +1284,55 @@ winner mcts_h_ege0.1 (108) vs. loser mcts_h_ege0.15 (92)
 Winner: mcts_h_ege0.1
 \end{verbatim}
 
+\subsubsection{Dynamic Early Terminations Tournament}
+
+\begin{verbatim}
+round 1
+winner mcts_h_det1.0 (121) vs. loser mcts_h_det0.1 (79)
+winner mcts_h_det0.95 (115) vs. loser mcts_h_det0.15 (85)
+winner mcts_h_det0.9 (120) vs. loser mcts_h_det0.2 (80)
+winner mcts_h_det0.25 (101) vs. loser mcts_h_det0.85 (99)
+winner mcts_h_det0.3 (119) vs. loser mcts_h_det0.8 (81)
+winner mcts_h_det0.35 (117) vs. loser mcts_h_det0.75 (83)
+winner mcts_h_det0.4 (107) vs. loser mcts_h_det0.7 (93)
+winner mcts_h_det0.45 (132) vs. loser mcts_h_det0.65 (68)
+winner mcts_h_det0.5 (106) vs. loser mcts_h_det0.6 (94)
+mcts_h_det0.55 gets a by
+
+round 2
+winner mcts_h_det0.55 (129) vs. loser mcts_h_det1.0 (71)
+winner mcts_h_det0.5 (124) vs. loser mcts_h_det0.95 (76)
+winner mcts_h_det0.45 (115) vs. loser mcts_h_det0.9 (85)
+winner mcts_h_det0.25 (134) vs. loser mcts_h_det0.4 (66)
+winner mcts_h_det0.3 (108) vs. loser mcts_h_det0.35 (92)
+
+round 3
+winner mcts_h_det0.3 (133) vs. loser mcts_h_det0.55 (67)
+winner mcts_h_det0.25 (120) vs. loser mcts_h_det0.5 (80)
+mcts_h_det0.45 gets a by
+
+round 4
+winner mcts_h_det0.3 (135) vs. loser mcts_h_det0.45 (65)
+mcts_h_det0.25 gets a by
+
+round 5
+winner mcts_h_det0.3 (106) vs. loser mcts_h_det0.25 (94)
+
+Winner: mcts_h_det0.3
+\end{verbatim}
+
+
 \subsubsection{Breakthrough Tournament Winner Comparisons (using efMS)}
 
 % MISSING: det comparisons
+%  mcts_s_h_det0.3 vs.                          mcts_s_h_ege0.1:   185   815     0 (diff  -630, games  1000) 18.50 81.50 +/- 2.41
+%  mcts_s_h_det0.3 vs.                            mcts_s_h_pd20:   719   281     0 (diff   438, games  1000) 71.90 28.10 +/- 2.79
+%  mcts_s_h_det0.3 vs.                             mcts_s_h_pd4:   715   285     0 (diff   430, games  1000) 71.50 28.50 +/- 2.80
+
+%  mcts_s_h_ege0.1 vs.                   mcts_s_h_ege0.1_det0.3:   448   552     0 (diff  -104, games  1000) 44.80 55.20 +/- 3.08
+%  mcts_s_h_ege0.1 vs.                   mcts_s_h_ege0.1_det0.5:   252   748     0 (diff  -496, games  1000) 25.20 74.80 +/- 2.69
+%  mcts_s_h_ege0.1 vs.                   mcts_s_h_ege0.1_det0.7:   387   613     0 (diff  -226, games  1000) 38.70 61.30 +/- 3.02
+
 
 Table~\ref{tbl:bt-efMS-toptourney} shows the results of the top Breakthrough playout winners using efMS.
 
@@ -1288,15 +1342,22 @@ Table~\ref{tbl:bt-efMS-toptourney} shows the results of the top Breakthrough pla
 \hline
 Player A & Player B                             & A Wins (\%)  & B Wins (\%)  & Ties \\ 
 \hline
-MCTS(ege$0.1$)          & MCTS(fet$20$)          & 557 (55.7)   & 443 (44.3)   & 0    \\
-MCTS(ege$0.1$)          & MCTS(fet$4$)           & 768 (76.8)   & 232 (23.2)   & 0    \\
-MCTS(ege$0.1$,det$0.5$) & MCTS(ege$0.1$)         & 738 (78.2)   & 262 (26.2)   & 0    \\
-MCTS(ege$0.1$,det$0.5$) & MCTS(fet$20$,det$0.5$) & 633 (63.3)   & 367 (36.7)   & 0    \\
+MCTS(ipp,ege$0.1$)          & MCTS(ipp,fet$20$)          & 557 (55.7)   & 443 (44.3)   & 0    \\
+MCTS(ipp,ege$0.1$)          & MCTS(ipp,fet$4$)           & 768 (76.8)   & 232 (23.2)   & 0    \\
+MCTS(ipp,ege$0.1$)          & MCTS(ipp,det$0.3$)         & 815 (81.5)   & 185 (18.5)   & 0    \\
+MCTS(ipp,det$0.3$)          & MCTS(ipp,fet$20$)          & 719 (71.9)   & 281 (28.1)   & 0    \\
+MCTS(ipp,det$0.3$)          & MCTS(ipp,fet$4$)           & 715 (71.5)   & 285 (28.5)   & 0    \\
+\hline
+MCTS(ipp,ege$0.1$,det$0.3$) & MCTS(ipp,ege$0.1$)         & 552 (55.2)   & 448 (44.8)   & 0    \\
+MCTS(ipp,ege$0.1$,det$0.5$) & MCTS(ipp,ege$0.1$)         & 748 (74.8)   & 252 (25.2)   & 0    \\
+MCTS(ipp,ege$0.1$,det$0.7$) & MCTS(ipp,ege$0.1$)         & 613 (61.3)   & 387 (38.7)   & 0    \\
+MCTS(ipp,ege$0.1$,det$0.5$) & MCTS(ipp,fet$20$,det$0.5$) & 633 (63.3)   & 367 (36.7)   & 0    \\
 \hline
 \end{tabular}
 \end{center}
 \caption{Breakthrough playout comparisons using efMS. \label{tbl:bt-efMS-toptourney}}
 \end{table}
+
 
 \subsection{Breakthrough Playout Enhancements (using efLH evaluator)}
 
@@ -1369,13 +1430,13 @@ Table~\ref{tbl:bt-efLH-toptourney} shows the results of the top Breakthrough pla
 \hline
 Player A & Player B                  & A Wins (\%)  & B Wins (\%)  & Ties \\ 
 \hline
-MCTS(fet$8$)   & MCTS(fet$20$)       & 514 (51.4)   & 486 (48.6)   & 0    \\
-MCTS(ege$0.3$) & MCTS(fet$0.7$)      & 510 (51.0)   & 490 (49.0)   & 0    \\
+MCTS(ipp,fet$8$)   & MCTS(ipp,fet$20$)       & 514 (51.4)   & 486 (48.6)   & 0    \\
+MCTS(ipp,ege$0.3$) & MCTS(ipp,fet$0.7$)      & 510 (51.0)   & 490 (49.0)   & 0    \\
 \hline
-MCTS(ege$0.3$) & MCTS(fet$8$)        & 354 (35.4)   & 646 (64.6)   & 0    \\
-MCTS(ege$0.3$) & MCTS(fet$20$)       & 340 (34.0)   & 660 (66.0)   & 0    \\
-MCTS(ege$0.7$) & MCTS(fet$8$)        & 255 (25.5)   & 745 (74.5)   & 0    \\
-MCTS(ege$0.7$) & MCTS(fet$20$)       & 194 (19.4)   & 806 (80.6)   & 0    \\
+MCTS(ipp,ege$0.3$) & MCTS(ipp,fet$8$)        & 354 (35.4)   & 646 (64.6)   & 0    \\
+MCTS(ipp,ege$0.3$) & MCTS(ipp,fet$20$)       & 340 (34.0)   & 660 (66.0)   & 0    \\
+MCTS(ipp,ege$0.7$) & MCTS(ipp,fet$8$)        & 255 (25.5)   & 745 (74.5)   & 0    \\
+MCTS(ipp,ege$0.7$) & MCTS(ipp,fet$20$)       & 194 (19.4)   & 806 (80.6)   & 0    \\
 \hline
 \end{tabular}
 \end{center}

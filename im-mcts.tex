@@ -1118,9 +1118,9 @@ Implicit minimax backups improves performance against a stronger benchmark playe
 We then played the two best players for the respective evaluation functions against each other, 
 that is we played MCTS(efMS,bl,np,im$0.4$) against MCTS(efLH,bl',im$0.6$). 
 MCTS(efMS,bl,np,im$0.4$) wins 53.40\% of games. 
-Given this result, we suspect that implicit minimax backups may benefit more easily when 
-combined with defensive and less granular evaluation functions in Breakthrough. We try to 
-further explain this finding in the next subsection.
+Given these results, it could be that a more defensive and less granular evaluation function is preferred 
+in Breakthrough when given only 1 second of search time. 
+The results in our comparison to $\alpha\beta$ in the next subsection seem to suggest this as well.
 
 \begin{figure}[t]
 \begin{center}
@@ -1218,7 +1218,7 @@ The results are listed in Table~\ref{tbl:ab_vs_mcts}.
 The first observation from these results is that the performance of MCTS increases versus 
 $\alpha\beta$ as search time increases. This is true in all cases, using either evaluation function, 
 with and without implicit minimax backups. This is similar to previous observations in 
-Lines of Action~\cite{Winands11AB} and multiplayer search~\cite{Sturtevant08icga,Nijssen13}.
+Lines of Action~\cite{Winands11AB} and multiplayer search~\cite{Nijssen13,Sturtevant08icga}.
 
 The second observation is that in every case, MCTS(im$\alpha$) performs significantly better 
 against $\alpha\beta$ than the baseline player at the same search time. 
