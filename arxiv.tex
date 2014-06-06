@@ -425,10 +425,19 @@ the algorithm, as was done in our experiments in Lines of Action.
   \caption{MCTS with implicit minimax backups. \label{alg}}
 \end{algorithm2e}
 
-In essence, MCTS with implicit minimax backups acts like a heuristic approximation of MCTS-Solver for the portion of the
+In essence, this defines a new {\it information scheme} where each node is augmented with 
+heuristic estimates which are backed-up differently than the Monte Carlo statistics.
+When MCTS-Solver is enabled, proven values take precedence in the selection policy 
+and the resulting scheme is informative and consistent~\cite{Saffidine13PhdThesis}, so 
+Algorithm \ref{alg} converges to the optimal choice eventually. However, before a node 
+becomes a proven win or loss, 
+the implicit minimax values act like an heuristic approximation of MCTS-Solver for the portion of the
 search tree that has not reached terminal states. 
-Unlike MCTS-Solver and minimax hybrids, modifications are based on heuristic evaluations rather than 
-proven wins and losses.
+
+%In essence, MCTS with implicit minimax backups acts like a heuristic approximation of MCTS-Solver for the portion of the
+%search tree that has not reached terminal states. 
+%Unlike MCTS-Solver and minimax hybrids, modifications are based on heuristic evaluations rather than 
+%proven wins and losses.
 %which might help the search in the opening and mid-games. 
 
 %While a badly chosen-evaluation function can still converge to the optimal value eventually with a minimax-consistent
@@ -570,7 +579,7 @@ capture diagonally like Chess pawns. A player wins by moving a single piece to t
 
 Breakthrough was first introduced in general game-playing competitions and has been identified as a domain 
 that is particularly difficult for MCTS due to traps and uninformed playouts~\cite{Gudmundsson13Sufficiency}. 
-Our playout policy always chooses a one-ply ``decisive'' wins and prevents immediate ``anti-decisive'' 
+Our playout policy always chooses one-ply ``decisive'' wins and prevents immediate ``anti-decisive'' 
 losses~\cite{Teytaud10On}.
 Otherwise, a move is selected non-uniformly at random, where capturing undefended pieces are four times more
 likely than other moves. 
