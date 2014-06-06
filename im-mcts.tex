@@ -614,7 +614,7 @@ The prime example is MCTS-Solver~\cite{Winands08Solver}, which backpropagates pr
 extra information in MCTS. When a node is proven to be a 
 win or a loss, it no longer needs to be searched. This domain-independent modification greatly enhances 
 MCTS with negligible overhead. Score-bounded MCTS extends this idea to games with multiple 
-outcomes, leading to $\alpha \beta$-style pruning in the tree~\cite{Cazenave10Score}. Finally, one can use shallow-depth
+outcomes, leading to $\alpha \beta$-style pruning in the tree~\cite{Cazenave10Score}. One can use shallow-depth
 minimax searches in the tree to initialize nodes during expansion, enhance the playout, or to help MCTS-Solver 
 in backpropagation~\cite{Baier13MinimaxHybrids}.
 
@@ -662,7 +662,7 @@ By popular convention, we define $r_{s,a} = r_{s'}$ where $s' = \cT(s,a)$, and s
 Also, we use $r^{\tau}_s$ to denote the reward at state $s$ {\it with respect to player} $\tau(s)$. 
 
 Let $\hQ(s,a)$ be an estimator for the value of state-action pair $(s,a)$, where $s \in \cA(s)$. 
-For example, one popular estimator is the observed mean over all simulations 
+One popular estimator is the observed mean 
 $Q(s,a) = r^{\tau}_{s,a} / n_{s,a}$. 
 The most widely-used selection policy is based on a bandit algorithm called Upper Confidence Bounds 
 (UCB)~\cite{Auer02Finite}, used in adaptive multistage sampling~\cite{Chang2005AMS} and in 
@@ -756,10 +756,17 @@ the algorithm, as was done in our experiments in Lines of Action.
   \caption{MCTS with implicit minimax backups. \label{alg}}
 \end{algorithm2e}
 
-In essence, MCTS with implicit minimax backups acts like a heuristic approximation of MCTS-Solver for the portion of the
+In essence, this defines a new {\it information scheme} where each node is augmented with 
+heuristic estimates which are backed-up differently than the Monte Carlo statistics.
+When MCTS-Solver is enabled, proven values take precedence in the selection policy 
+and the resulting scheme is informative and consistent~\cite{Saffidine13PhdThesis}, so 
+Algorithm \ref{alg} converges to the optimal choice eventually. However, before a node 
+becomes a proven win or loss, 
+the implicit minimax values act like an heuristic approximation of MCTS-Solver for the portion of the
 search tree that has not reached terminal states. 
-Unlike MCTS-Solver and minimax hybrids, modifications are based on heuristic evaluations rather than 
-proven wins and losses.
+
+%Unlike MCTS-Solver and minimax hybrids, modifications are based on heuristic evaluations rather than 
+%proven wins and losses.
 %which might help the search in the opening and mid-games. 
 
 %While a badly chosen-evaluation function can still converge to the optimal value eventually with a minimax-consistent
@@ -883,7 +890,6 @@ wins both games, the game is discarded.
 The default playout policy chooses a move uniformly at random. 
 We determined which playout enhancement led to the best player. 
 Tournament results revealed that a fet$4$ early termination worked best. 
-
 The evaluation function was the same one used in \cite{Ramanujan11Tradeoffs}, the difference between stones
 in each player's stores. Results with one 
 second of search time are shown in Figure~\ref{fig:kalah-alpha}. 
@@ -1215,12 +1221,12 @@ policies: decisive and anti-decisive moves are first, then captures of defensele
 then all other captures, and finally regular moves.
 The results are listed in Table~\ref{tbl:ab_vs_mcts}.
 
-The first observation from these results is that the performance of MCTS increases versus 
-$\alpha\beta$ as search time increases. This is true in all cases, using either evaluation function, 
-with and without implicit minimax backups. This is similar to previous observations in 
-Lines of Action~\cite{Winands11AB} and multiplayer search~\cite{Nijssen13,Sturtevant08icga}.
+The first observation is that the performance of MCTS (vs. $\alpha\beta$) 
+increases as search time increases. This is true in all cases, using either evaluation function, 
+with and without implicit minimax backups. This is similar to observations in 
+Lines of Action~\cite{Winands11AB} and multiplayer MCTS~\cite{Nijssen13,Sturtevant08icga}.
 
-The second observation is that in every case, MCTS(im$\alpha$) performs significantly better 
+The second observation is that MCTS(im$\alpha$) performs significantly better 
 against $\alpha\beta$ than the baseline player at the same search time. 
 Using efMS in Breakthrough with 5 seconds of search time, MCTS(im$0.4$) performs significantly 
 better than both the baseline MCTS player and $\alpha\beta$ search on their own. 
