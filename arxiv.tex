@@ -223,7 +223,7 @@ where classic minimax search has traditionally been preferred.
 The most popular MCTS algorithm is UCT~\cite{Kocsis06Bandit}, 
 which performs a single simulation from the root of the search tree to a terminal state at each iteration. 
 During the iterative process, a game tree is incrementally built by adding a 
-new leaf node to the tree on each iteration, whose nodes maintain statistical estimates of average payoffs. 
+new leaf node to the tree on each iteration, whose nodes maintain statistical estimates such as average payoffs. 
 With each new simulation, these estimates improve and help to guide future simulations. 
 
 %The nodes in the tree are used to store statistical information regarding wins and losses, and backpropagation
@@ -634,7 +634,7 @@ parameter-tuning tournaments, for all the playout enhancements we have tried usi
 thousands of played games. Hence, we use it as our primary benchmark for comparison in the 
 rest of our experiments with efMS. 
 For convenience, we abbreviate this baseline player (MCTS(ege$0.1$,det$0.5$)) to MCTS(bl). 
-%(ipp,ege$0.1$,det$0.5$) is used as the playout policy for every MCTS player unless otherwise stated.
+%(ege$0.1$,det$0.5$) is used as the playout policy for every MCTS player unless otherwise stated.
 %As a final summary, this baseline player:
 %\begin{enumerate}
 %\item Uses ege$0.1$, an $\epsilon$-greedy playout policy with $\epsilon = 0.1$.
@@ -894,7 +894,7 @@ The results are listed in Table~\ref{tbl:ab_vs_mcts}.
 The first observation is that the performance of MCTS (vs. $\alpha\beta$) 
 increases as search time increases. This is true in all cases, using either evaluation function, 
 with and without implicit minimax backups. This is similar to observations in 
-Lines of Action~\cite{Winands11AB} and multiplayer MCTS~\cite{Nijssen13,Sturtevant08An}.
+Lines of Action~\cite{Winands11AB} and multiplayer MCTS~\cite{Sturtevant08An,Nijssen13}.
 
 The second observation is that MCTS(im$\alpha$) performs significantly better 
 against $\alpha\beta$ than the baseline player at the same search time. 
@@ -906,7 +906,7 @@ heuristic information, more so than $\alpha\beta$.
 When using efMS, MCTS takes less long to do better against $\alpha\beta$, 
 possibly because MCTS makes better use of weaker information. 
 When using efLH, $\alpha\beta$ preforms significantly better against MCTS at low time settings.  
-However, it unclear whether this due to $\alpha\beta$ improving or MCTS worsening 
+However, it unclear whether this due to $\alpha\beta$ improving or MCTS worsening.
 %(indeed, 
 %in the previous subsection we showed that the best implicit minimax player is the one that uses 
 %the simpler evaluation function.) 
@@ -976,8 +976,8 @@ Here, $n$ represents the number of games played and $t$ time in seconds per sear
 
 We repeat the implicit minimax backups experiment with varying $\alpha$. At first, we use standard UCT without enhancements 
 and a simple playout that is selects moves non-uniformly at random based on the move categories, and uses the early cut-off strategy. 
-Then, we enable shallow $\alpha \beta$ searches in the playouts described in~\cite{Winands11AB}. 
-Finally, we enable the progressive bias based on move categories. The results for these 
+Then, we enable shallow $\alpha\beta$ searches in the playouts described in~\cite{Winands11AB}. 
+Finally, we enable the progressive bias based on move categories in addition to the $\alpha\beta$ playouts. The results for these 
 three different settings are shown in Figure~\ref{fig:loa-alpha}. As before, we notice that in the first two situations,
 implicit minimax backups with $\alpha \in [0.1,0.5]$ can lead to better performance. When the progressive bias based on move 
 categories is added, the advantage diminishes. However, we do notice that $\alpha \in [0.05,0.3]$ seems to not significantly 
@@ -1027,7 +1027,7 @@ but more work has to be performed to understand if we would find success with a 
 We have introduced a new technique called implicit minimax backups for MCTS. 
 This technique stores the information from both sources separately, only combining the
 two sources to guide selection. Implicit minimax can lead to stronger play even with
-simple evaluation functions, which is often readily available. 
+simple evaluation functions, which are often readily available. 
 In Breakthrough, our evaluation shows that implicit minimax backups increases 
 the strength of MCTS significantly compared to similar techniques for improving MCTS
 using domain knowledge. Furthermore, the technique improves 
@@ -1050,7 +1050,7 @@ Parameters could be modified online. For example, $\alpha$ could be changed base
 of each choice made during the game, and $Q(s,a)$ could be used for online search 
 bootstrapping of evaluation function weights~\cite{Veness09Bootstrapping}.
 Finally, the technique could also work in general game-playing using learned
-evaluation functions~\cite{Finnsson10Learning}.
+evaluation functions~\cite{Finnsson10Learning}. \\
 
 {\small
 \noindent {\bf Acknowledgments.} This work is partially funded by the Netherlands 
@@ -1350,16 +1350,16 @@ Table~\ref{tbl:bt-efMS-toptourney} shows the results of the top Breakthrough pla
 \hline
 Player A & Player B                             & A Wins (\%)  & B Wins (\%)  & Ties \\ 
 \hline
-MCTS(ipp,ege$0.1$)          & MCTS(ipp,fet$20$)          & 557 (55.7)   & 443 (44.3)   & 0    \\
-MCTS(ipp,ege$0.1$)          & MCTS(ipp,fet$4$)           & 768 (76.8)   & 232 (23.2)   & 0    \\
-MCTS(ipp,ege$0.1$)          & MCTS(ipp,det$0.3$)         & 815 (81.5)   & 185 (18.5)   & 0    \\
+MCTS(ege$0.1$)              & MCTS(ipp,fet$20$)          & 557 (55.7)   & 443 (44.3)   & 0    \\
+MCTS(ege$0.1$)              & MCTS(ipp,fet$4$)           & 768 (76.8)   & 232 (23.2)   & 0    \\
+MCTS(ege$0.1$)              & MCTS(ipp,det$0.3$)         & 815 (81.5)   & 185 (18.5)   & 0    \\
 MCTS(ipp,det$0.3$)          & MCTS(ipp,fet$20$)          & 719 (71.9)   & 281 (28.1)   & 0    \\
 MCTS(ipp,det$0.3$)          & MCTS(ipp,fet$4$)           & 715 (71.5)   & 285 (28.5)   & 0    \\
 \hline
-MCTS(ipp,ege$0.1$,det$0.3$) & MCTS(ipp,ege$0.1$)         & 552 (55.2)   & 448 (44.8)   & 0    \\
-MCTS(ipp,ege$0.1$,det$0.5$) & MCTS(ipp,ege$0.1$)         & 748 (74.8)   & 252 (25.2)   & 0    \\
-MCTS(ipp,ege$0.1$,det$0.7$) & MCTS(ipp,ege$0.1$)         & 613 (61.3)   & 387 (38.7)   & 0    \\
-MCTS(ipp,ege$0.1$,det$0.5$) & MCTS(ipp,fet$20$,det$0.5$) & 633 (63.3)   & 367 (36.7)   & 0    \\
+MCTS(ege$0.1$,det$0.3$) & MCTS(ege$0.1$)         & 552 (55.2)   & 448 (44.8)   & 0    \\
+MCTS(ege$0.1$,det$0.5$) & MCTS(ege$0.1$)         & 748 (74.8)   & 252 (25.2)   & 0    \\
+MCTS(ege$0.1$,det$0.7$) & MCTS(ege$0.1$)         & 613 (61.3)   & 387 (38.7)   & 0    \\
+MCTS(ege$0.1$,det$0.5$) & MCTS(ipp,fet$20$,det$0.5$) & 633 (63.3)   & 367 (36.7)   & 0    \\
 \hline
 \end{tabular}
 \end{center}
@@ -1439,12 +1439,12 @@ Table~\ref{tbl:bt-efLH-toptourney} shows the results of the top Breakthrough pla
 Player A & Player B                  & A Wins (\%)  & B Wins (\%)  & Ties \\ 
 \hline
 MCTS(ipp,fet$8$)   & MCTS(ipp,fet$20$)       & 514 (51.4)   & 486 (48.6)   & 0    \\
-MCTS(ipp,ege$0.3$) & MCTS(ipp,fet$0.7$)      & 510 (51.0)   & 490 (49.0)   & 0    \\
+MCTS(ege$0.3$)     & MCTS(ipp,fet$0.7$)      & 510 (51.0)   & 490 (49.0)   & 0    \\
 \hline
-MCTS(ipp,ege$0.3$) & MCTS(ipp,fet$8$)        & 354 (35.4)   & 646 (64.6)   & 0    \\
-MCTS(ipp,ege$0.3$) & MCTS(ipp,fet$20$)       & 340 (34.0)   & 660 (66.0)   & 0    \\
-MCTS(ipp,ege$0.7$) & MCTS(ipp,fet$8$)        & 255 (25.5)   & 745 (74.5)   & 0    \\
-MCTS(ipp,ege$0.7$) & MCTS(ipp,fet$20$)       & 194 (19.4)   & 806 (80.6)   & 0    \\
+MCTS(ege$0.3$) & MCTS(ipp,fet$8$)        & 354 (35.4)   & 646 (64.6)   & 0    \\
+MCTS(ege$0.3$) & MCTS(ipp,fet$20$)       & 340 (34.0)   & 660 (66.0)   & 0    \\
+MCTS(ege$0.7$) & MCTS(ipp,fet$8$)        & 255 (25.5)   & 745 (74.5)   & 0    \\
+MCTS(ege$0.7$) & MCTS(ipp,fet$20$)       & 194 (19.4)   & 806 (80.6)   & 0    \\
 \hline
 \end{tabular}
 \end{center}
